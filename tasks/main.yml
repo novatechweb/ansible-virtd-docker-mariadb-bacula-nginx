@@ -1,0 +1,10 @@
+---
+- name: Install/setup Bacula Director
+  yum: name={{ item }} state=present
+  with_items:
+    - bacula-director
+- name: Copy Bacula Director Config
+  copy: src=bacula-dir.conf dest={{ bacula_director_config_dir }}/bacula-dir.conf
+          owner=bacula group=bacula mode=0640 backup=yes
+- name: Enable and start bacula director
+  service: name=bacula-dir enabled=yes state=started

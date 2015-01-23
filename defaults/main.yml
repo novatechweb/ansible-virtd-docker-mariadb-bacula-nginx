@@ -1,0 +1,13 @@
+---
+bacula_storage_config_dir: "/etc/bacula"
+bacula_storage_name: "server-sd"
+bacula_storage_port: 9103
+bacula_storage_working_dir: "/var/lib/bacula"
+bacula_storage_pid_dir: "/var/run/bacula"
+bacula_storage_concurrent_jobs: 20
+bacula_director_name: "server-dir"
+bacula_director_password: ""
+bacula_monitor_name: "server-mon"
+bacula_monitor_password: ""
+bacula_storage_device_type: Tape
+bacula_storage_device_archive_device: "/dev/nst0"

@@ -6,5 +6,7 @@
 - name: Configure Bacula Storage
   template: src=bacula-sd.conf.j2 dest={{ bacula_storage_config_dir }}/bacula-sd.conf
           owner=bacula group=bacula mode=0640 backup=yes
+- name: Test Bacula Storage configuration
+  command: /usr/sbin/bacula-sd -t -c {{ bacula_storage_config_dir }}/bacula-sd.conf
 - name: Enable and start Bacula Storage
   service: name=bacula-sd enabled=yes state=started

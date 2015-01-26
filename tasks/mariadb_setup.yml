@@ -1,0 +1,11 @@
+---
+- name: Create bacula mysql user and set password
+  shell: mysql -u root -e "UPDATE mysql.user SET password=PASSWORD(\"centos\") WHERE user='bacula';"
+- name: Flush mysql privileges
+  shell: mysql -u root -e "FLUSH PRIVILEGES;"
+- name: Grant mysql privileges
+  shell: /usr/libexec/bacula/grant_mysql_privileges -u root
+- name: Create mysql database
+  shell: /usr/libexec/bacula/create_mysql_database -u root
+- name: Make mysql tables
+  shell: /usr/libexec/bacula/make_mysql_tables -u root

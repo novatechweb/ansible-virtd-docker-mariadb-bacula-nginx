@@ -2,8 +2,8 @@
 bacula_client_config_dir: "/etc/bacula"
 bacula_client_name: "server-fd"
 bacula_client_port: 9102
-bacula_client_working_dir: "/var/lib/bacula"
-bacula_client_pid_dir: "/var/run/bacula"
+bacula_client_working_dir: "/var/spool/bacula"
+bacula_client_pid_dir: "/var/run"
 bacula_client_concurrent_jobs: 20
 bacula_director_name: "server-dir"
 bacula_director_password: ""

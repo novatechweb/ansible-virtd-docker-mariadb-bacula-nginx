@@ -1,0 +1,12 @@
+[submodule "roles/mariadb"]
+	path = roles/mariadb
+	url = https://github.com/jorti/ansible-mariadb.git
+[submodule "roles/bacula-director"]
+	path = roles/bacula-director
+	url = https://github.com/gmccollister/ansible-bacula-director.git
+[submodule "roles/bacula-storage"]
+	path = roles/bacula-storage
+	url = https://github.com/gmccollister/ansible-bacula-storage.git
+[submodule "roles/bacula-client"]
+	path = roles/bacula-client
+	url = https://github.com/gmccollister/ansible-bacula-client.git

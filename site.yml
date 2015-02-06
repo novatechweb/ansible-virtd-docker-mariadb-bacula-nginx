@@ -1,0 +1,13 @@
+---
+# This playbook deploys the whole application stack in this site.
+
+- name: install/setup everything
+  hosts: all
+  user: ansibleremote
+  sudo: true
+
+  roles:
+    - { role: mariadb, mariadb_open_firewall: true, mariadb_remote_root_access: false }
+    - { role: bacula-director }
+    - { role: bacula-storage }
+    - { role: bacula-client }

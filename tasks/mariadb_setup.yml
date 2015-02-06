@@ -1,6 +1,6 @@
 ---
 - name: Create bacula mysql user and set password
-  shell: mysql -u root -e "UPDATE mysql.user SET password=PASSWORD(\"centos\") WHERE user='bacula';"
+  shell: mysql -u root -e "UPDATE mysql.user SET password=PASSWORD(\"{{ mariadb_bacula_password }}\") WHERE user='bacula';"
 - name: Flush mysql privileges
   shell: mysql -u root -e "FLUSH PRIVILEGES;"
 - name: Grant mysql privileges

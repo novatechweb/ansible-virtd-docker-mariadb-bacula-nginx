@@ -10,3 +10,6 @@
 [submodule "roles/bacula-client"]
 	path = roles/bacula-client
 	url = https://github.com/gmccollister/ansible-bacula-client.git
+[submodule "roles/bacula-console"]
+	path = roles/bacula-console
+	url = https://github.com/gmccollister/ansible-bacula-console.git

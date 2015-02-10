@@ -11,3 +11,4 @@
     - { role: bacula-director }
     - { role: bacula-storage }
     - { role: bacula-client }
+    - { role: bacula-console }

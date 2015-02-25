@@ -3,8 +3,8 @@
   yum: name={{ item }} state=present
   with_items:
     - bacula-director
-- name: Copy Bacula Director Config
-  copy: src=bacula-dir.conf dest={{ bacula_director_config_dir }}/bacula-dir.conf
+- name: Configure Bacula Director
+  template: src=bacula-dir.conf.j2 dest={{ bacula_director_config_dir }}/bacula-dir.conf
           owner=bacula group=bacula mode=0640 backup=yes
 - name: Use libbaccats-mysql
   command: alternatives --set libbaccats.so /usr/lib64/libbaccats-mysql.so

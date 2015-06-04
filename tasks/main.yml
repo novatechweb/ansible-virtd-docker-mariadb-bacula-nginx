@@ -11,6 +11,8 @@
   register: baculatape_pp
 - include: selinux-tape-policy.yml
   when: baculatape_pp.stat.exists is defined and baculatape_pp.stat.exists == false
+- name: Make sure bacula user is in the tape group
+  user: name=bacula groups=tape
 - name: Test Bacula Storage configuration
   command: /usr/sbin/bacula-sd -t -c {{ bacula_storage_config_dir }}/bacula-sd.conf
 - name: Enable and start Bacula Storage

@@ -13,3 +13,7 @@
 [submodule "roles/bacula-console"]
 	path = roles/bacula-console
 	url = https://github.com/gmccollister/ansible-bacula-console.git
+[submodule "roles/libvirt-lvmpool"]
+	path = roles/libvirt-lvmpool
+	url = https://github.com/gmccollister/ansible-libvirt-lvmpool.git
+	branch = master

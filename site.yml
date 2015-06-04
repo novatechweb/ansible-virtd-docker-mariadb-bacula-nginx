@@ -12,3 +12,4 @@
     - { role: bacula-storage }
     - { role: bacula-client }
     - { role: bacula-console }
+    - { role: libvirt-lvmpool }

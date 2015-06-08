@@ -1,0 +1,11 @@
+---
+- name: Check for volume
+  command: /usr/bin/virsh vol-info --pool {{ vm_pool }} {{ vm_vol }}
+  register: volinfo
+  ignore_errors: True
+- name: Create volume
+  command: /usr/bin/virsh vol-create-as --pool {{ vm_pool }} --name {{ vm_vol }} --capacity {{ vm_capacity }}
+  when: volinfo.stdout.find('Capacity') == -1
+- name: Upload image to volume
+  command: /usr/bin/virsh vol-upload --pool {{ vm_pool }} --vol {{ vm_vol }} --file {{ vm_image }}
+  when: vm_image is defined and volinfo.stdout.find('Capacity') == -1

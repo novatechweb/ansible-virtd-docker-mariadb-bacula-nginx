@@ -1,0 +1,14 @@
+---
+- name: Check for domain
+  virt: name={{ vm_name }}
+        command=status
+  register: domstatus
+  ignore_errors: True
+- name: Get domain XML contents
+  command: /usr/bin/cat {{ vm_xml }}
+  register: domxml
+- name: Define domain
+  virt: name={{ vm_name }}
+        command=define
+        xml="{{ domxml.stdout }}"
+  when: domstatus.msg is defined and domstatus.msg.find('not found') != -1

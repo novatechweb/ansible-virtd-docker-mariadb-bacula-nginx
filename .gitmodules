@@ -17,3 +17,7 @@
 	path = roles/libvirt-lvmpool
 	url = https://github.com/gmccollister/ansible-libvirt-lvmpool.git
 	branch = master
+[submodule "roles/libvirt-vm"]
+	path = roles/libvirt-vm
+	url = https://github.com/gmccollister/ansible-libvirt-vm.git
+	branch = master

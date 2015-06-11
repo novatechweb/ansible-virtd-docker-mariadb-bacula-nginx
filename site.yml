@@ -5,12 +5,23 @@
   hosts: all
   user: ansibleremote
   sudo: true
+  vars:
+    bacula_storage: TapeDrive
+    bacula_fileset: 'Full Set'
+    bacula_dest: /tmp/bacula-restores
 
   roles:
     - { role: mariadb, mariadb_open_firewall: true, mariadb_remote_root_access: false }
-    - { role: bacula-director }
+    - { role: bacula-director, bacula_director_backup_vms: 'freeipa-centos7' }
     - { role: bacula-storage }
     - { role: bacula-client }
     - { role: bacula-console }
     - { role: bacula-catalog }
     - { role: libvirt-lvmpool }
+    - { role: libvirt-vm,
+                vm_name: freeipa-centos7,
+                vm_pool: virtstorage,
+                vm_vol: freeipa-centos7-vol,
+                vm_capacity: 40000M,
+                vm_image: freeipa-centos7_vda.img,
+                vm_start: True }

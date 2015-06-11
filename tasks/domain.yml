@@ -5,7 +5,7 @@
   register: domstatus
   ignore_errors: True
 - name: Get domain XML contents
-  command: /usr/bin/cat {{ vm_xml }}
+  command: /usr/bin/cat {{ bacula_dest }}/var/lib/libvirt/backup/{{ vm_name }}/{{ vm_name }}.xml
   register: domxml
 - name: Define domain
   virt: name={{ vm_name }}

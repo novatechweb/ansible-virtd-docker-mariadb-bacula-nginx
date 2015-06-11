@@ -2,7 +2,6 @@
 - assert: { that: vm_name is defined }
 - include: volume.yml
 - include: domain.yml
-  when: vm_xml is defined
 - name: Start domain
   virt: name={{ vm_name }} state=running
   when: vm_start is defined and vm_start == True

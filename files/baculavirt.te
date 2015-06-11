@@ -1,0 +1,31 @@
+module baculavirt 1.0;
+
+require {
+        type virt_var_lib_t;
+        type insmod_exec_t;
+        type lvm_exec_t;
+        type virtd_t;
+        type svirt_image_t;
+        type proc_net_t;
+        type virt_var_run_t;
+        type bacula_t;
+        class process setsched;
+        class unix_stream_socket connectto;
+        class file { write execute read create unlink open getattr execute_no_trans };
+        class sock_file write;
+        class blk_file { read open };
+        class dir { write remove_name create add_name rmdir };
+}
+
+#============= bacula_t ==============
+allow bacula_t insmod_exec_t:file { execute execute_no_trans };
+allow bacula_t lvm_exec_t:file { execute execute_no_trans };
+allow bacula_t proc_net_t:file { read getattr open };
+allow bacula_t self:process setsched;
+allow bacula_t svirt_image_t:blk_file { read open };
+allow bacula_t virt_var_lib_t:dir { write remove_name create add_name rmdir };
+allow bacula_t virt_var_lib_t:file { write create unlink };
+allow bacula_t virt_var_run_t:sock_file write;
+
+#!!!! This avc can be allowed using the boolean 'daemons_enable_cluster_mode'
+allow bacula_t virtd_t:unix_stream_socket connectto;

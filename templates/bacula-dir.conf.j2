@@ -44,6 +44,10 @@ JobDefs {
 Job {
   Name = "BackupClient1"
   JobDefs = "DefaultJob"
+  {% if bacula_director_backup_vms is defined %}
+  RunBeforeJob = "/usr/bin/virt-backup --action dump --vm={{ bacula_director_backup_vms }}"
+  RunAfterJob  = "/usr/bin/virt-backup --action cleanup --vm={{ bacula_director_backup_vms }}"
+  {% endif %}
 }
 
 #Job {
@@ -107,7 +111,9 @@ FileSet {
 #    disk storage during initial testing.
 #
     File = /usr/sbin
+    {% if bacula_director_backup_vms is defined %}
     File = /var/lib/libvirt/backup
+    {% endif %}
   }
 
 #

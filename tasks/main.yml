@@ -6,8 +6,24 @@
 - name: Configure Bacula Director
   template: src=bacula-dir.conf.j2 dest={{ bacula_director_config_dir }}/bacula-dir.conf
           owner=bacula group=bacula mode=0640 backup=yes
+  register: bacula_director_config_status
 - name: Use libbaccats-mysql
   command: alternatives --set libbaccats.so /usr/lib64/libbaccats-mysql.so
+- name: Make sure bacula user is in the tape group
+  user: name=bacula groups=qemu append=yes
+  when: bacula_director_backup_vms is defined
+- name: libvirt polkit
+  copy: src=50-bacula-libvirt-access.pkla
+        dest=/etc/polkit-1/localauthority/50-local.d/50-bacula-libvirt-access.pkla
+  when: bacula_director_backup_vms is defined
+- name: Check if baculavirt selinux module exists
+  stat: path=/etc/selinux/targeted/modules/active/modules/baculavirt.pp
+  register: baculavirt_pp
+  when: bacula_director_backup_vms is defined
+- include: selinux-virt-policy.yml
+  when: bacula_director_backup_vms is defined and
+        baculavirt_pp.stat.exists is defined and
+        baculavirt_pp.stat.exists == false
 - name: Check if bacula mysql database exists
   command: mysql -u root -e "SHOW DATABASES;"
   register: databases
@@ -15,5 +31,9 @@
   when: databases.stdout.find('bacula') == -1
 - name: Test Bacula Director configuration
   command: /usr/sbin/bacula-dir -t -c {{ bacula_director_config_dir }}/bacula-dir.conf
+- name: Enable and restart Bacula Director
+  service: name=bacula-dir enabled=yes state=restarted
+  when: bacula_director_config_status.changed
 - name: Enable and start Bacula Director
   service: name=bacula-dir enabled=yes state=started
+  when: not bacula_director_config_status.changed

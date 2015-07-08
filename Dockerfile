@@ -3,7 +3,7 @@
 #
 # Version 0.1
 
-FROM debian
+FROM debian:8
 MAINTAINER Joseph Lutz <Joseph.Lutz@novatechweb.com>
 
 VOLUME ["/home/git/data"]

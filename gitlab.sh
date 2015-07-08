@@ -12,7 +12,7 @@ case ${1} in
     backup)
         sudo docker inspect "${datavolume_name}" &> /dev/null || \
             docker stop "${GITLAB_CONTAINER_NAME}"
-        sudo cp ./$(get_docker_dir ${GITLAB_DV_IMAGE_NAME})/backup_script.sh ${HOST_GITLAB_BACKUP_DIR}/
+        sudo cp ${GITLAB_BACKUP_SCRIPT_DIR}/backup_script.sh ${HOST_GITLAB_BACKUP_DIR}/
         sudo docker run --name=gitlab_UTILITY --rm -t \
             --volumes-from "${GITLAB_DV_NAME}" \
             --link ${GITLAB_DB_CONTAINER_NAME}:gitlab-db \
@@ -44,7 +44,7 @@ case ${1} in
         }
         sudo docker inspect "${datavolume_name}" &> /dev/null || \
             docker stop "${GITLAB_CONTAINER_NAME}"
-        sudo cp ./$(get_docker_dir ${GITLAB_DV_IMAGE_NAME})/restore_script.sh ${HOST_GITLAB_RESTORE_DIR}/
+        sudo cp ${GITLAB_RESTORE_SCRIPT_DIR}/restore_script.sh ${HOST_GITLAB_RESTORE_DIR}/
         sudo docker run --name=gitlab_UTILITY -it --rm \
             -v ${HOST_GITLAB_RESTORE_DIR}:/tmp/import_export \
             --env="BACKUP_TIMESTAMP=${timestamp}" \
@@ -70,7 +70,7 @@ case ${1} in
         }
         sudo docker inspect "${datavolume_name}" &> /dev/null || \
             docker stop "${GITLAB_CONTAINER_NAME}"
-        sudo cp ./$(get_docker_dir ${GITLAB_DV_IMAGE_NAME})/import_script.sh ${HOST_GITLAB_RESTORE_DIR}/repositories/
+        sudo cp ${GITLAB_IMPORT_SCRIPT_DIR}/import_script.sh ${HOST_GITLAB_RESTORE_DIR}/repositories/
         sudo docker run --name=gitlab_UTILITY -it --rm \
             -v ${HOST_GITLAB_RESTORE_DIR}/repositories:/tmp/import_export \
             --env="NAMESPACE=${namespace}" \

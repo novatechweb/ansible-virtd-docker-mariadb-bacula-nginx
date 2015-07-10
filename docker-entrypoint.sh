@@ -16,10 +16,7 @@ usage() {
     echo "OPTIONS:" >&2
     echo "  openldap            Run slapd process" >&2
     echo "  init_data_volumes   Reset/Set OpenLDAP back to package default" >&2
-    echo "  backup              Creates an LDIF file of the specified database" >&2
-    echo "    ARGUMENTS: <dbnum> <ldif-file>" >&2
-    echo "      dbnum           The database number. \"0\" specifies OpenLDAP config." >&2
-    echo "      ldif-file       The LDIF filename to create in ${BACKUP_PATH}" >&2
+    echo "  backup              Creates LDIF files for all databases" >&2
     echo "  apply_ldif          apply a series of LDIF files to specified databases (default: OpenLDAP config)" >&2
     echo "    ARGUMENTS: <-n suffix | -b dbnum> <-l ldif-file>" >&2
     echo "      -n suffix       The specified suffix to determine which database to add subsequent LDIF files" >&2
@@ -81,9 +78,12 @@ case ${1} in
         ;;
 
     backup)
-        dbnum=${2}
-        ldif_file=${3}
-        nice ${SLAPCAT} -F ${CONFIG_PATH} -n ${dbnum} > ${BACKUP_PATH}/${ldif_file}
+        dbnum=0
+        while nice ${SLAPCAT} -F ${CONFIG_PATH} -n ${dbnum} > ${BACKUP_PATH}/LDAP_database_$(printf '%04d' ${dbnum}).ldif
+        do
+            dbnum=$((dbnum + 1))
+        done
+        rm ${BACKUP_PATH}/LDAP_database_$(printf '%04d' ${dbnum}).ldif
         chmod 640 ${BACKUP_PATH}/*.ldif
         ;;
 

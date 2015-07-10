@@ -46,7 +46,7 @@ case ${1} in
         [[ ! -d ${BACKUP_PATH} ]] && exit 1
         suffix=''
         dbnum='0'
-        while getopts ":b:n:l:" opt; do
+        while getopts ":b:n:l:" opt ${@:2}; do
             case ${opt} in
               b)
                 suffix=${OPTARG}

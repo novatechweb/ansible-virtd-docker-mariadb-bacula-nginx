@@ -75,7 +75,7 @@ case ${1} in
         fi
         # Start utility container to perform a restore
         GITLAB_USER=git
-        docker run --name=${GITLAB_CONTAINER_NAME}_UTILITY -it --rm \
+        docker run --name=${GITLAB_CONTAINER_NAME}_UTILITY --rm \
             -v ${HOST_GITLAB_RESTORE_DIR}:/home/git/backups \
             --env="BACKUP_TIMESTAMP=${timestamp}" \
             --volumes-from "${GITLAB_DV_NAME}" \

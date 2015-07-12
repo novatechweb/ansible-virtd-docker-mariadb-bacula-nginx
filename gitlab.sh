@@ -1,52 +1,82 @@
 #!/bin/bash
-source config.sh
-set -e
 
-[[ -f ./gitlab.env.list ]] || {
-    echo "file dose not exist: ./gitlab.env.list"
-    echo "  Are you running the script from the correct directory?"
+[[ -f ./config.sh ]] || {
+    echo "file dose not exist: ./config.sh" >&2
+    echo "  Are you running the script from the correct directory?" >&2
     exit 1
 }
 
+source config.sh
+
+[[ -f ./gitlab.env.list ]] || {
+    echo "file dose not exist: ./gitlab.env.list" >&2
+    echo "  Are you running the script from the correct directory?" >&2
+    exit 1
+}
+
+# verify containers
+docker inspect ${GITLAB_CONTAINER_NAME}_UTILITY &> /dev/null
+if [[ "${?}" == "0" ]]; then
+    echo "ERROR: ${GITLAB_CONTAINER_NAME}_UTILITY container exists." >&2
+    echo "The utility container should be removed" >&2
+    exit 1
+fi
+docker inspect ${GITLAB_CONTAINER_NAME} &> /dev/null
+if [[ "${?}" != "0" ]]; then
+    echo "ERROR: ${GITLAB_CONTAINER_NAME} container does not exists." >&2
+    echo "The gitlab container needs to exist in order to backup, restore, or import." >&2
+    exit 1
+fi
+docker inspect ${GITLAB_DV_NAME} &> /dev/null
+if [[ "${?}" != "0" ]]; then
+    echo "ERROR: ${GITLAB_DV_NAME} container does not exists." >&2
+    echo "The gitlab Data-Volume container needs to exist in order to backup, restore, or import." >&2
+    exit 1
+fi
+
+set -e
+
 case ${1} in
     backup)
-        sudo docker inspect "${datavolume_name}" &> /dev/null || \
+        # remove previous backups from backup dir
+        rm -f ${HOST_GITLAB_BACKUP_DIR}/??????????_gitlab_backup.tar
+        # Stop gitlab container
+        if [[ $(docker inspect -f '{{ .State.Running }}' ${GITLAB_CONTAINER_NAME}) == 'true' ]]; then
             docker stop "${GITLAB_CONTAINER_NAME}"
-        sudo cp ${GITLAB_BACKUP_SCRIPT_DIR}/backup_script.sh ${HOST_GITLAB_BACKUP_DIR}/
-        sudo docker run --name=gitlab_UTILITY --rm -t \
+        fi
+        # Start utility container to perform a backup
+        docker run --name=${GITLAB_CONTAINER_NAME}_UTILITY --rm -t \
             --volumes-from "${GITLAB_DV_NAME}" \
             --link ${GITLAB_DB_CONTAINER_NAME}:gitlab-db \
             --link ${GITLAB_REDIS_CONTAINER_NAME}:gitlab-redis \
             --env-file=./gitlab.env.list \
             --env="DB_USER=${GITLAB_DB_USER}" \
             --env="DB_PASS=${GITLAB_DB_PASSWORD}" \
-            -v ${HOST_GITLAB_BACKUP_DIR}/:/tmp/import_export \
+            -v ${HOST_GITLAB_BACKUP_DIR}/:/home/git/backups \
             ${GITLAB_IMAGE_NAME}:${DOCKER_IMAGE_TAG} \
-                /tmp/import_export/backup_script.sh
-        sudo rm ${HOST_GITLAB_BACKUP_DIR}/backup_script.sh
-        sudo docker start "${GITLAB_CONTAINER_NAME}"
+                app:rake gitlab:backup:create
+        # Start gitlab container running
+        docker start "${GITLAB_CONTAINER_NAME}"
         ;;
 
     restore)
-        timestamp="${2}"
-        [[ -z "${timestamp}" ]] && {
-            echo "Please use the timestamp argument to specify which backup file to restore."
-            echo "Available timestamps:"
-            for i in $(ls -1 ${HOST_GITLAB_RESTORE_DIR}/*_gitlab_backup.tar | sed 's|^'${HOST_GITLAB_RESTORE_DIR}/'\(.*\)_gitlab_backup.tar$|\1|' | sort -r)
-            do
-                echo " - ${i}"
-            done
+        # verify there is only one gitlab archive to restore
+        if [[ $(ls -1 ${HOST_GITLAB_RESTORE_DIR}/??????????_gitlab_backup.tar | wc -l) != '1' ]]; then
+            echo "ERROR: more than one gitlab archive exists to be restored." >&2
+            echo "There should be only one:" >&2
+            ls -1 ${HOST_GITLAB_RESTORE_DIR}/??????????_gitlab_backup.tar >&2
             exit 1
-        }
-        [[ ! -f "${HOST_GITLAB_RESTORE_DIR}/${timestamp}_gitlab_backup.tar" ]] && {
-            printf "Could not locate backup archive file: \n    ${HOST_GITLAB_RESTORE_DIR}/${timestamp}_gitlab_backup.tar\n"
-            exit 1
-        }
-        sudo docker inspect "${datavolume_name}" &> /dev/null || \
+        fi
+        # get the timestamp from the backup file
+        timestamp="$(ls -1 ${HOST_GITLAB_RESTORE_DIR}/??????????_gitlab_backup.tar | sed 's|^'${HOST_GITLAB_RESTORE_DIR}/'\(..........\)_gitlab_backup.tar$|\1|')"
+        # Stop gitlab container
+        if [[ $(docker inspect -f '{{ .State.Running }}' ${GITLAB_CONTAINER_NAME}) == 'true' ]]; then
             docker stop "${GITLAB_CONTAINER_NAME}"
-        sudo cp ${GITLAB_RESTORE_SCRIPT_DIR}/restore_script.sh ${HOST_GITLAB_RESTORE_DIR}/
-        sudo docker run --name=gitlab_UTILITY -it --rm \
-            -v ${HOST_GITLAB_RESTORE_DIR}:/tmp/import_export \
+        fi
+        # Start utility container to perform a restore
+        GITLAB_USER=git
+        docker run --name=${GITLAB_CONTAINER_NAME}_UTILITY -it --rm \
+            -v ${HOST_GITLAB_RESTORE_DIR}:/home/git/backups \
             --env="BACKUP_TIMESTAMP=${timestamp}" \
             --volumes-from "${GITLAB_DV_NAME}" \
             --link ${GITLAB_DB_CONTAINER_NAME}:gitlab-db \
@@ -55,36 +85,37 @@ case ${1} in
             --env="DB_USER=${GITLAB_DB_USER}" \
             --env="DB_PASS=${GITLAB_DB_PASSWORD}" \
             ${GITLAB_IMAGE_NAME}:${DOCKER_IMAGE_TAG} \
-                /tmp/import_export/restore_script.sh
-        sudo rm ${HOST_GITLAB_RESTORE_DIR}/restore_script.sh
-        sudo docker start "${GITLAB_CONTAINER_NAME}"
+                app:rake gitlab:backup:restore force=yes BACKUP=${timestamp}
+#                sudo -HEu ${GITLAB_USER} bundle exec rake gitlab:backup:restore force=yes BACKUP=${timestamp} RAILS_ENV=production
+        # Start gitlab container running
+        docker start "${GITLAB_CONTAINER_NAME}"
         ;;
 
-    import)
-        #     https://github.com/gitlabhq/gitlabhq/wiki/Import-existing-repositories-into-GitLab
-        namespace="root"
-        [[ ! -z "${2}" ]] && namespace=${2}
-        [[ ! -d "${HOST_GITLAB_RESTORE_DIR}/repositories" ]] && {
-            echo "Repository archives do not exist."
-            exit 1
-        }
-        sudo docker inspect "${datavolume_name}" &> /dev/null || \
-            docker stop "${GITLAB_CONTAINER_NAME}"
-        sudo cp ${GITLAB_IMPORT_SCRIPT_DIR}/import_script.sh ${HOST_GITLAB_RESTORE_DIR}/repositories/
-        sudo docker run --name=gitlab_UTILITY -it --rm \
-            -v ${HOST_GITLAB_RESTORE_DIR}/repositories:/tmp/import_export \
-            --env="NAMESPACE=${namespace}" \
-            --volumes-from "${GITLAB_DV_NAME}" \
-            --link ${GITLAB_DB_CONTAINER_NAME}:gitlab-db \
-            --link ${GITLAB_REDIS_CONTAINER_NAME}:gitlab-redis \
-            --env-file=./gitlab.env.list \
-            --env="DB_USER=${GITLAB_DB_USER}" \
-            --env="DB_PASS=${GITLAB_DB_PASSWORD}" \
-            ${GITLAB_IMAGE_NAME}:${DOCKER_IMAGE_TAG} \
-                /tmp/import_export/import_script.sh
-        sudo rm ${HOST_GITLAB_RESTORE_DIR}/repositories/import_script.sh
-        sudo docker start "${GITLAB_CONTAINER_NAME}"
-        ;;
+#    import)
+#        #     https://github.com/gitlabhq/gitlabhq/wiki/Import-existing-repositories-into-GitLab
+#        namespace="root"
+#        [[ ! -z "${2}" ]] && namespace=${2}
+#        [[ ! -d "${HOST_GITLAB_RESTORE_DIR}/repositories" ]] && {
+#            echo "Repository archives do not exist."
+#            exit 1
+#        }
+#        docker inspect "${datavolume_name}" &> /dev/null || \
+#            docker stop "${GITLAB_CONTAINER_NAME}"
+#        cp ${GITLAB_IMPORT_SCRIPT_DIR}/import_script.sh ${HOST_GITLAB_RESTORE_DIR}/repositories/
+#        docker run --name=${GITLAB_CONTAINER_NAME}_UTILITY -it --rm \
+#            -v ${HOST_GITLAB_RESTORE_DIR}/repositories:/tmp/import_export \
+#            --env="NAMESPACE=${namespace}" \
+#            --volumes-from "${GITLAB_DV_NAME}" \
+#            --link ${GITLAB_DB_CONTAINER_NAME}:gitlab-db \
+#            --link ${GITLAB_REDIS_CONTAINER_NAME}:gitlab-redis \
+#            --env-file=./gitlab.env.list \
+#            --env="DB_USER=${GITLAB_DB_USER}" \
+#            --env="DB_PASS=${GITLAB_DB_PASSWORD}" \
+#            ${GITLAB_IMAGE_NAME}:${DOCKER_IMAGE_TAG} \
+#                /tmp/import_export/import_script.sh
+#        rm ${HOST_GITLAB_RESTORE_DIR}/repositories/import_script.sh
+#        docker start "${GITLAB_CONTAINER_NAME}"
+#        ;;
 
     *)
         echo "Usage:"
@@ -93,12 +124,10 @@ case ${1} in
         echo "  OPERATION:"
         echo "    backup        Backup data from the container"
         echo "    restore       Restore data to the container (Interactive)"
-        echo "    import        Import git repositories into the container"
-        echo ""
-        echo "  OPTIONS:"
-        echo "    timestamp     The timestamp of the backup file you wish to restore."
-        echo "                  Ex: 1433176694  for file  1433176694_gitlab_backup.tar"
-        echo "    namespace     The subdirectory the repositories will be placed durring importing."
+#        echo "    import        Import git repositories into the container"
+#        echo ""
+#        echo "  OPTIONS:"
+#        echo "    namespace     The subdirectory the repositories will be placed durring importing."
         echo ""
         exit 0
         ;;

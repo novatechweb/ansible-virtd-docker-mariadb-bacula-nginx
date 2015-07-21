@@ -12,17 +12,17 @@ SLAPCAT=/usr/sbin/slapcat
 ulimit -n 8192
 
 usage() {
-    echo "Usage: ${0} <OPTION> [ARGUMENTS ...]" >&2
-    echo "OPTIONS:" >&2
-    echo "  openldap            Run slapd process" >&2
-    echo "  init_data_volumes   Reset/Set OpenLDAP back to package default" >&2
-    echo "  backup              Creates LDIF files for all databases" >&2
-    echo "  apply_ldif          apply a series of LDIF files to specified databases (default: OpenLDAP config)" >&2
-    echo "    ARGUMENTS: <-n suffix | -b dbnum> <-l ldif-file>" >&2
-    echo "      -n suffix       The specified suffix to determine which database to add subsequent LDIF files" >&2
-    echo "      -b dbnum        The dbnum-th database listed in the configuration file to apply the subsequent LDIF files" >&2
-    echo "      -l ldif-file    The specified LDIF file to import" >&2
-    echo "  <Another Program>   Any other program on the system followed by it's arguments" >&2
+    echo >&2 "Usage: ${0} <OPTION> [ARGUMENTS ...]"
+    echo >&2 "OPTIONS:"
+    echo >&2 "  openldap            Run slapd process"
+    echo >&2 "  init_data_volumes   Reset/Set OpenLDAP back to package default"
+    echo >&2 "  backup              Creates LDIF files for all databases"
+    echo >&2 "  apply_ldif          apply a series of LDIF files to specified databases (default: OpenLDAP config)"
+    echo >&2 "    ARGUMENTS: <-n suffix | -b dbnum> <-l ldif-file>"
+    echo >&2 "      -n suffix       The specified suffix to determine which database to add subsequent LDIF files"
+    echo >&2 "      -b dbnum        The dbnum-th database listed in the configuration file to apply the subsequent LDIF files"
+    echo >&2 "      -l ldif-file    The specified LDIF file to import"
+    echo >&2 "  <Another Program>   Any other program on the system followed by it's arguments"
     exit 1
 }
 
@@ -58,7 +58,7 @@ case ${1} in
               l)
                 ldif_file=${OPTARG}
                 if [[ ! -e ${BACKUP_PATH}/${ldif_file} ]] ; then
-                    echo "LDIF file not found: ${ldif_file}" >&2
+                    echo >&2 "LDIF file not found: ${ldif_file}"
                     continue
                 fi
                 if [[ -z "${dbnum}" ]]; then
@@ -69,7 +69,7 @@ case ${1} in
                 ;;
 
               \?)
-                echo "Invalid option: -$OPTARG" >&2
+                echo >&2 "Invalid option: -$OPTARG"
                 usage
                 ;;
             esac

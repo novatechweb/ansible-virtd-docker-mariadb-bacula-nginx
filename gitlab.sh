@@ -1,36 +1,36 @@
 #!/bin/bash
 
 [[ -f ./config.sh ]] || {
-    echo "file dose not exist: ./config.sh" >&2
-    echo "  Are you running the script from the correct directory?" >&2
+    echo >&2 "file dose not exist: ./config.sh"
+    echo >&2 "  Are you running the script from the correct directory?"
     exit 1
 }
 
 source config.sh
 
 [[ -f ./gitlab.env.list ]] || {
-    echo "file dose not exist: ./gitlab.env.list" >&2
-    echo "  Are you running the script from the correct directory?" >&2
+    echo >&2 "file dose not exist: ./gitlab.env.list"
+    echo >&2 "  Are you running the script from the correct directory?"
     exit 1
 }
 
 # verify containers
 docker inspect ${GITLAB_CONTAINER_NAME}_UTILITY &> /dev/null
 if [[ "${?}" == "0" ]]; then
-    echo "ERROR: ${GITLAB_CONTAINER_NAME}_UTILITY container exists." >&2
-    echo "The utility container should be removed" >&2
+    echo >&2 "ERROR: ${GITLAB_CONTAINER_NAME}_UTILITY container exists."
+    echo >&2 "The utility container should be removed"
     exit 1
 fi
 docker inspect ${GITLAB_CONTAINER_NAME} &> /dev/null
 if [[ "${?}" != "0" ]]; then
-    echo "ERROR: ${GITLAB_CONTAINER_NAME} container does not exists." >&2
-    echo "The gitlab container needs to exist in order to backup, restore, or import." >&2
+    echo >&2 "ERROR: ${GITLAB_CONTAINER_NAME} container does not exists."
+    echo >&2 "The gitlab container needs to exist in order to backup, restore, or import."
     exit 1
 fi
 docker inspect ${GITLAB_DV_NAME} &> /dev/null
 if [[ "${?}" != "0" ]]; then
-    echo "ERROR: ${GITLAB_DV_NAME} container does not exists." >&2
-    echo "The gitlab Data-Volume container needs to exist in order to backup, restore, or import." >&2
+    echo >&2 "ERROR: ${GITLAB_DV_NAME} container does not exists."
+    echo >&2 "The gitlab Data-Volume container needs to exist in order to backup, restore, or import."
     exit 1
 fi
 
@@ -62,9 +62,9 @@ case ${1} in
     restore)
         # verify there is only one gitlab archive to restore
         if [[ $(ls -1 ${HOST_GITLAB_RESTORE_DIR}/??????????_gitlab_backup.tar | wc -l) != '1' ]]; then
-            echo "ERROR: more than one gitlab archive exists to be restored." >&2
-            echo "There should be only one:" >&2
-            ls -1 ${HOST_GITLAB_RESTORE_DIR}/??????????_gitlab_backup.tar >&2
+            echo >&2 "ERROR: more than one gitlab archive exists to be restored."
+            echo >&2 "There should be only one:" 
+            ls >&2 -1 ${HOST_GITLAB_RESTORE_DIR}/??????????_gitlab_backup.tar
             exit 1
         fi
         # get the timestamp from the backup file

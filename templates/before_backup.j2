@@ -13,8 +13,8 @@ set -e
 # *****************************************************************************
 # Backup openssl data container
 
-docker run -i --rm \
-    --volumes-from "{{ openssl_dv_name }}" \
+docker run --rm \
+    --volumes-from {{ openssl_dv_name }} \
     {{ openssl_image_name }}:{{ docker_image_tag }} archive > \
         {{ openssl_docker_backup_dir }}{{ openssl_backup_file }}
 {% endif %}
@@ -24,9 +24,10 @@ docker run -i --rm \
 # *****************************************************************************
 # backup OpenLDAP data container
 
-pushd {{ docker_projects_dir }}/docker-openldap
-# no command to do the backup as of yet
-popd
+docker run --rm \
+    --volumes-from {{ openldap_dv_name }} \
+    -v {{ openldap_docker_backup_dir }}:/tmp/import_export \
+    {{ openldap_image_name }}:{{ docker_image_tag }} backup
 {% endif %}
 
 
@@ -34,8 +35,8 @@ popd
 # *****************************************************************************
 # Backup SVN repositories
 
-docker run -ti --rm \
-    --volumes-from "{{ svn_dv_name }}" \
+docker run --rm \
+    --volumes-from {{ svn_dv_name }} \
     -v {{ svn_docker_backup_dir }}:/tmp/import_export \
     {{ svn_image_name }}:{{ docker_image_tag }} backup
 {% endif %}
@@ -45,8 +46,8 @@ docker run -ti --rm \
 # *****************************************************************************
 # Backup WIKI data container
 
-pushd {{ docker_projects_dir }}/docker-mediawiki
-{{ docker_projects_dir }}/docker-mediawiki/mediawiki.sh backup
+pushd {{ docker_restore_config_base_dir }}/{{ wiki_dv_name }}/wiki_DV
+./mediawiki.sh backup
 popd
 {% endif %}
 
@@ -55,7 +56,7 @@ popd
 # *****************************************************************************
 # Backup gitlab
 
-pushd {{ docker_projects_dir }}/docker-gitlab
-{{ docker_projects_dir }}/docker-gitlab/gitlab.sh backup
+pushd {{ docker_restore_config_base_dir }}/{{ gitlab_dv_name }}
+./gitlab.sh backup
 popd
 {% endif %}

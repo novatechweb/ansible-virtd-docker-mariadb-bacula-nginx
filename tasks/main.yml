@@ -1,0 +1,128 @@
+---
+# file: roles/docker-gitlab/tasks/main.yaml
+
+# *****************************************************************************
+# Setup the directory where the backup and restore is to take place
+
+- name: backup dir
+  file:
+    state: directory
+    path: '{{ gitlab_docker_backup_dir }}'
+    owner: root
+    group: root
+    mode: 0755
+    recurse: yes
+    setype: svirt_sandbox_file_t
+
+- name: restore dir
+  file:
+    state: directory
+    path: '{{ host_gitlab_docker_restore_dir }}'
+    owner: root
+    group: root
+    mode: 0755
+    recurse: yes
+    setype: svirt_sandbox_file_t
+
+- name: docker_container.conf dir
+  file:
+    state: directory
+    path: '{{ docker_restore_config_base_dir }}/{{ gitlab_dv_name }}'
+    owner: root
+    group: root
+    mode: 'u=rwx,g=rx,o=rx'
+
+# *****************************************************************************
+# update the Docker restore config
+
+# contains the database username and password
+- name: make config.sh
+  template:
+    src: config.sh.j2
+    dest: '{{ docker_restore_config_base_dir }}/{{ gitlab_dv_name }}/config.sh'
+    backup: yes
+    owner: root
+    group: root
+    mode: 'u=rw,g=,o='
+
+- name: copy env-file
+  command: 'cp --verbose --update --backup=numbered {{ docker_projects_dir }}/docker-gitlab/gitlab.env.list {{ docker_restore_config_base_dir }}/{{ gitlab_dv_name }}'
+
+- name: copy script
+  command: 'cp --verbose --update --backup=numbered {{ docker_projects_dir }}/docker-gitlab/gitlab.sh {{ docker_restore_config_base_dir }}/{{ gitlab_dv_name }}'
+
+- name: exists - state file
+  stat:
+    path: '{{ docker_restore_config_base_dir }}/{{ gitlab_dv_name }}/restore.date.txt'
+    get_checksum: False
+    get_md5: False
+  register: st_gitlab_restore
+
+# *****************************************************************************
+# Update or make the image.
+
+# using the image from docker hub
+
+# *****************************************************************************
+# Create the data volumes
+
+- name: data-volume container (gitlab)
+  docker_datavolume:
+    image_name: '{{ gitlab_dv_image_name }}'
+    image_tag: '{{ docker_image_tag }}'
+    data_volume_container_name: '{{ gitlab_dv_name }}'
+
+- name: data-volume container (postgres)
+  docker_datavolume:
+    image_name: '{{ gitlab_db_image_name }}'
+    image_tag: '{{ docker_image_tag }}'
+    data_volume_container_name: '{{ gitlab_db_dv_name }}'
+
+- name: stop prev container (postgres)
+  docker:
+    image: '{{ gitlab_db_image_name }}'
+    name: '{{ gitlab_db_container_name }}'
+    state: stopped
+
+- name: initial populate (postgres)
+  docker_db_init:
+    image_name: '{{ gitlab_db_image_name }}'
+    image_tag: '{{ docker_image_tag }}'
+    container_name: '{{ gitlab_db_dv_name }}_init_db'
+    data_volume_container_name: '{{ gitlab_db_dv_name }}'
+    data_volume_dir: '{{ docker_projects_dir }}/docker-gitlab/postgres/'
+    database_name: gitlabhq_production
+    database_user: '{{ gitlab_db_user }}'
+    database_password: '{{ gitlab_db_password | quote }}'
+
+# *****************************************************************************
+# Start the data container running
+
+- name: start container (redis)
+  docker_run:
+    container_name: '{{ gitlab_redis_container_name }}'
+    docker_run_arguments: '{{ redis_image_name }}:{{ docker_image_tag }}'
+
+- name: start container (postgres)
+  docker_run:
+    container_name: '{{ gitlab_db_container_name }}'
+    docker_run_arguments: '--volumes-from {{ gitlab_db_dv_name }} {{ gitlab_db_image_name }}:{{ docker_image_tag }}'
+
+- name: start container (gitlab)
+  docker_run:
+    container_name: '{{ gitlab_container_name }}'
+    docker_run_arguments: '{{ gitlab_docker_port_mapping }} --link {{ openldap_container_name }}:gitlab-ldap --link {{ gitlab_redis_container_name }}:gitlab-redis --link {{ gitlab_db_container_name }}:gitlab-db --volumes-from {{ openssl_dv_name }} --volumes-from {{ gitlab_dv_name }} --env GITLAB_HOST={{ gitlab_hostname }} --env GITLAB_SSH_HOST={{ gitlab_hostname }} --env DB_USER={{ gitlab_db_user }} --env DB_PASS={{ gitlab_db_password | quote }} --env-file {{ docker_projects_dir }}/docker-gitlab/gitlab.env.list {{ gitlab_image_name }}:{{ docker_image_tag }}'
+
+- name: Wait for gitlab to be fully running
+  wait_for:
+    delay: 30
+    host: '{{ gitlab_hostname }}'
+    port: 22
+    state: started
+    timeout: 180
+
+# *****************************************************************************
+# restore?
+
+- include: restore.yml
+  when: st_gitlab_restore.stat.exists == False

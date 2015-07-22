@@ -1,0 +1,11 @@
+---
+
+# The hostname passed as an envirnment variable into the container
+gitlab_hostname: git.novatech-llc.com
+
+# the port mappings used when starting the container
+gitlab_docker_port_mapping: '-P'
+
+# database usernames and passwords
+gitlab_db_user: novatech
+gitlab_db_password: '{{ lookup("password", "credentials/" + inventory_hostname + "/" + gitlab_hostname + "/" + gitlab_db_user + " length=20") }}'

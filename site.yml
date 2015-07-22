@@ -1,14 +1,10 @@
 ---
 # This playbook deploys the whole application stack in this site.
 
-- name: install/setup everything
-  hosts: all
+- name: Bacula
+  hosts: bacula
   user: ansibleremote
   sudo: true
-  vars:
-    bacula_storage: TapeDrive
-    bacula_fileset: 'Full Set'
-    bacula_dest: /tmp/bacula-restores
 
   roles:
     - { role: mariadb, mariadb_open_firewall: true, mariadb_remote_root_access: false }
@@ -17,6 +13,12 @@
     - { role: bacula-client }
     - { role: bacula-console }
     - { role: bacula-catalog }
+
+
+- name: Virtual machines
+  hosts: virtual-machine-hosts
+  user: ansibleremote
+  sudo: true
     - { role: libvirt-lvmpool }
     - { role: libvirt-vm,
                 vm_name: freeipa-centos7,
@@ -25,3 +27,33 @@
                 vm_capacity: 40000M,
                 vm_image: freeipa-centos7_vda.img,
                 vm_start: True }
+
+
+- name: install/setup Docker images and containers
+  hosts: docker-hosts
+  user: ansibleremote
+  sudo: true
+
+  roles:
+  - name: Build base images that are not on Docker Hub
+    role: docker-build-base-image
+    tags:
+    - base_images
+
+  - name: Build and start the SVN Docker container
+    role: docker-svn
+    svn_repos: 'ddio novatech NCD_Release'
+    tags:
+    - svn_container
+
+  - name: Build and start the MediaWIKI Docker container
+    role: docker-mediawiki
+    wiki_db_user: novatech
+    tags:
+    - wiki_container
+
+  - name: Build and start the GitLab Docker container
+    role: docker-gitlab
+    gitlab_db_user: novatech
+    tags:
+    - gitlab_container

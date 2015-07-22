@@ -1,0 +1,87 @@
+---
+# file: roles/docker-openldap/tasks/main.yaml
+
+# *****************************************************************************
+# Setup the directory where the backup and restore is to take place
+
+- name: backup dir
+  file:
+    state: directory
+    path: '{{ openldap_docker_backup_dir }}'
+    owner: root
+    group: root
+    mode: 0755
+    recurse: yes
+    setype: svirt_sandbox_file_t
+
+- name: restore dir
+  file:
+    state: directory
+    path: '{{ host_openldap_docker_restore_dir }}'
+    owner: root
+    group: root
+    mode: 0755
+    recurse: yes
+    setype: svirt_sandbox_file_t
+
+- name: docker_container.conf dir
+  file:
+    state: directory
+    path: '{{ docker_restore_config_base_dir }}/{{ openldap_dv_name }}'
+    owner: root
+    group: root
+    mode: 'u=rwx,g=rx,o=rx'
+
+# *****************************************************************************
+# update the Docker restore config
+
+- name: exists - state file
+  stat:
+    path: '{{ docker_restore_config_base_dir }}/{{ openldap_dv_name }}/restore.date.txt'
+    get_checksum: False
+    get_md5: False
+  register: st_openldap_restore
+
+# *****************************************************************************
+# Update or make the image.
+
+- name: build image
+  docker_build:
+    image_name: '{{ openldap_image_name }}'
+    image_tag: '{{ docker_image_tag }}'
+    dockerfile_dir: '{{ docker_projects_dir }}/docker-openldap'
+
+# *****************************************************************************
+# Create the data volumes
+
+- name: data-volume container
+  docker_datavolume:
+    image_name: '{{ openldap_image_name }}'
+    image_tag: '{{ docker_image_tag }}'
+    data_volume_container_name: '{{ openldap_dv_name }}'
+
+# *****************************************************************************
+# Populate the ldap data-volume with default data
+
+- name: initial populate
+  command: 'docker run --rm --volumes-from {{ openldap_dv_name }} {{ openldap_image_name }}:{{ docker_image_tag }} init_data_volumes'
+  when: st_openldap_restore.stat.exists == False
+
+# *****************************************************************************
+# Start the data container running
+
+- name: start container (ldap)
+  docker_run:
+    container_name: '{{ openldap_container_name }}'
+    docker_run_arguments: '{{ openldap_docker_port_mapping }} --volumes-from {{ openssl_dv_name }} --volumes-from {{ openldap_dv_name }} --env LDAP_HOSTNAME={{ openldap_hostname }} {{ openldap_image_name }}:{{ docker_image_tag }}'
+
+- name: start container (phpldapadmin)
+  docker_run:
+    container_name: '{{ phpldapadmin_container_name }}'
+    docker_run_arguments: '{{ phpldapadmin_docker_port_mapping }} --volumes-from {{ openssl_dv_name }} --env HTTPS=false --env LDAP_HOSTS=ldap --link {{ openldap_container_name }}:ldap {{ phpldapadmin_image_name }}:{{ docker_image_tag }}'
+
+# *****************************************************************************
+# restore?
+
+- include: restore.yml
+  when: st_openldap_restore.stat.exists == False

@@ -1,0 +1,16 @@
+---
+
+# The hostname passed as an envirnment variable into the container
+openldap_hostname: ldap.novatech-llc.com
+
+# the port mappings used when starting the container
+openldap_docker_port_mapping: '-P'
+
+# the port mappings used when starting the utility container - phpldapadmin
+phpldapadmin_docker_port_mapping: '-P'
+
+openldap_backup_files:
+  - ldif_file: LDAP_database_0000.ldif
+    dbnum: 0
+  - ldif_file: LDAP_database_0001.ldif
+    dbnum: 1

@@ -1,0 +1,10 @@
+---
+
+# The hostname passed as an envirnment variable into the container
+svn_hostname: svn.novatech-llc.com
+
+# the port mappings used when starting the container
+svn_docker_port_mapping:  '-P'
+
+# The repositories that will be created/imported durring a data-volume restore
+svn_repos: 'ddio novatech NCD_Release'

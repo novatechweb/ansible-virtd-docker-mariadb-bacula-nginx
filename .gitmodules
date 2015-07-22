@@ -25,3 +25,27 @@
 	path = roles/bacula-catalog
 	url = https://github.com/gmccollister/ansible-bacula-catalog.git
 	branch = master
+[submodule "roles/docker-build-base-image"]
+	path = roles/docker-build-base-image
+	url = git@github.com:novatechweb/ansible-docker-build-base-image.git
+[submodule "roles/docker-common"]
+	path = roles/docker-common
+	url = git@github.com:novatechweb/ansible-docker-common.git
+[submodule "roles/docker-gitlab"]
+	path = roles/docker-gitlab
+	url = git@github.com:novatechweb/ansible-docker-gitlab.git
+[submodule "roles/docker-mediawiki"]
+	path = roles/docker-mediawiki
+	url = git@github.com:novatechweb/ansible-docker-mediawiki.git
+[submodule "roles/docker-openldap"]
+	path = roles/docker-openldap
+	url = git@github.com:novatechweb/ansible-docker-openldap.git
+[submodule "roles/docker-openssl"]
+	path = roles/docker-openssl
+	url = git@github.com:novatechweb/ansible-docker-openssl.git
+[submodule "roles/docker-pull-images"]
+	path = roles/docker-pull-images
+	url = git@github.com:novatechweb/ansible-docker-pull-images.git
+[submodule "roles/docker-svn"]
+	path = roles/docker-svn
+	url = git@github.com:novatechweb/ansible-docker-svn.git

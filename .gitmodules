@@ -49,3 +49,7 @@
 [submodule "roles/docker-svn"]
 	path = roles/docker-svn
 	url = git@github.com:novatechweb/ansible-docker-svn.git
+[submodule "roles/openssh-server"]
+	path = roles/openssh-server
+	url = https://github.com/gmccollister/ansible-openssh-server.git
+	branch = master

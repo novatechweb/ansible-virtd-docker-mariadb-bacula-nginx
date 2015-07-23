@@ -1,6 +1,6 @@
 ---
 bacula_director_config_dir: "/etc/bacula"
-bacula_director_password: ""
-bacula_monitor_password: ""
-mariadb_bacula_password: ""
+bacula_director_password: '{{ lookup("password", "credentials/" + inventory_hostname + "/bacula/director length=20") }}'
+bacula_monitor_password: '{{ lookup("password", "credentials/" + inventory_hostname + "/bacula/monitor length=20") }}'
+mariadb_bacula_password: '{{ lookup("password", "credentials/" + inventory_hostname + "/bacula/mariadb length=20") }}'
 bacula_client_address: 127.0.0.1

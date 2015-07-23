@@ -1,0 +1,62 @@
+#!/bin/bash
+set -e
+
+{% if bacula_director_backup_vms is defined %}
+# *****************************************************************************
+# Backup VMs
+
+/usr/bin/virt-backup --action dump --vm={{ bacula_director_backup_vms }}
+{% endif %}
+
+
+{% if openssl_dv_name is defined %}
+# *****************************************************************************
+# Backup openssl data container
+
+docker run --rm \
+    --volumes-from {{ openssl_dv_name }} \
+    {{ openssl_image_name }}:{{ docker_image_tag }} archive > \
+        {{ openssl_docker_backup_dir }}{{ openssl_backup_file }}
+{% endif %}
+
+
+{% if docker_projects_dir is defined %}
+# *****************************************************************************
+# backup OpenLDAP data container
+
+docker run --rm \
+    --volumes-from {{ openldap_dv_name }} \
+    -v {{ openldap_docker_backup_dir }}:/tmp/import_export \
+    {{ openldap_image_name }}:{{ docker_image_tag }} backup
+{% endif %}
+
+
+{% if svn_dv_name is defined %}
+# *****************************************************************************
+# Backup SVN repositories
+
+docker run --rm \
+    --volumes-from {{ svn_dv_name }} \
+    -v {{ svn_docker_backup_dir }}:/tmp/import_export \
+    {{ svn_image_name }}:{{ docker_image_tag }} backup
+{% endif %}
+
+
+{% if docker_projects_dir is defined %}
+# *****************************************************************************
+# Backup WIKI data container
+
+pushd {{ docker_restore_config_base_dir }}/{{ wiki_dv_name }}/wiki_DV
+./mediawiki.sh backup
+popd
+{% endif %}
+
+
+{% if docker_projects_dir is defined %}
+# *****************************************************************************
+# Backup gitlab
+
+pushd {{ docker_restore_config_base_dir }}/{{ gitlab_dv_name }}
+./gitlab.sh backup
+popd
+{% endif %}

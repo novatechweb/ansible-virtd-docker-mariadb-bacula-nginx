@@ -19,6 +19,8 @@
   hosts: virtual-machine-hosts
   user: ansibleremote
   sudo: true
+
+  roles:
     - { role: libvirt-lvmpool }
     - { role: libvirt-vm,
                 vm_name: freeipa-centos7,
@@ -46,14 +48,14 @@
     tags:
     - svn_container
 
-  - name: Build and start the MediaWIKI Docker container
-    role: docker-mediawiki
-    wiki_db_user: novatech
-    tags:
-    - wiki_container
-
   - name: Build and start the GitLab Docker container
     role: docker-gitlab
     gitlab_db_user: novatech
     tags:
     - gitlab_container
+
+  - name: Build and start the MediaWIKI Docker container
+    role: docker-mediawiki
+    wiki_db_user: novatech
+    tags:
+    - wiki_container

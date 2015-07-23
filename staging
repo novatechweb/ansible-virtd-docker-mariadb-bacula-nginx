@@ -1,0 +1,10 @@
+[bacula]
+testdaedalus
+
+[virtual-machine-hosts]
+testdaedalus
+
+[freeipa-VM]
+
+[docker-hosts]
+testdaedalus

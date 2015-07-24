@@ -1,5 +1,10 @@
 ---
 
+- name: Directory for backup scripts
+  file:
+    path: /usr/libexec/bacula/
+    state: directory
+
 - name: Create before_backup script
   template:
     src: before_backup.j2

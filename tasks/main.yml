@@ -9,9 +9,9 @@
     state: directory
     path: '{{ openldap_docker_backup_dir }}'
     owner: root
-    group: root
-    mode: 0755
-    recurse: yes
+    group: tape
+    mode: 'u=rwx,g=rwx,o=rx'
+    recurse: no
     setype: svirt_sandbox_file_t
 
 - name: restore dir
@@ -19,9 +19,9 @@
     state: directory
     path: '{{ host_openldap_docker_restore_dir }}'
     owner: root
-    group: root
-    mode: 0755
-    recurse: yes
+    group: tape
+    mode: 'u=rwx,g=rwx,o=rx'
+    recurse: no
     setype: svirt_sandbox_file_t
 
 - name: docker_container.conf dir
@@ -31,6 +31,7 @@
     owner: root
     group: root
     mode: 'u=rwx,g=rx,o=rx'
+    recurse: no
 
 # *****************************************************************************
 # update the Docker restore config

@@ -15,11 +15,19 @@
   file:
     state: directory
     path: '{{ docker_restore_dir }}'
+    owner: root
+    group: tape
+    mode: 'u=rwx,g=rwx,o=rx'
+    recurse: no
 
 - name: backups base dir
   file:
     state: directory
     path: '{{ docker_backup_dir }}'
+    owner: root
+    group: tape
+    mode: 'u=rwx,g=rwx,o=rx'
+    recurse: no
 
 - name: base docker_container.conf dir
   file:
@@ -33,6 +41,9 @@
   file:
     state: directory
     path: '{{ docker_projects_dir }}'
+    owner: root
+    group: root
+    mode: 'u=rwx,g=rx,o=rx'
 
 - name: checkout git repositories
   git:

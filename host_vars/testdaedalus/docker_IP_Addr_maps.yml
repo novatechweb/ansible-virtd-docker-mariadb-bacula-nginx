@@ -1,9 +1,9 @@
 ---
 
-ip_addr_svn: '172.16.0.108'
-ip_addr_git: '172.16.0.102'
-ip_addr_wiki: '172.16.0.103'
-ip_addr_ldap: '172.16.0.110'
+ip_addr_svn: '172.16.64.101'
+ip_addr_git: '172.16.64.102'
+ip_addr_wiki: '172.16.64.103'
+ip_addr_ldap: '172.16.64.108'
 
 # SVN
 svn_docker_port_mapping: '-p {{ ip_addr_svn }}:80:80 -p {{ ip_addr_svn }}:443:443'

@@ -4,14 +4,14 @@
   template:
     src: before_backup.j2
     dest: /usr/libexec/bacula/before_backup
-    owner: root
-    group: root
-    mode: 0755
+    owner: bacula
+    group: tape
+    mode: 'u=rwx,g=rwx,o=rx'
 
 - name: Create after_backup script
   template:
     src: after_backup.j2
     dest: /usr/libexec/bacula/after_backup
-    owner: root
-    group: root
-    mode: 0755
+    owner: bacula
+    group: tape
+    mode: 'u=rwx,g=rwx,o=rx'

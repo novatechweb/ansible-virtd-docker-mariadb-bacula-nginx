@@ -53,3 +53,7 @@
 	path = roles/openssh-server
 	url = https://github.com/gmccollister/ansible-openssh-server.git
 	branch = master
+[submodule "roles/bacula-backup-scripts"]
+	path = roles/bacula-backup-scripts
+	url = https://github.com/gmccollister/ansible-bacula-backup-scripts.git
+	branch = master

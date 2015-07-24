@@ -62,3 +62,11 @@
     wiki_db_user: novatech
     tags:
     - wiki_container
+
+- name: Bacula backup scripts
+  hosts: bacula
+  user: ansibleremote
+  sudo: true
+
+  roles:
+    - { role: bacula-backup-scripts }

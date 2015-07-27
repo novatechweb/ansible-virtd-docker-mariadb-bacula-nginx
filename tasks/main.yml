@@ -1,27 +1,9 @@
 ---
 # file: roles/docker-common/tasks/main.yaml
 
-- name: install yum package python-docker
-  yum:
-    name: python-docker
-    state: present
-  when: ansible_os_family == "RedHat"
-
-- name: Install docker-py (1.0.0)
-  pip: name=docker-py version=1.0.0
-  when: ansible_os_family != "RedHat"
-
-- name: Set host ssh ListenAddress
-  replace:
-    dest: /etc/ssh/sshd_config
-    regexp: '#ListenAddress 0.0.0.0'
-    replace: 'ListenAddress {{ ansible_br0["ipv4"]["address"] }}'
-    backup: yes
-
-- name: Restart host sshd server
-  service:
-    name: sshd
-    state: restarted
+- include: ip_addr.yaml
+- include: packages.yaml
+- include: sshd_settings.yaml
 
 - name: restores base dir
   file:

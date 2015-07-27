@@ -6,3 +6,33 @@ set -e
 # Clean up VMs
 /usr/bin/virt-backup --action cleanup --vm={{ bacula_director_backup_vms }}
 {% endif %}
+
+{% if openssl_docker_backup_dir is defined %}
+# *****************************************************************************
+# Clean up openssl
+rm -rf {{ openssl_docker_backup_dir }}
+{% endif %}
+
+{% if openldap_docker_backup_dir is defined %}
+# *****************************************************************************
+# Clean up ldap
+rm -rf {{ openldap_docker_backup_dir }}
+{% endif %}
+
+{% if svn_docker_backup_dir is defined %}
+# *****************************************************************************
+# Clean up svn
+rm -rf {{ svn_docker_backup_dir }}
+{% endif %}
+
+{% if wiki_docker_backup_dir is defined %}
+# *****************************************************************************
+# Clean up wiki
+rm -rf {{ wiki_docker_backup_dir }}
+{% endif %}
+
+{% if gitlab_docker_backup_dir is defined %}
+# *****************************************************************************
+# Clean up git
+rm -rf {{ gitlab_docker_backup_dir }}
+{% endif %}

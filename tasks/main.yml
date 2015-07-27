@@ -1,9 +1,9 @@
 ---
 # file: roles/docker-common/tasks/main.yaml
 
-- include: ip_addr.yaml
-- include: packages.yaml
-- include: sshd_settings.yaml
+- include: ip_addr.yml
+- include: packages.yml
+- include: sshd_settings.yml
 
 - name: restores base dir
   file:

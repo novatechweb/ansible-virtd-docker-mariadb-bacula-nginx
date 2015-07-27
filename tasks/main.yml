@@ -67,7 +67,7 @@
 - name: start container
   docker_run:
     container_name: '{{ svn_container_name }}'
-    docker_run_arguments: '{{ svn_docker_port_mapping }} --link {{ openldap_container_name }}:ldap --volumes-from {{ openssl_dv_name }} --volumes-from {{ svn_dv_name }} --env SVN_HOSTNAME={{ svn_hostname }} {{ svn_image_name }}:{{ docker_image_tag }}'
+    docker_run_arguments: '{{ container_port_map.svn.port_args }} --link {{ openldap_container_name }}:ldap --volumes-from {{ openssl_dv_name }} --volumes-from {{ svn_dv_name }} --env SVN_HOSTNAME={{ container_addr_map.svn.hostname }} {{ svn_image_name }}:{{ docker_image_tag }}'
 
 # *****************************************************************************
 # restore?

@@ -14,15 +14,6 @@
     mode: 'u=rwx,g=rwx,o=rx'
     recurse: no
 
-- name: backups base dir
-  file:
-    state: directory
-    path: '{{ docker_backup_dir }}'
-    owner: root
-    group: tape
-    mode: 'u=rwx,g=rwx,o=rx'
-    recurse: no
-
 - name: base docker_container.conf dir
   file:
     state: directory

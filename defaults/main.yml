@@ -1,12 +1,17 @@
 ---
 
 # The hostname passed as an envirnment variable into the container
-wiki_hostname: wiki.novatech-llc.com
+container_addr_map:
+  wiki:
+    ip_addr: '127.0.0.1'
+    hostname: wiki.example.com
 
 # the port mappings used when starting the container
-wiki_docker_port_mapping: '-P'
+container_port_map:
+  wiki:
+    port_args: '-P'
 
 # database usernames and passwords
-wiki_db_root_password: '{{ lookup("password",   "credentials/" + inventory_hostname + "/" + wiki_hostname + "/root length=20") }}'
+wiki_db_root_password: '{{ lookup("password",   "credentials/" + inventory_hostname + "/" + container_addr_map.wiki.hostname + "/root length=20") }}'
 wiki_db_user: novatech
-wiki_db_password: '{{ lookup("password", "credentials/" + inventory_hostname + "/" + wiki_hostname + "/" + wiki_db_user + " length=20") }}'
+wiki_db_password: '{{ lookup("password", "credentials/" + inventory_hostname + "/" + container_addr_map.wiki.hostname + "/" + wiki_db_user + " length=20") }}'

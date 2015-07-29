@@ -51,3 +51,11 @@
   with_items: docker_projects
   tags:
     - docker_repositories
+
+- name: Check if baculavirt selinux module exists
+  stat:
+    path: /etc/selinux/targeted/modules/active/modules/dockervirt.pp
+  register: dockervirt_pp
+
+- include: selinux-virt-policy.yml
+  when: (dockervirt_pp.stat.exists is defined) and (dockervirt_pp.stat.exists == false)

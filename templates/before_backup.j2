@@ -1,0 +1,11 @@
+{% if openssl_docker_backup_dir is defined %}
+
+# *****************************************************************************
+# Backup openssl data container
+mkdir -p -m u=rwx,g=rwx,o= {{ openssl_docker_backup_dir }}
+chown root:tape {{ openssl_docker_backup_dir }}
+docker run --rm \
+    --volumes-from {{ openssl_dv_name }} \
+    {{ openssl_image_name }}:{{ docker_image_tag }} archive > \
+        {{ openssl_docker_backup_dir }}{{ openssl_backup_file }}
+{% endif %}

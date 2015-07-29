@@ -1,0 +1,6 @@
+{% if openssl_docker_backup_dir is defined %}
+
+# *****************************************************************************
+# Clean up openssl
+rm -rf {{ openssl_docker_backup_dir }}
+{% endif %}

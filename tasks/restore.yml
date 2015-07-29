@@ -46,9 +46,8 @@
 
 - name: Remove files
   file:
-    path: '{{ host_gitlab_docker_restore_dir }}/{{ item }}'
+    path: '{{ host_gitlab_docker_restore_dir }}'
     state: absent
-  with_items: '{{ gitlab_backup.file_list | default([]) }}'
 
 - name: State file
   shell: 'date --rfc-3339=seconds > {{ docker_restore_config_base_dir }}/{{ gitlab_dv_name }}/restore.date.txt'

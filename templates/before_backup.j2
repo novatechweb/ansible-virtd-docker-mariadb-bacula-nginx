@@ -3,7 +3,6 @@
 # *****************************************************************************
 # Backup WIKI data container
 mkdir -p -m u=rwx,g=rwx,o= {{ wiki_docker_backup_dir }}
-chown root:tape {{ wiki_docker_backup_dir }}
 pushd {{ docker_restore_config_base_dir }}/{{ wiki_dv_name }}
 ./mediawiki.sh backup
 popd

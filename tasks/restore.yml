@@ -47,7 +47,7 @@
 
 - name: remove - openssl archive
   file:
-    path: '{{ host_openssl_docker_restore_dir }}{{ openssl_backup_file }}'
+    path: '{{ host_openssl_docker_restore_dir }}'
     state: absent
 
 - name: State file

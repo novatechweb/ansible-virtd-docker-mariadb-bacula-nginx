@@ -1,0 +1,10 @@
+{% if gitlab_docker_backup_dir is defined %}
+
+# *****************************************************************************
+# Backup gitlab
+mkdir -p -m u=rwx,g=rwx,o= {{ gitlab_docker_backup_dir }}
+chown root:tape {{ gitlab_docker_backup_dir }}
+pushd {{ docker_restore_config_base_dir }}/{{ gitlab_dv_name }}
+./gitlab.sh backup
+popd
+{% endif %}

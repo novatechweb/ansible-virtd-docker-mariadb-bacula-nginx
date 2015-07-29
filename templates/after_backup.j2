@@ -1,0 +1,6 @@
+{% if gitlab_docker_backup_dir is defined %}
+
+# *****************************************************************************
+# Clean up git
+rm -rf {{ gitlab_docker_backup_dir }}
+{% endif %}

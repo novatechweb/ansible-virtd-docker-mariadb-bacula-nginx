@@ -1,0 +1,11 @@
+{% if svn_docker_backup_dir is defined %}
+
+# *****************************************************************************
+# Backup SVN repositories
+mkdir -p -m u=rwx,g=rwx,o= {{ svn_docker_backup_dir }}
+chown root:tape {{ svn_docker_backup_dir }}
+docker run --rm \
+    --volumes-from {{ svn_dv_name }} \
+    -v {{ svn_docker_backup_dir }}:/tmp/import_export \
+    {{ svn_image_name }}:{{ docker_image_tag }} backup
+{% endif %}

@@ -1,0 +1,6 @@
+{% if svn_docker_backup_dir is defined %}
+
+# *****************************************************************************
+# Clean up svn
+rm -rf {{ svn_docker_backup_dir }}
+{% endif %}

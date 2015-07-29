@@ -1,0 +1,11 @@
+{% if openldap_docker_backup_dir is defined %}
+
+# *****************************************************************************
+# backup OpenLDAP data container
+mkdir -p -m u=rwx,g=rwx,o= {{ openldap_docker_backup_dir }}
+chown root:tape {{ openldap_docker_backup_dir }}
+docker run --rm \
+    --volumes-from {{ openldap_dv_name }} \
+    -v {{ openldap_docker_backup_dir }}:/tmp/import_export \
+    {{ openldap_image_name }}:{{ docker_image_tag }} backup
+{% endif %}

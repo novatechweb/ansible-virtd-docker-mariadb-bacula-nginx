@@ -1,0 +1,6 @@
+{% if openldap_docker_backup_dir is defined %}
+
+# *****************************************************************************
+# Clean up ldap
+rm -rf {{ openldap_docker_backup_dir }}
+{% endif %}

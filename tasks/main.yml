@@ -60,3 +60,16 @@
 
 - include: selinux-backula-policy.yml
   when: (docker_bacula_pp.stat.exists is defined) and (docker_bacula_pp.stat.exists == false)
+
+# *****************************************************************************
+# backup script part
+
+- name: Assemble dir for backup scripts
+  file:
+    path: /usr/libexec/bacula/backup-scripts
+    state: directory
+
+- name: Create after_backup script
+  template:
+    src: after_backup.j2
+    dest: /usr/libexec/bacula/backup-scripts/99.after_backup.docker

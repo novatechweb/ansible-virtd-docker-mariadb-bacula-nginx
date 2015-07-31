@@ -1,0 +1,6 @@
+{% if docker_backup_dir is defined %}
+
+# *****************************************************************************
+# Clean up docker backup dir
+rm -rf {{ docker_backup_dir }}
+{% endif %}

@@ -2,5 +2,5 @@
 
 # *****************************************************************************
 # Clean up git
-rm -rf {{ gitlab_docker_backup_dir }}
+docker run --rm -v {{ docker_backup_dir }}:/tmp/import_export debian:production bash -c "rm -rf /tmp/import_export/GIT"
 {% endif %}

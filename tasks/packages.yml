@@ -8,5 +8,11 @@
   when: ansible_os_family == "RedHat"
 
 - name: Install docker-py (1.0.0)
-  pip: name=docker-py version=1.0.0
-  when: ansible_os_family != "RedHat"
+  command: pip2 install docker-py==1.0.0
+  when: ansible_os_family == "Archlinux"
+
+- name: Install docker-py (1.0.0)
+  pip:
+    name: docker-py
+    version: 1.0.0
+  when: (ansible_os_family != "RedHat") and (ansible_os_family != "Archlinux")

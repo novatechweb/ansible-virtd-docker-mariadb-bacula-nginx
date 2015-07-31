@@ -54,8 +54,8 @@
 
 - name: Check if baculavirt selinux module exists
   stat:
-    path: /etc/selinux/targeted/modules/active/modules/dockervirt.pp
-  register: dockervirt_pp
+    path: /etc/selinux/targeted/modules/active/modules/docker_bacula.pp
+  register: docker_bacula_pp
 
-- include: selinux-virt-policy.yml
-  when: (dockervirt_pp.stat.exists is defined) and (dockervirt_pp.stat.exists == false)
+- include: selinux-backula-policy.yml
+  when: (docker_bacula_pp.stat.exists is defined) and (docker_bacula_pp.stat.exists == false)

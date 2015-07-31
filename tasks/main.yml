@@ -63,13 +63,19 @@
 
 # *****************************************************************************
 # backup script part
+#   Docker backup script parts should be between 50 and 59
 
 - name: Assemble dir for backup scripts
   file:
     path: /usr/libexec/bacula/backup-scripts
     state: directory
 
+- name: Create before_backup script
+  template:
+    src: before_backup.j2
+    dest: /usr/libexec/bacula/backup-scripts/50.before_backup.svn
+
 - name: Create after_backup script
   template:
     src: after_backup.j2
-    dest: /usr/libexec/bacula/backup-scripts/99.after_backup.docker
+    dest: /usr/libexec/bacula/backup-scripts/59.after_backup.docker

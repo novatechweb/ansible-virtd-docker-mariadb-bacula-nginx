@@ -34,12 +34,12 @@
 - name: before_backup script part
   template:
     src: before_backup.j2
-    dest: /usr/libexec/bacula/backup-scripts/50.before_backup.wiki
+    dest: /usr/libexec/bacula/backup-scripts/55.before_backup.wiki
 
 - name: after_backup script part
   template:
     src: after_backup.j2
-    dest: /usr/libexec/bacula/backup-scripts/50.after_backup.wiki
+    dest: /usr/libexec/bacula/backup-scripts/55.after_backup.wiki
 
 # *****************************************************************************
 # update the Docker restore config

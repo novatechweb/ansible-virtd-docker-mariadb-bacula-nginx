@@ -2,6 +2,7 @@
 
 # *****************************************************************************
 # Backup SVN repositories
+docker run --rm -v {{ docker_backup_dir }}:/tmp/import_export debian:production bash -c "rm -rf /tmp/import_export/SVN"
 mkdir -p -m u=rwx,g=rwx,o= {{ svn_docker_backup_dir }}
 docker run --rm \
     --volumes-from {{ svn_dv_name }} \

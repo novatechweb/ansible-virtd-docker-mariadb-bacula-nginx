@@ -34,12 +34,12 @@
 - name: Create before_backup script
   template:
     src: before_backup.j2
-    dest: /usr/libexec/bacula/backup-scripts/50.before_backup.svn
+    dest: /usr/libexec/bacula/backup-scripts/55.before_backup.svn
 
 - name: Create after_backup script
   template:
     src: after_backup.j2
-    dest: /usr/libexec/bacula/backup-scripts/50.after_backup.svn
+    dest: /usr/libexec/bacula/backup-scripts/55.after_backup.svn
 
 # *****************************************************************************
 # update the Docker restore config

@@ -1,5 +1,26 @@
 ---
 
+- name: copy - delete_catalog_backup
+  copy:
+    src: delete_catalog_backup
+    dest: /usr/libexec/bacula/delete_catalog_backup
+    owner: bacula
+    group: tape
+    mode: 'u=rwx,g=rx,o=rx'
+
+- name: template - bacula-bootstrap-backup
+  template:
+    src: bacula-bootstrap-backup
+    dest: /usr/libexec/bacula/bacula-bootstrap-backup
+    owner: bacula
+    group: tape
+    mode: 'u=rwx,g=rx,o=rx'
+
+- name: run bacula-bootstrap-backup
+  command: /usr/libexec/bacula/bacula-bootstrap-backup
+  sudo: yes
+  sudo_user: bacula
+
 - name: Assemble dir for backup scripts
   file:
     path: /usr/libexec/bacula/backup-scripts
@@ -23,6 +44,9 @@
     owner: bacula
     group: tape
     mode: 'u=rw,g=rw,o=r'
+
+# *****************************************************************************
+# Assemble the backup scripts if the assemble_scripts variable is set
 
 - name: Assemble bacula before_backup script
   assemble:

@@ -4,12 +4,9 @@
 # *****************************************************************************
 # Get data from tape
 
-- name: exists
-  stat:
-    path: '{{ host_openldap_docker_restore_dir }}/{{ item.ldif_file }}'
-    get_checksum: False
-    get_md5: False
-  with_items: '{{ openldap_backup_files }}'
+- name: find files
+  files_in_dir:
+    path: '{{ host_openldap_docker_restore_dir }}'
   register: ldap_backup
 
 - name: Get data-volume data from tape
@@ -19,7 +16,7 @@
     fileset: '{{ bacula_fileset }}'
     dest: '{{ bacula_dest }}'
     path_to_restore: '{{ openldap_docker_backup_dir }}'
-  when: ldap_backup.results == []
+  when: ldap_backup.file_list == []
 
 - name: Set permissions for data-volume data
   file:

@@ -1,0 +1,50 @@
+---
+
+- assert:
+    that:
+    - remote_user_username is defined
+
+- name: Setup | create user
+  user:
+    name: '{{ remote_user_username }}'
+    comment: "Ansible Remote"
+    generate_ssh_key: yes
+    createhome: yes
+    system: yes
+
+- name: Setup | authorized key upload
+  authorized_key:
+    user: '{{ remote_user_username }}'
+    key: '{{ lookup("file", item) }}'
+    path: '/home/{{ remote_user_username }}/.ssh/authorized_keys'
+    manage_dir: no
+  with_fileglob:
+  - ../../../public_keys/*.pub
+
+- name: Sudoers | touch sudoers.d file
+  file:
+    path: /etc/sudoers.d/00_{{ remote_user_username }}
+    owner: root
+    group: root
+    mode: 'u=r,g=r,o='
+    state: touch
+
+- name: Sudoers | update sudoers file and validate
+  lineinfile:
+    dest: /etc/sudoers.d/00_{{ remote_user_username }}
+    insertafter: EOF
+    line: '{{ remote_user_username }} ALL=(ALL) NOPASSWD: ALL'
+    regexp: '{{ remote_user_username }} ALL=(ALL) NOPASSWD: ALL'
+    state: present
+
+- name: lockdown root user
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '.*PermitRootLogin .*'
+    line: 'PermitRootLogin no'
+    state: present
+
+- name: restart sshd service
+  service:
+    name: sshd
+    state: restarted

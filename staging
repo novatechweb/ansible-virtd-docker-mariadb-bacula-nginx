@@ -1,10 +1,10 @@
 [bacula]
-testdaedalus
+testdaedalus.novatech-llc.com
 
 [virtual-machine-hosts]
-testdaedalus
+testdaedalus.novatech-llc.com
 
 [freeipa-VM]
 
 [docker-hosts]
-testdaedalus
+testdaedalus.novatech-llc.com

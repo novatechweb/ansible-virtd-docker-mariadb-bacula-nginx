@@ -29,10 +29,6 @@
 	path = roles/openssh-server
 	url = https://github.com/gmccollister/ansible-openssh-server.git
 	branch = master
-[submodule "roles/bacula-backup-scripts"]
-	path = roles/bacula-backup-scripts
-	url = https://github.com/gmccollister/ansible-bacula-backup-scripts.git
-	branch = master
 [submodule "roles/bacula-catalog"]
 	path = roles/bacula-catalog
 	url = https://github.com/novatechweb/ansible-bacula-catalog.git
@@ -54,3 +50,6 @@
 [submodule "roles/libvirt-vm"]
 	path = roles/libvirt-vm
 	url = https://github.com/novatechweb/ansible-libvirt-vm.git
+[submodule "roles/bacula-script"]
+	path = roles/bacula-script
+	url = https://github.com/novatechweb/ansible-bacula-script.git

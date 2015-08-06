@@ -18,8 +18,9 @@
 
 - name: run bacula-bootstrap-backup
   command: /usr/libexec/bacula/bacula-bootstrap-backup
-  sudo: yes
-  sudo_user: bacula
+  become: true
+  become_user: bacula
+  become_method: sudo
 
 - name: Assemble dir for backup scripts
   file:

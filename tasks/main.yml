@@ -1,4 +1,7 @@
 ---
+- assert:
+    that:
+    - bacula_director_password is defined
 - name: Install/setup Bacula Console
   yum: name={{ item }} state=present
   with_items:

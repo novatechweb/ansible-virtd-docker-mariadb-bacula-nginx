@@ -3,8 +3,10 @@
 
 - name: Bacula
   hosts: bacula
-  user: '{{ remote_user_username }}'
-  sudo: true
+  remote_user: '{{ remote_user_username }}'
+  become: true
+  become_user: root
+  become_method: sudo
   roles:
   - role: mariadb
     vars:
@@ -23,8 +25,10 @@
 
 - name: Virtual machines
   hosts: virtual-machine-hosts
-  user: '{{ remote_user_username }}'
-  sudo: true
+  remote_user: '{{ remote_user_username }}'
+  become: true
+  become_user: root
+  become_method: sudo
   roles:
   - role: libvirt-lvmpool
   - role: libvirt-vm
@@ -38,8 +42,10 @@
 
 - name: Install/Setup Docker images and containers
   hosts: docker-hosts
-  user: '{{ remote_user_username }}'
-  sudo: true
+  remote_user: '{{ remote_user_username }}'
+  become: true
+  become_user: root
+  become_method: sudo
   roles:
   - name: Build base images that are not on Docker Hub
     role: docker-build-base-image
@@ -66,8 +72,10 @@
 
 - name: Assemble Bacula backup scripts
   hosts: bacula
-  user: '{{ remote_user_username }}'
-  sudo: true
+  remote_user: '{{ remote_user_username }}'
+  become: true
+  become_user: root
+  become_method: sudo
   roles:
   - role: bacula-script
     vars:
@@ -75,8 +83,10 @@
 
 - name: Cleanup tasks
   hosts: all
-  user: '{{ remote_user_username }}'
-  sudo: true
+  remote_user: '{{ remote_user_username }}'
+  become: true
+  become_user: root
+  become_method: sudo
   tasks:
   - name: Remove bacula-restores dir
     file:

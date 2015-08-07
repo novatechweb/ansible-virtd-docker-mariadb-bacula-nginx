@@ -72,3 +72,13 @@
   - role: bacula-script
     vars:
     - assemble_scripts: true
+
+- name: Cleanup tasks
+  hosts: all
+  user: '{{ remote_user_username }}'
+  sudo: true
+  tasks:
+  - name: Remove bacula-restores dir
+    file:
+      path: /tmp/bacula-restores/
+      state: absent

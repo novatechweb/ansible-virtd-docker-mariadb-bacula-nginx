@@ -1,6 +1,4 @@
 ---
-- name: Generate password
-  include_vars: root_password.yml
 - name: Set root password
   shell: mysql -e "UPDATE mysql.user SET Password=PASSWORD('{{ mariadb_root_password }}') WHERE User='root';"
 - name: Remove anonymous users

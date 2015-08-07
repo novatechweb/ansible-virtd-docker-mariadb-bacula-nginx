@@ -7,3 +7,6 @@ mariadb_remote_root_access: false
 mariadb_innodb_use_barracuda: true
 mariadb_character_set: "utf8"
 mariadb_collation: "utf8_general_ci"
+
+# must pass in the following variables
+# mariadb_root_password: ''

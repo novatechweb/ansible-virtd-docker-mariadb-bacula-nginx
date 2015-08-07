@@ -49,3 +49,6 @@
 [submodule "roles/mariadb"]
 	path = roles/mariadb
 	url = https://github.com/novatechweb/ansible-mariadb.git
+[submodule "roles/setup-remote-user"]
+	path = roles/setup-remote-user
+	url = https://github.com/novatechweb/ansible-setup-remote-user.git

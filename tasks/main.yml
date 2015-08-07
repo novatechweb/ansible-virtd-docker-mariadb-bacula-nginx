@@ -1,6 +1,11 @@
 ---
 # file: roles/docker-mediawiki/tasks/main.yaml
 
+- assert:
+    that:
+    - wiki_db_root_password is defined
+    - wiki_db_password is defined
+
 # *****************************************************************************
 # Setup the directory where the backup and restore is to take place
 

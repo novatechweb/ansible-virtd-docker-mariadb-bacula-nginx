@@ -13,3 +13,7 @@ bacula_storage_device_name: "QuantumTape"
 bacula_storage_device_type: Tape
 bacula_storage_device_archive_device: "/dev/nst0"
 bacula_storage_device_media_type: "tape"
+
+# must pass in the following variables
+# bacula_director_password: ''
+# bacula_monitor_password: ''

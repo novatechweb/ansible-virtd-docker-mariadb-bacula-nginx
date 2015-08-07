@@ -13,4 +13,6 @@ container_port_map:
 
 # database usernames and passwords
 gitlab_db_user: novatech
-gitlab_db_password: '{{ lookup("password", "../../../credentials/" + inventory_hostname + "/" + container_addr_map.git.hostname + "/" + gitlab_db_user + " length=20") }}'
+
+# must pass in the following variables
+# gitlab_db_password: ''

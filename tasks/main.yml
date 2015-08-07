@@ -1,6 +1,10 @@
 ---
 # file: roles/docker-gitlab/tasks/main.yaml
 
+- assert:
+    that:
+    - gitlab_db_password is defined
+
 # *****************************************************************************
 # Setup the directory where the backup and restore is to take place
 

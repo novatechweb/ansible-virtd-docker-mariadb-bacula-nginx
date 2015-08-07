@@ -10,3 +10,7 @@ bacula_director_password: ""
 bacula_monitor_name: "bacula-mon"
 bacula_monitor_password: ""
 bacula_client_address: 127.0.0.1
+
+# must pass in the following variables
+# bacula_director_password: ''
+# bacula_monitor_password: ''

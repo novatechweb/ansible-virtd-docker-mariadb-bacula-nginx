@@ -16,6 +16,9 @@
   - role: bacula-storage
   - role: bacula-client
   - role: bacula-console
+  - role: bacula-script
+    vars:
+    - assemble_scripts: false
   - role: bacula-catalog
 
 - name: Virtual machines
@@ -61,9 +64,11 @@
     tags:
     - wiki_container
 
-- name: Bacula backup scripts
+- name: Assemble Bacula backup scripts
   hosts: bacula
   user: '{{ remote_user_username }}'
   sudo: true
   roles:
-  - role: bacula-backup-scripts
+  - role: bacula-script
+    vars:
+    - assemble_scripts: true

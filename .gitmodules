@@ -1,6 +1,3 @@
-[submodule "roles/mariadb"]
-	path = roles/mariadb
-	url = https://github.com/jorti/ansible-mariadb.git
 [submodule "roles/docker-build-base-image"]
 	path = roles/docker-build-base-image
 	url = git@github.com:novatechweb/ansible-docker-build-base-image.git
@@ -53,3 +50,6 @@
 [submodule "roles/bacula-script"]
 	path = roles/bacula-script
 	url = https://github.com/novatechweb/ansible-bacula-script.git
+[submodule "roles/mariadb"]
+	path = roles/mariadb
+	url = https://github.com/novatechweb/ansible-mariadb.git

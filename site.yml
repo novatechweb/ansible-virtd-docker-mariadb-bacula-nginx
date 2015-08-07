@@ -9,18 +9,15 @@
   become_method: sudo
   roles:
   - role: mariadb
-    vars:
-    - mariadb_open_firewall: true
-    - mariadb_remote_root_access: false
+    mariadb_open_firewall: true
+    mariadb_remote_root_access: false
   - role: bacula-director
-    vars:
-    - bacula_director_backup_vms: 'freeipa-centos7'
+    bacula_director_backup_vms: 'freeipa-centos7'
   - role: bacula-storage
   - role: bacula-client
   - role: bacula-console
   - role: bacula-script
-    vars:
-    - assemble_scripts: false
+    assemble_scripts: false
   - role: bacula-catalog
 
 - name: Virtual machines
@@ -32,13 +29,12 @@
   roles:
   - role: libvirt-lvmpool
   - role: libvirt-vm
-    vars:
-    - vm_name: freeipa-centos7
-    - vm_pool: virtstorage
-    - vm_vol: freeipa-centos7-vol
-    - vm_capacity: 40000M
-    - vm_image: freeipa-centos7_vda.img
-    - vm_start: True
+    vm_name: freeipa-centos7
+    vm_pool: virtstorage
+    vm_vol: freeipa-centos7-vol
+    vm_capacity: 40000M
+    vm_image: freeipa-centos7_vda.img
+    vm_start: True
 
 - name: Install/Setup Docker images and containers
   hosts: docker-hosts
@@ -53,20 +49,17 @@
     - base_images
   - name: Build and start the SVN Docker container
     role: docker-svn
-    vars:
-    - svn_repos: 'ddio novatech NCD_Release'
+    svn_repos: 'ddio novatech NCD_Release'
     tags:
     - svn_container
   - name: Build and start the GitLab Docker container
     role: docker-gitlab
-    vars:
-    - gitlab_db_user: novatech
+    gitlab_db_user: novatech
     tags:
     - gitlab_container
   - name: Build and start the MediaWIKI Docker container
     role: docker-mediawiki
-    vars:
-    - wiki_db_user: novatech
+    wiki_db_user: novatech
     tags:
     - wiki_container
 
@@ -78,8 +71,7 @@
   become_method: sudo
   roles:
   - role: bacula-script
-    vars:
-    - assemble_scripts: true
+    assemble_scripts: true
 
 - name: Cleanup tasks
   hosts: all

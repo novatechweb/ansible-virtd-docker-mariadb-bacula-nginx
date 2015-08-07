@@ -88,6 +88,13 @@
   become_user: root
   become_method: sudo
   tasks:
+  - name: Copy credentials to the /etc dir
+    copy:
+      src: ./credentials/{{ inventory_hostname }}
+      dest: /etc/ansible-credentials/
+      owner: root
+      group: root
+      mode: 'u=rw,g=,o='
   - name: Remove bacula-restores dir
     file:
       path: /tmp/bacula-restores/

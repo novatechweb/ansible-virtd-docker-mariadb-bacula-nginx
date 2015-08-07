@@ -40,7 +40,7 @@
 - name: lockdown root user
   lineinfile:
     dest: /etc/ssh/sshd_config
-    regexp: '.*PermitRootLogin .*'
+    regexp: '^[#]?PermitRootLogin .*$'
     line: 'PermitRootLogin no'
     state: present
 

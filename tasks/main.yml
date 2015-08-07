@@ -15,9 +15,7 @@
   register: bacula_director_config_status
 - name: Use libbaccats-mysql
   command: alternatives --set libbaccats.so /usr/lib64/libbaccats-mysql.so
-- name: Make sure bacula user is in the tape group
-  user: name=bacula groups=qemu append=yes
-  when: bacula_director_backup_vms is defined
+- include: bacula-user.yml
 - name: libvirt polkit
   copy: src=50-bacula-libvirt-access.pkla
         dest=/etc/polkit-1/localauthority/50-local.d/50-bacula-libvirt-access.pkla

@@ -1,0 +1,24 @@
+---
+
+- name: Make sure bacula user is in the tape group
+  user:
+    name: bacula
+    groups: tape
+    append: yes
+
+- name: Make sure bacula user is in the qemu group
+  user:
+    name: bacula
+    groups: qemu
+    append: yes
+
+- name: Create the docker group
+  group:
+    name: docker
+    system: yes
+
+- name: Make sure bacula user is in the docker group
+  user:
+    name: bacula
+    groups: docker
+    append: yes

@@ -1,4 +1,9 @@
 ---
+- assert:
+    that:
+    - bacula_director_password is defined
+    - bacula_monitor_password is defined
+    - mariadb_bacula_password is defined
 - name: Install/setup Bacula Director
   yum: name={{ item }} state=present
   with_items:

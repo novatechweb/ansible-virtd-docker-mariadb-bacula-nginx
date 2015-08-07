@@ -5,61 +5,61 @@
   hosts: bacula
   user: ansibleremote
   sudo: true
-
   roles:
-    - { role: mariadb, mariadb_open_firewall: true, mariadb_remote_root_access: false }
-    - { role: bacula-director, bacula_director_backup_vms: 'freeipa-centos7' }
-    - { role: bacula-storage }
-    - { role: bacula-client }
-    - { role: bacula-console }
-    - { role: bacula-catalog }
-
+  - role: mariadb
+    vars:
+    - mariadb_open_firewall: true
+    - mariadb_remote_root_access: false
+  - role: bacula-director
+    vars:
+    - bacula_director_backup_vms: 'freeipa-centos7'
+  - role: bacula-storage
+  - role: bacula-client
+  - role: bacula-console
+  - role: bacula-catalog
 
 - name: Virtual machines
   hosts: virtual-machine-hosts
   user: ansibleremote
   sudo: true
-
   roles:
-    - { role: libvirt-lvmpool }
-    - { role: libvirt-vm,
-                vm_name: freeipa-centos7,
-                vm_pool: virtstorage,
-                vm_vol: freeipa-centos7-vol,
-                vm_capacity: 40000M,
-                vm_image: freeipa-centos7_vda.img,
-                vm_start: True }
+  - role: libvirt-lvmpool
+  - role: libvirt-vm
+    vars:
+    - vm_name: freeipa-centos7
+    - vm_pool: virtstorage
+    - vm_vol: freeipa-centos7-vol
+    - vm_capacity: 40000M
+    - vm_image: freeipa-centos7_vda.img
+    - vm_start: True
 
-
-- name: install/setup Docker images and containers
+- name: Install/Setup Docker images and containers
   hosts: docker-hosts
   user: ansibleremote
   sudo: true
-
   roles:
   - name: ssh server
     role: openssh-server
-
   - name: Build base images that are not on Docker Hub
     role: docker-build-base-image
     tags:
     - base_images
-
   - name: Build and start the SVN Docker container
     role: docker-svn
-    svn_repos: 'ddio novatech NCD_Release'
+    vars:
+    - svn_repos: 'ddio novatech NCD_Release'
     tags:
     - svn_container
-
   - name: Build and start the GitLab Docker container
     role: docker-gitlab
-    gitlab_db_user: novatech
+    vars:
+    - gitlab_db_user: novatech
     tags:
     - gitlab_container
-
   - name: Build and start the MediaWIKI Docker container
     role: docker-mediawiki
-    wiki_db_user: novatech
+    vars:
+    - wiki_db_user: novatech
     tags:
     - wiki_container
 
@@ -67,6 +67,5 @@
   hosts: bacula
   user: ansibleremote
   sudo: true
-
   roles:
-    - { role: bacula-backup-scripts }
+  - role: bacula-backup-scripts

@@ -15,6 +15,10 @@ require {
         type sysctl_net_t;
         type ssh_exec_t;
         type svirt_sandbox_file_t;
+        type user_tmp_t;
+        type ssh_keygen_exec_t;
+        type bacula_spool_t;
+        class lnk_file { create unlink };
         class process setsched;
         class unix_stream_socket connectto;
         class file { write execute read create unlink open getattr execute_no_trans setattr };
@@ -46,3 +50,6 @@ allow bacula_t sysctl_net_t:file { read open };
 
 allow bacula_t svirt_sandbox_file_t:dir { write add_name setattr };
 allow bacula_t svirt_sandbox_file_t:file { write create setattr };
+allow bacula_t bacula_spool_t:lnk_file { create unlink };
+allow bacula_t ssh_keygen_exec_t:file { execute execute_no_trans };
+allow bacula_t user_tmp_t:dir setattr;

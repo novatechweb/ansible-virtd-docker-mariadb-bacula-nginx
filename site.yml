@@ -3,7 +3,7 @@
 
 - name: Bacula
   hosts: bacula
-  user: ansibleremote
+  user: '{{ remote_user_username }}'
   sudo: true
   roles:
   - role: mariadb
@@ -20,7 +20,7 @@
 
 - name: Virtual machines
   hosts: virtual-machine-hosts
-  user: ansibleremote
+  user: '{{ remote_user_username }}'
   sudo: true
   roles:
   - role: libvirt-lvmpool
@@ -35,7 +35,7 @@
 
 - name: Install/Setup Docker images and containers
   hosts: docker-hosts
-  user: ansibleremote
+  user: '{{ remote_user_username }}'
   sudo: true
   roles:
   - name: ssh server
@@ -65,7 +65,7 @@
 
 - name: Bacula backup scripts
   hosts: bacula
-  user: ansibleremote
+  user: '{{ remote_user_username }}'
   sudo: true
   roles:
   - role: bacula-backup-scripts

@@ -128,7 +128,7 @@
 
 - name: Wait for gitlab to be fully running
   wait_for:
-    delay: 30
+    delay: 10
     host: '{{ container_addr_map.git.ip_addr }}'
     port: 22
     state: started

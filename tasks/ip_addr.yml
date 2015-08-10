@@ -35,3 +35,9 @@
     name: network
     state: restarted
   when: ansible_os_family == "RedHat"
+
+- name: make IPs active (second attempt)
+  service:
+    name: network
+    state: restarted
+  when: ansible_os_family == "RedHat"

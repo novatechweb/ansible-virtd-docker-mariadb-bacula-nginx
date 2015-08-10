@@ -1,7 +1,7 @@
 ---
 # file: roles/docker-common/tasks/sshd_settings.yaml
 
-- name: Set host ssh ListenAddress
+- name: Set ssh ListenAddress
   replace:
     dest: /etc/ssh/sshd_config
     regexp: '#ListenAddress 0.0.0.0'
@@ -9,7 +9,7 @@
     backup: yes
   when: ansible_br0 is defined and ansible_br0.ipv4 is defined and ansible_br0.ipv4.address is defined
 
-- name: Restart host sshd server
+- name: Restart sshd server
   service:
     name: sshd
     state: restarted

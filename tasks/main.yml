@@ -16,6 +16,7 @@
 - include: packages.yml
 - include: sshd_settings.yml
 - include: mariadb_settings.yml
+  when: ansible_os_family == "RedHat"
 
 - name: restores base dir
   file:
@@ -57,6 +58,7 @@
   stat:
     path: /etc/selinux/targeted/modules/active/modules/docker_bacula.pp
   register: docker_bacula_pp
+  when: ansible_os_family == "RedHat"
 
 - include: selinux-backula-policy.yml
   when: (docker_bacula_pp.stat.exists is defined) and (docker_bacula_pp.stat.exists == false)

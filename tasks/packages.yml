@@ -1,9 +1,9 @@
 ---
 # file: roles/docker-common/tasks/package.yaml
 
-- name: install yum package python-docker
+- name: install yum package docker-python (1.0.0)
   yum:
-    name: python-docker
+    name: docker-python-1.0.0
     state: present
   when: ansible_os_family == "RedHat"
 

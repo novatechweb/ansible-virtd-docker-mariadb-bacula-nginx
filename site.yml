@@ -49,7 +49,7 @@
     - base_images
   - name: Build and start the SVN Docker container
     role: docker-svn
-    svn_repos: 'ddio novatech NCD_Release'
+    svn_repos: 'ddio NCD_Release'
     tags:
     - svn_container
   - name: Build and start the GitLab Docker container

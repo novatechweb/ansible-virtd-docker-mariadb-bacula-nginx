@@ -2,8 +2,7 @@
 
 container_addr_map:
   svn:
-    ip_addr: 172.16.0.111
-    #ip_addr: 172.16.0.101
+    ip_addr: 172.16.0.101
     hostname: svn.novatech-llc.com
     bridge_num: 1
   git:

@@ -87,6 +87,14 @@
       owner: root
       group: root
       mode: 'u=rw,g=,o='
+  - name: set directory permissions for /etc/ansible-credentials/
+    file:
+      state: directory
+      path: /etc/ansible-credentials/
+      owner: root
+      group: root
+      mode: 'u=rw,g=,o='
+      recurse: yes
   - name: Remove bacula-restores dir
     file:
       path: /tmp/bacula-restores/

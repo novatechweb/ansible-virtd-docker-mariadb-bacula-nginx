@@ -25,9 +25,10 @@ container_addr_map:
     ip_addr: 172.16.64.106
     hostname: test-testssh.novatech-llc.com
     bridge_num: 6
-  107:
+  exim4:
     ip_addr: 172.16.64.107
-    hostname: test-107.novatech-llc.com
+    hostname: test-mail.novatech-llc.com
+    bridge_num: 7
   ldap:
     ip_addr: 172.16.64.108
     hostname: test-ldap.novatech-llc.com
@@ -56,8 +57,8 @@ container_port_map:
     port_args: '-p {{ container_addr_map.build.ip_addr }}:80:80 -p {{ container_addr_map.build.ip_addr }}:443:443'
   testssh:
     port_args: '-p {{ container_addr_map.testssh.ip_addr }}:2200:22'
-  107:
-    port_args: '-P'
+  exim4:
+    port_args: '-p {{ container_addr_map.exim4.ip_addr }}:25:25 -p {{ container_addr_map.exim4.ip_addr }}:465:465 -p {{ container_addr_map.exim4.ip_addr }}:587:587'
   ldap:
     port_args: '-p {{ container_addr_map.ldap.ip_addr }}:389:389 -p {{ container_addr_map.ldap.ip_addr }}:636:636'
   phpldapadmin:

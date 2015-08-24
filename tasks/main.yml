@@ -16,7 +16,6 @@
 - include: packages.yml
 - include: sshd_settings.yml
 - include: mariadb_settings.yml
-  when: ansible_os_family == "RedHat"
 
 - name: restores base dir
   file:

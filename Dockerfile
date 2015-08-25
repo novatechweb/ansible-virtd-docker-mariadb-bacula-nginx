@@ -10,7 +10,8 @@ RUN apt-get update && \
                     python-setuptools=3.3* \
                     libpython-dev=2.7* \
                     python-svn=1.7* \
-                    openssh-server=1:6* && \
+                    openssh-server=1:6* \
+						  rsync=3.1* && \
     rm -rf /var/lib/apt/lists/*
 #---------------------------
 RUN pip install "django<1.8" \

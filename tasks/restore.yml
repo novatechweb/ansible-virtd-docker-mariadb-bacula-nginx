@@ -33,7 +33,7 @@
     state: touch
     owner: root
     group: root
-    mode: 'u=rwx,g=rwx,o='
+    mode: 'u=rw,g=rw,o='
 
 - name: permissions - SQL
   file:
@@ -41,7 +41,7 @@
     state: touch
     owner: root
     group: root
-    mode: 'u=rwx,g=rwx,o='
+    mode: 'u=rw,g=rw,o='
 
 - name: exists - Static
   stat:

@@ -66,6 +66,17 @@
     role: docker-mantisbt
     tags:
     - mantisbt_container
+  - name: Build and start Build System (Test Station) containers
+    role: docker-buildsystem
+    tags:
+    - buildsystem_container
+
+- name: Setup the Build System (Test Station) with repo data
+  hosts: buildsystem
+  roles:
+  - role: buildsystem
+    tags:
+     - buildsystem_container
 
 - name: Assemble Bacula backup scripts
   hosts: bacula

@@ -8,3 +8,6 @@ daedalus.novatech-llc.com
 
 [docker-hosts]
 daedalus.novatech-llc.com
+
+[buildsystem]
+buildsystem.novatech-llc.com become=false ansible_ssh_user=root ansible_ssh_private_key_file=~/.ssh/id_rsa_buildsystem_default

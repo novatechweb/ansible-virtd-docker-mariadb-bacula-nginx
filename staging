@@ -10,4 +10,4 @@ testdaedalus.novatech-llc.com
 testdaedalus.novatech-llc.com
 
 [buildsystem]
-172.16.64.105 become=false ansible_ssh_user=root ansible_ssh_private_key_file=~/.ssh/id_rsa_buildsystem_default
+buildsystem.novatech-llc.com ansible_ssh_host=172.16.64.105

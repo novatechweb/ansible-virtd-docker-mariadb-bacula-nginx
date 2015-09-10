@@ -7,7 +7,7 @@
 #       image_name=debian pull_image_tag=8 working_image_tag=current
 #
 # Arguments:
-#    image_name - [postgres, mysql]
+#    image_name - [postgres, mysql, mariadb]
 #    image_tag
 #    container_name
 #    data_volume_container_name - optional
@@ -44,14 +44,22 @@ if [[ -z "${image_name}" ]]; then
 fi
 
 case ${image_name} in
-    postgres)
+    *postgres*)
         if [[ -z "${data_volume_dir}" ]]; then
             printf "{\"failed\": true, \"changed\": false, \"msg\": \"Module needs data_volume_dir= argument\"}"
             exit 1
         fi
         ;;
 
-    mysql)
+    *mysql*)
+        data_volume_dir=""
+        if [[ -z "${database_root_password}" ]]; then
+            printf "{\"failed\": true, \"changed\": false, \"msg\": \"Module needs database_password= argument\"}"
+            exit 1
+        fi
+        ;;
+
+    *mariadb*)
         data_volume_dir=""
         if [[ -z "${database_root_password}" ]]; then
             printf "{\"failed\": true, \"changed\": false, \"msg\": \"Module needs database_password= argument\"}"
@@ -60,7 +68,7 @@ case ${image_name} in
         ;;
 
     *)
-        printf "{\"failed\": true, \"changed\": false, \"msg\": \"Module needs image_name= argument from [postgres, mysql]\"}"
+        printf "{\"failed\": true, \"changed\": false, \"msg\": \"Module needs image_name= argument from [postgres, mysql, mariadb]\"}"
         exit 1
         ;;
 esac
@@ -111,7 +119,7 @@ fi
 # Start the docker container to initilize the database
 
 case ${image_name} in
-    postgres)
+    *postgres*)
         # set command to run to check if database has finished starting
         check_command="docker exec ${container_name} su 2>&1 postgres -c 'psql -l' | grep -q \"^ ${database_name}\b\" &> /dev/null"
         # start the docker container that will generate the database files
@@ -125,7 +133,21 @@ case ${image_name} in
         run_result="${?}"
         ;;
 
-    mysql)
+    *mysql*)
+        # set command to run to check if database has finished starting
+        check_command="printf 'SHOW GLOBAL STATUS\n' | docker exec -i ${container_name} mysql --host=localhost --user=\"${database_user}\" --password=\"${database_password}\" ${database_name} &> /dev/null"
+        # start the docker container that will generate the database files
+        docker run -d --name ${container_name} \
+          ${data_volume_container_name} \
+          --env MYSQL_DATABASE=${database_name} \
+          --env MYSQL_ROOT_PASSWORD=${database_root_password} \
+          --env MYSQL_USER=${database_user} \
+          --env MYSQL_PASSWORD=${database_password} \
+          ${image_name}:${image_tag} &> /dev/null
+        run_result="${?}"
+        ;;
+
+    *mariadb*)
         # set command to run to check if database has finished starting
         check_command="printf 'SHOW GLOBAL STATUS\n' | docker exec -i ${container_name} mysql --host=localhost --user=\"${database_user}\" --password=\"${database_password}\" ${database_name} &> /dev/null"
         # start the docker container that will generate the database files

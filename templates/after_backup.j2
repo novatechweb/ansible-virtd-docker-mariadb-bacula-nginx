@@ -1,0 +1,6 @@
+{% if mantisbt_docker_backup_dir is defined %}
+
+# *****************************************************************************
+# Clean up mantisbt
+rm -rf {{ mantisbt_docker_backup_dir }}
+{% endif %}

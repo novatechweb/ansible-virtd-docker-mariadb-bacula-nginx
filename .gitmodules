@@ -52,3 +52,6 @@
 [submodule "roles/setup-remote-user"]
 	path = roles/setup-remote-user
 	url = https://github.com/novatechweb/ansible-setup-remote-user.git
+[submodule "roles/docker-mantisbt"]
+	path = roles/docker-mantisbt
+	url = https://github.com/novatechweb/ansible-docker-mantisbt.git

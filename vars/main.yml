@@ -14,6 +14,8 @@ docker_projects:
     repo: https://github.com/novatechweb/docker-openssl.git
   - name: docker-svn
     repo: https://github.com/novatechweb/docker-svn.git
+  - name: docker-mantisbt
+    repo: https://github.com/novatechweb/docker-mantisbt.git
   - name: docker-mysql-data
     repo: https://github.com/novatechweb/docker-mysql-data.git
 

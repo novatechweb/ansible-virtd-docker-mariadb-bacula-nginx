@@ -13,9 +13,10 @@ container_addr_map:
     ip_addr: 172.16.0.103
     hostname: wiki.novatech-llc.com
     bridge_num: 3
-  mantis:
+  mantisbt:
     ip_addr: 172.16.0.104
     hostname: mantis.novatech-llc.com
+    bridge_num: 4
   build:
     ip_addr: 172.16.0.105
     hostname: buildsystem.novatech-llc.com
@@ -49,8 +50,8 @@ container_port_map:
     port_args: '-p {{ container_addr_map.git.ip_addr }}:80:80 -p {{ container_addr_map.git.ip_addr }}:443:443  -p {{ container_addr_map.git.ip_addr }}:22:22'
   wiki:
     port_args: '-p {{ container_addr_map.wiki.ip_addr }}:80:80 -p {{ container_addr_map.wiki.ip_addr }}:443:443'
-  mantis:
-    port_args: '-p {{ container_addr_map.mantis.ip_addr }}:80:80 -p {{ container_addr_map.mantis.ip_addr }}:443:443'
+  mantisbt:
+    port_args: '-p {{ container_addr_map.mantisbt.ip_addr }}:80:80 -p {{ container_addr_map.mantisbt.ip_addr }}:443:443'
   build:
     port_args: '-p {{ container_addr_map.build.ip_addr }}:80:80 -p {{ container_addr_map.build.ip_addr }}:443:443'
   testssh:

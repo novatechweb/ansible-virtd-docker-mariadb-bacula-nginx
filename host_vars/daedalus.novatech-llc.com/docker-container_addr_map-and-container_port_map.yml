@@ -18,10 +18,12 @@ container_addr_map:
     hostname: mantis.novatech-llc.com
   build:
     ip_addr: 172.16.0.105
-    hostname: build.novatech-llc.com
+    hostname: buildsystem.novatech-llc.com
+    bridge_num: 5
   testssh:
     ip_addr: 172.16.0.106
     hostname: testssh.novatech-llc.com
+    bridge_num: 6
   107:
     ip_addr: 172.16.0.107
     hostname: 107.novatech-llc.com

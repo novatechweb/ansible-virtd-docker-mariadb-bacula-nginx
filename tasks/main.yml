@@ -90,6 +90,7 @@
   copy:
     src: '{{ item }}'
     dest: '{{ host_mantisbt_docker_restore_dir }}/{{ item }}'
+    setype: svirt_sandbox_file_t
   with_items:
   - largefile.cnf
   - character-set.cnf

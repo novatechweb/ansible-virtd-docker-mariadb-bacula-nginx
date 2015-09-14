@@ -62,6 +62,10 @@
     wiki_db_user: novatech
     tags:
     - wiki_container
+  - name: Build and start the MantisBT Docker container
+    role: docker-mantisbt
+    tags:
+    - mantisbt_container
 
 - name: Assemble Bacula backup scripts
   hosts: bacula

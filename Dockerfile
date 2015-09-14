@@ -34,9 +34,9 @@ RUN pip install "django<1.8" \
                 "pyserial>=2.7"
 #---------------------------
 
-COPY ./error_documents/403.shtml /ErrorDocument/403.shtml
-COPY ./error_documents/404.shtml /ErrorDocument/404.shtml
-COPY ./error_documents/500.shtml /ErrorDocument/500.shtml
+COPY ./error_documents/403.shtml /srv/www/ErrorDocument/403.shtml
+COPY ./error_documents/404.shtml /srv/www/ErrorDocument/404.shtml
+COPY ./error_documents/500.shtml /srv/www/ErrorDocument/500.shtml
 
 COPY ./openssl.tar /openssl.tar
 RUN  tar -x -f /openssl.tar --directory=/ 

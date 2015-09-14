@@ -6,14 +6,17 @@ require {
         type lvm_exec_t;
         type virtd_t;
         type svirt_image_t;
+        type fixed_disk_device_t;
         type proc_net_t;
         type virt_var_run_t;
+        type svirt_t;
         type bacula_t;
         type docker_exec_t;
         type docker_t;
         type docker_var_run_t;
         type sysctl_net_t;
         type ssh_exec_t;
+        type logrotate_t;
         type svirt_sandbox_file_t;
         type user_tmp_t;
         type ssh_keygen_exec_t;
@@ -23,8 +26,8 @@ require {
         class unix_stream_socket connectto;
         class file { write execute read create unlink open getattr execute_no_trans setattr };
         class sock_file write;
-        class blk_file { read open };
-        class dir { search write remove_name create add_name rmdir setattr };
+        class blk_file { read write open };
+        class dir { search read write remove_name create add_name rmdir setattr };
 }
 
 #============= bacula_t ==============
@@ -48,8 +51,16 @@ allow bacula_t ssh_exec_t:file { execute execute_no_trans };
 allow bacula_t sysctl_net_t:dir search;
 allow bacula_t sysctl_net_t:file { read open };
 
-allow bacula_t svirt_sandbox_file_t:dir { write add_name setattr };
+allow bacula_t svirt_sandbox_file_t:dir { write create add_name setattr };
 allow bacula_t svirt_sandbox_file_t:file { write create setattr };
 allow bacula_t bacula_spool_t:lnk_file { create unlink };
 allow bacula_t ssh_keygen_exec_t:file { execute execute_no_trans };
 allow bacula_t user_tmp_t:dir setattr;
+
+allow bacula_t fixed_disk_device_t:blk_file read;
+
+#============= logrotate_t ==============
+allow logrotate_t svirt_sandbox_file_t:dir read;
+
+#============= svirt_t ==============
+allow svirt_t fixed_disk_device_t:blk_file write;

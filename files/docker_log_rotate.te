@@ -1,0 +1,10 @@
+module docker_log_rotate 1.0;
+
+require {
+        type svirt_sandbox_file_t;
+        type logrotate_t;
+        class file getattr;
+}
+
+#============= logrotate_t ==============
+allow logrotate_t svirt_sandbox_file_t:file getattr;

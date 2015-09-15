@@ -55,3 +55,6 @@
 [submodule "roles/docker-mantisbt"]
 	path = roles/docker-mantisbt
 	url = https://github.com/novatechweb/ansible-docker-mantisbt.git
+[submodule "roles/docker-exim4"]
+	path = roles/docker-exim4
+	url = https://github.com/novatechweb/ansible-docker-exim4.git

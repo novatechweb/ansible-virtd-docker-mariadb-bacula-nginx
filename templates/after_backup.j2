@@ -2,5 +2,5 @@
 
 # *****************************************************************************
 # Clean up openssl
-rm -rf {{ openssl_docker_backup_dir }}
+docker run --rm -v {{ docker_backup_dir }}:/tmp/import_export:z debian:production bash -c "rm -rf /tmp/import_export/openssl"
 {% endif %}

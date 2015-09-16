@@ -120,7 +120,7 @@
 - name: start container (mediwiki)
   docker_run:
     container_name: '{{ wiki_container_name }}'
-    docker_run_arguments: '{{ container_port_map.wiki.port_args }} --link {{ openldap_container_name }}:wiki_ldap --link {{ wiki_db_container_name }}:wiki_db --volumes-from {{ openssl_dv_name }} --volumes-from {{ wiki_dv_name }} --env WIKI_HOSTNAME={{ container_addr_map.wiki.hostname }} {{ wiki_image_name }}:{{ docker_image_tag }}'
+    docker_run_arguments: '{{ container_port_map.wiki.port_args }} --link {{ openldap_container_name }}:wiki_ldap --link {{ wiki_db_container_name }}:wiki_db --volumes-from {{ openssl_dv_name }} --volumes-from {{ wiki_dv_name }} --env WIKI_HOSTNAME={{ container_addr_map.wiki.hostname }} --env SMTP_PASS={{ wiki_email_password | quote }} {{ wiki_image_name }}:{{ docker_image_tag }}'
 
 # *****************************************************************************
 # restore?

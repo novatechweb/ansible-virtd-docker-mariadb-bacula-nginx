@@ -14,11 +14,9 @@ repository_images:
   ubuntu:
     image: ubuntu
     tag: '14.04'
-# I am waiting on the next release of this package to supply some fixes
-# NOTE: modify roles/docker-gitlab/vars/main.yml back to use these values
-#  gitlab:
-#    image: sameersbn/gitlab
-#    tag: '7.12.2-2'
+  gitlab:
+    image: sameersbn/gitlab
+    tag: '7.14.3'
   redis:
     image: redis
     tag: '3.0'

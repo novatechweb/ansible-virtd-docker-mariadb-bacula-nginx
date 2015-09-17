@@ -74,7 +74,7 @@
 - name: Create before_backup script
   template:
     src: before_backup.j2
-    dest: /usr/libexec/bacula/backup-scripts/50.before_backup.svn
+    dest: /usr/libexec/bacula/backup-scripts/50.before_backup.docker
 
 - name: Create after_backup script
   template:

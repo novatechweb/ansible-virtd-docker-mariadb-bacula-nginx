@@ -74,7 +74,11 @@
 # *****************************************************************************
 # Update or make the image.
 
-# using the image from docker hub
+- name: build image
+  docker_build:
+    image_name: '{{ gitlab_image_name }}'
+    image_tag: '{{ docker_image_tag }}'
+    dockerfile_dir: '{{ docker_projects_dir }}/docker-gitlab'
 
 # Data volume image is now the same as the container image
 #- name: build image

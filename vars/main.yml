@@ -37,6 +37,3 @@ repository_images:
   php:
     image: debian
     tag: jessie
-  docker-gitlab:
-    image: sameersbn/ubuntu
-    tag: 14.04.20150712

@@ -19,7 +19,7 @@ docker_projects:
   - name: docker-mysql-data
     repo: https://github.com/novatechweb/docker-mysql-data.git
   - name: docker-exim4
-    repo: https://github.com/novatechweb/ansible-docker-exim4.git
+    repo: https://github.com/novatechweb/docker-exim4.git
 
 # the base directory where the docker projects will be checked out
 docker_projects_dir: '/opt/docker/{{ docker_image_tag }}'

@@ -82,12 +82,12 @@
 - name: start container (ldap)
   docker_run:
     container_name: '{{ openldap_container_name }}'
-    docker_run_arguments: '{{ container_port_map.ldap.port_args }} --volumes-from {{ openssl_dv_name }} --volumes-from {{ openldap_dv_name }} --env LDAP_HOSTNAME={{ container_addr_map.ldap.hostname }} {{ openldap_image_name }}:{{ docker_image_tag }}'
+    docker_run_arguments: '--hostname={{ container_addr_map.ldap.hostname }} {{ container_port_map.ldap.port_args }} --volumes-from {{ openssl_dv_name }} --volumes-from {{ openldap_dv_name }} --env LDAP_HOSTNAME={{ container_addr_map.ldap.hostname }} {{ openldap_image_name }}:{{ docker_image_tag }}'
 
 - name: start container (phpldapadmin)
   docker_run:
     container_name: '{{ phpldapadmin_container_name }}'
-    docker_run_arguments: '{{ container_port_map.phpldapadmin.port_args }} --volumes-from {{ openssl_dv_name }} --env HTTPS=false --env LDAP_HOSTS=ldap --env LDAP_HOSTNAME={{ container_addr_map.phpldapadmin.hostname }} --link {{ openldap_container_name }}:ldap {{ phpldapadmin_image_name }}:{{ docker_image_tag }}'
+    docker_run_arguments: '--hostname={{ container_addr_map.ldap.hostname }} {{ container_port_map.phpldapadmin.port_args }} --volumes-from {{ openssl_dv_name }} --env HTTPS=false --env LDAP_HOSTS=ldap --env LDAP_HOSTNAME={{ container_addr_map.phpldapadmin.hostname }} --link {{ openldap_container_name }}:ldap {{ phpldapadmin_image_name }}:{{ docker_image_tag }}'
 
 # *****************************************************************************
 # restore?

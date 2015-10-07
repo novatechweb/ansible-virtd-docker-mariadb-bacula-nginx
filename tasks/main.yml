@@ -141,7 +141,7 @@
 - name: start container (mantisbt)
   docker_run:
     container_name: '{{ mantisbt_container_name }}'
-    docker_run_arguments: '{{ container_port_map.mantisbt.port_args }} --link {{ openldap_container_name }}:mantisbt_ldap --link {{ mantisbt_db_container_name }}:mantisbt_db --volumes-from {{ openssl_dv_name }} --volumes-from {{ mantisbt_dv_name }} --env MANTISBT_HOSTNAME={{ container_addr_map.mantisbt.hostname }} --env SMTP_PASS={{ mantisbt_email_password | quote }} {{ mantisbt_image_name }}:{{ docker_image_tag }}'
+    docker_run_arguments: '--hostname={{ container_addr_map.mantisbt.hostname }} {{ container_port_map.mantisbt.port_args }} --link {{ openldap_container_name }}:mantisbt_ldap --link {{ mantisbt_db_container_name }}:mantisbt_db --volumes-from {{ openssl_dv_name }} --volumes-from {{ mantisbt_dv_name }} --env MANTISBT_HOSTNAME={{ container_addr_map.mantisbt.hostname }} --env SMTP_PASS={{ mantisbt_email_password | quote }} {{ mantisbt_image_name }}:{{ docker_image_tag }}'
 
 # *****************************************************************************
 # remove the MySQL config in the restore directory

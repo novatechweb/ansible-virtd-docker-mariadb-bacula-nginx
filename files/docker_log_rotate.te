@@ -2,9 +2,15 @@ module docker_log_rotate 1.0;
 
 require {
         type svirt_sandbox_file_t;
+        type system_mail_t;
         type logrotate_t;
-        class file getattr;
+        class dir { write remove_name };
+        class file { read write open getattr };
 }
 
 #============= logrotate_t ==============
-allow logrotate_t svirt_sandbox_file_t:file getattr;
+allow logrotate_t svirt_sandbox_file_t:dir { write remove_name };
+allow logrotate_t svirt_sandbox_file_t:file { read write open getattr };
+
+#============= system_mail_t ==============
+allow system_mail_t svirt_sandbox_file_t:file { read getattr };

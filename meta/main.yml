@@ -16,3 +16,8 @@ dependencies:
   role: docker-openldap
   tags:
   - openldap_container
+
+- name: Build and start the exim4 Docker container
+  role: docker-exim4
+  tags:
+  - exim4_container

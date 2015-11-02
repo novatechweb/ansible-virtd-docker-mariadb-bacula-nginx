@@ -1,12 +1,8 @@
 ---
 
-- assert:
-    that:
-    - remote_user_username is defined
-
 - name: Setup | create user
   user:
-    name: '{{ remote_user_username }}'
+    name: ansibleremote
     comment: "Ansible Remote"
     generate_ssh_key: yes
     createhome: yes
@@ -14,16 +10,16 @@
 
 - name: Setup | authorized key upload
   authorized_key:
-    user: '{{ remote_user_username }}'
+    user: ansibleremote
     key: '{{ lookup("file", item) }}'
-    path: '/home/{{ remote_user_username }}/.ssh/authorized_keys'
+    path: '/home/ansibleremote/.ssh/authorized_keys'
     manage_dir: no
   with_fileglob:
   - ../../../public_keys/*.pub
 
 - name: Sudoers | touch sudoers.d file
   file:
-    path: /etc/sudoers.d/00_{{ remote_user_username }}
+    path: /etc/sudoers.d/00_ansibleremote
     owner: root
     group: root
     mode: 'u=r,g=r,o='
@@ -31,10 +27,10 @@
 
 - name: Sudoers | update sudoers file and validate
   lineinfile:
-    dest: /etc/sudoers.d/00_{{ remote_user_username }}
+    dest: /etc/sudoers.d/00_ansibleremote
     insertafter: EOF
-    line: '{{ remote_user_username }} ALL=(ALL) NOPASSWD: ALL'
-    regexp: '{{ remote_user_username }} ALL=(ALL) NOPASSWD: ALL'
+    line: 'ansibleremote ALL=(ALL) NOPASSWD: ALL'
+    regexp: 'ansibleremote ALL=(ALL) NOPASSWD: ALL'
     state: present
 
 - name: lockdown root user

@@ -5,7 +5,7 @@
 # the git repositoryies to check out for building the docker containers
 docker_projects:
   - name: docker-openldap
-    repo: https://github.com/cipherwizard/docker-openldap.git
+    repo: https://github.com/novatechweb/docker-openldap.git
   - name: docker-mediawiki
     repo: https://github.com/novatechweb/docker-mediawiki.git
   - name: docker-gitlab

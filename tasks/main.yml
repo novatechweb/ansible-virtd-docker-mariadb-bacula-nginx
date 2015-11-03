@@ -1,6 +1,13 @@
 ---
 # file: roles/docker-openldap/tasks/main.yaml
 
+# This will generate passwords for these accounts.
+# A manuel step of setting the passwords into the LDAP database is required
+- assert:
+    that:
+    - ldap_admin_password is defined
+    - ldap_proxyagent_password is defined
+
 # *****************************************************************************
 # Setup the directory where the backup and restore is to take place
 
@@ -94,3 +101,12 @@
 
 - include: restore.yml
   when: st_openldap_restore.stat.exists == False
+
+# *****************************************************************************
+# Set the LDAP passwords
+
+- name: set LDAP admin password
+  command: 'docker exec -i {{ openldap_container_name }} /docker-entrypoint.sh set_admin_pass {{ ldap_admin_password | quote }}'
+
+- name: set LDAP proxyagent password
+  command: 'docker exec -i {{ openldap_container_name }} /docker-entrypoint.sh set_proxyagent_pass {{ ldap_admin_password | quote }} {{ ldap_proxyagent_password | quote }}'

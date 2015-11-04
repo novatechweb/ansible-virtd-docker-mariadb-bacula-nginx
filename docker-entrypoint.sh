@@ -77,6 +77,28 @@ case ${1} in
         chown -R openldap.openldap ${DB_PATH} ${CONFIG_PATH}
         ;;
 
+    set_admin_pass)
+        if [[ "$#" -ne 2 ]]; then
+            echo "USAGE: docker exec -i <CONTAINER> /docker-entrypoint.sh set_admin_pass <ADMIN PASSWORD>"
+            echo "set_admin_pass needs one aditional argument.  The root DN password that is to be set."
+            exit 1
+        fi
+        new_pass_val=$(slappasswd -h {SSHA} -s "${2}")
+        DN=$(ldapsearch -LLL -Y EXTERNAL -H ldapi:/// -b cn=config olcRootDN=cn=admin,dc=novatech dn olcRootDN olcRootPW 2>/dev/null | grep '^dn: ')
+        # change the config password
+        printf '%s\nchangetype: modify\nreplace: olcRootPW\nolcRootPW: %s' "${DN}" "${new_pass_val}" \
+            | ldapmodify -Y EXTERNAL -H ldapi:///
+        ;;
+
+    set_proxyagent_pass)
+        if [[ "$#" -ne 3 ]]; then
+            echo "USAGE: docker exec -i <CONTAINER> /docker-entrypoint.sh set_proxyagent_pass <ADMIN PASSWORD> <PROXYAGENT PASSWORD>"
+            echo "set_proxyagent_pass needs two aditional arguments.  The root DN password followed by the password for the proxyagent."
+            exit 1
+        fi
+        ldappasswd -x -H ldapi:/// -D cn=admin,dc=novatech -w "${2}" -s "${3}" cn=proxyagent,dc=novatech
+        ;;
+
     backup)
         dbnum=0
         while nice ${SLAPCAT} -F ${CONFIG_PATH} -n ${dbnum} > ${BACKUP_PATH}/LDAP_database_$(printf '%04d' ${dbnum}).ldif

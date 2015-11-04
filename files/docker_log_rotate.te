@@ -5,12 +5,12 @@ require {
         type system_mail_t;
         type logrotate_t;
         class dir { write remove_name };
-        class file { read write open getattr };
+        class file { read write open rename getattr };
 }
 
 #============= logrotate_t ==============
 allow logrotate_t svirt_sandbox_file_t:dir { write remove_name };
-allow logrotate_t svirt_sandbox_file_t:file { read write open getattr };
+allow logrotate_t svirt_sandbox_file_t:file { read write open rename getattr };
 
 #============= system_mail_t ==============
 allow system_mail_t svirt_sandbox_file_t:file { read getattr };

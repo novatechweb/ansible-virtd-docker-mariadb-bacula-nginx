@@ -7,7 +7,10 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /root/.ssh/; chmod 700 /root/.ssh
-COPY ./id_rsa_buildsystem /root/.ssh/id_rsa_buildsystem
+COPY ./ssh_files/config /root/.ssh/config
+COPY ./ssh_files/id_rsa_new_supportsite_deploy /root/.ssh/id_rsa_new_supportsite_deploy
+COPY ./ssh_files/id_rsa_buildsystem /root/.ssh/id_rsa_buildsystem
+RUN chmod 700 /root/.ssh/*
 
 COPY ./entrypoint.sh /
 RUN chmod 777 /entrypoint.sh

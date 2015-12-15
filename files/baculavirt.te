@@ -58,7 +58,7 @@ allow bacula_t virtd_t:unix_stream_socket connectto;
 allow bacula_t docker_t:unix_stream_socket connectto;
 
 #============= logrotate_t ==============
-allow logrotate_t svirt_sandbox_file_t:dir read;
+allow logrotate_t svirt_sandbox_file_t:dir { read write create remove_name add_name };
 
 #============= svirt_t ==============
-allow svirt_t fixed_disk_device_t:blk_file write;
+allow svirt_t fixed_disk_device_t:blk_file { read write open };

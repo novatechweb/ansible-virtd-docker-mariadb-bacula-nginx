@@ -12,6 +12,8 @@ COPY ./ssh_files/id_rsa_new_supportsite_deploy /root/.ssh/id_rsa_new_supportsite
 COPY ./ssh_files/id_rsa_buildsystem /root/.ssh/id_rsa_buildsystem
 RUN chmod 700 /root/.ssh/*
 
+ENV DATABASE_PASSWORD root_password
+
 COPY ./entrypoint.sh /
 RUN chmod 777 /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]

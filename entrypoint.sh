@@ -1,12 +1,20 @@
 #!/bin/bash
 
-DATABASE_PASSWORD=RvVnDbaXEZGH6iK5f3ql
+#====================================================
+# The following environment variables should be populated by the ansible scripts before the image is built.
+#----------------------------------------------------
+# DATABASE_PASSWORD
+#----------------------------------------------------
 
-#BUILDSYSTEM=buildsystem.novatech-llc.com
+#====================================================
+# The following are static set variables.
+#----------------------------------------------------
+# BUILDSYSTEM=buildsystem.novatech-llc.com
+# SUPPORTSITE_SERVER=www.novatech-llc.com
 BUILDSYSTEM=172.16.64.105
 SUPPORTSITE_SERVER=test.novatech-llc.com
-
 SSH_OPTIONS="-i /root/.ssh/id_rsa_buildsystem -oStrictHostKeyChecking=no -oUser=root"
+#----------------------------------------------------
 
 if [ -d "/backup" ]; then
     IS_BACKUP=/bin/true

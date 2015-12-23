@@ -1,4 +1,4 @@
-FROM ubuntu:14.04.2
+FROM ubuntu:14.04
 
 # The following volume is for the django code of the test station.
 VOLUME /opt/tftp_files

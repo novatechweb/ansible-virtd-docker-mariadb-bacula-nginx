@@ -10,10 +10,8 @@
 #====================================================
 # The following are static set variables.
 #----------------------------------------------------
-# BUILDSYSTEM=buildsystem.novatech-llc.com
-# SUPPORTSITE_SERVER=www.novatech-llc.com
-BUILDSYSTEM=172.16.64.105
-SUPPORTSITE_SERVER=test.novatech-llc.com
+BUILDSYSTEM=buildsystem.novatech-llc.com
+SUPPORTSITE_SERVER=www.novatech-llc.com
 SSH_OPTIONS="-i /root/.ssh/id_rsa_buildsystem -oStrictHostKeyChecking=no -oUser=root"
 #----------------------------------------------------
 BUILDSYSTEM_SQL_RESTORE_FILE="/restore/buildsystem_backup.sql"

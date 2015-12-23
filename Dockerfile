@@ -1,4 +1,4 @@
-FROM ubuntu:14.04.2
+FROM ubuntu:14.04
 
 #---------------------------
 RUN apt-get update  && \

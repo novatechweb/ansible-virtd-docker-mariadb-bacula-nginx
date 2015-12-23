@@ -1,4 +1,4 @@
-FROM ubuntu:14.04.2
+FROM ubuntu:14.04
 
 # This directory contains the ISO images that the system will create 
 #  for NCD files.

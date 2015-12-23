@@ -1,4 +1,4 @@
-FROM ubuntu:14.04.2
+FROM ubuntu:14.04
 
 # This directory contains the NCD release code versions.
 VOLUME /opt/ncd_release

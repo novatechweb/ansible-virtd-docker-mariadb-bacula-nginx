@@ -9,7 +9,7 @@ require {
 }
 
 #============= logrotate_t ==============
-allow logrotate_t svirt_sandbox_file_t:dir { add_name write remove_name };
+allow logrotate_t svirt_sandbox_file_t:dir { read write create remove_name add_name };
 allow logrotate_t svirt_sandbox_file_t:file { create unlink setattr read write open rename getattr };
 
 #============= system_mail_t ==============

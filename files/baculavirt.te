@@ -16,7 +16,6 @@ require {
         type docker_var_run_t;
         type sysctl_net_t;
         type ssh_exec_t;
-        type logrotate_t;
         type svirt_sandbox_file_t;
         type user_tmp_t;
         type ssh_keygen_exec_t;
@@ -57,9 +56,6 @@ allow bacula_t virtd_t:unix_stream_socket connectto;
 
 #!!!! This avc can be allowed using the boolean 'daemons_enable_cluster_mode'
 allow bacula_t docker_t:unix_stream_socket connectto;
-
-#============= logrotate_t ==============
-allow logrotate_t svirt_sandbox_file_t:dir { read write create remove_name add_name };
 
 #============= svirt_t ==============
 allow svirt_t fixed_disk_device_t:blk_file { read write open };

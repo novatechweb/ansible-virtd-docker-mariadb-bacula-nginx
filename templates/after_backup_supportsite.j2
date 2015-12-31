@@ -1,0 +1,6 @@
+{% if backup_supportsite_docker_dir is defined %}
+
+# Clean up Support Site backup directory
+rm -rf {{ backup_supportsite_docker_dir }}
+
+{% endif %}

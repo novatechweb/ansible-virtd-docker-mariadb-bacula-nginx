@@ -1,0 +1,6 @@
+{% if backup_buildsystem_docker_dir is defined %}
+
+# Clean up Build System backup directory
+rm -rf {{ backup_buildsystem_docker_dir }}
+
+{% endif %}

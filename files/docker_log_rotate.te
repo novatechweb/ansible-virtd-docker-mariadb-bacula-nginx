@@ -4,7 +4,7 @@ require {
         type svirt_sandbox_file_t;
         type system_mail_t;
         type logrotate_t;
-        class dir { add_name write remove_name };
+        class dir { read create add_name write remove_name };
         class file { create unlink setattr read write open rename getattr };
 }
 

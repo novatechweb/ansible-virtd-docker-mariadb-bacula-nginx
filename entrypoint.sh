@@ -68,6 +68,10 @@ case ${1} in
         ssh $SSH_OPTIONS $BUILDSYSTEM "rm -f /tmp/test_client_files.tgz"
     ;;
 
+    cleanup_buildsystem)
+        rm -fr /cleanup/buildsystem
+    ;;
+
     #-----------------------------------------------------------------------------------------------
     restore_supportsite)
         if [ -e $SUPPORTSITE_SQL_RESTORE_FILE ]; then
@@ -92,9 +96,13 @@ case ${1} in
         ssh $SSH_OPTIONS supportsite_docker_container "find /opt/downloads/ -type f -exec md5sum {} \;" > /backup/supportsite_downloads_md5sum.txt
         ssh $SSH_OPTIONS supportsite_docker_container "ls -Fla --color=none /opt/downloads/" > /backup/supportsite_downloads_list.txt
     ;;
+
+    cleanup_supportsite)
+        rm -fr /cleanup/supportsite
+    ;;
 #===================================================================================================
     *)
-        exec /bin/bash
+        exec "$@"
     ;;
 
 esac

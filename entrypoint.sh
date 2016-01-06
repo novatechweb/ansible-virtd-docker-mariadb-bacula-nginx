@@ -39,7 +39,7 @@ case ${1} in
         fi
         if [ -e $BUILDSYSTEM_TFTP_RESTORE_FILE ]; then
             echo "Restore BS TFTP"
-            scp $SSH_OPTIONS BUILDSYSTEM_TFTP_RESTORE_FILE $BUILDSYSTEM:/tmp/tftp_files.tgz
+            scp $SSH_OPTIONS $BUILDSYSTEM_TFTP_RESTORE_FILE $BUILDSYSTEM:/tmp/tftp_files.tgz
             ssh $SSH_OPTIONS $BUILDSYSTEM "tar -xz -f /tmp/tftp_files.tgz        --directory=/"
         fi
         if [ -e $BUILDSYSTEM_TEST_CLIENT_RESTORE_FILE ]; then

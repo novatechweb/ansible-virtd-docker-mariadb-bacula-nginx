@@ -8,3 +8,6 @@ testdaedalus.novatech-llc.com
 
 [docker-hosts]
 testdaedalus.novatech-llc.com
+
+[buildsystem]
+buildsystem.novatech-llc.com ansible_ssh_host=172.16.64.105

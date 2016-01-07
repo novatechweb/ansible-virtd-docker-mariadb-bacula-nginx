@@ -58,3 +58,9 @@
 [submodule "roles/docker-exim4"]
 	path = roles/docker-exim4
 	url = https://github.com/novatechweb/ansible-docker-exim4.git
+[submodule "roles/docker-buildsystem"]
+	path = roles/docker-buildsystem
+	url = https://github.com/novatechweb/ansible-docker-buildsystem.git
+[submodule "roles/buildsystem"]
+	path = roles/buildsystem
+	url = https://github.com/novatechweb/ansible-buildsystem.git

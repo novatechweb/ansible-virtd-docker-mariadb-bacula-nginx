@@ -18,26 +18,26 @@
     version: "django_1-7-1"
     force: yes
 
-- name: Set datebase user in website code
+- name: Set datebase name in website code
   sudo: false
   local_action: replace
     dest="{{ working_directory }}/{{ web_site_name }}/settings.py"
     regexp="(.*'NAME':\s*').*('.*)"
     replace='\1{{ database_name }}\2'
 
-- name: Set database user password in website code
+- name: Set database user in website code
   sudo: false
   local_action: replace
     dest="{{ working_directory }}/{{ web_site_name }}/settings.py"
     regexp="(.*'USER':\s*').*('.*)"
     replace='\1{{ database_user }}\2'
 
-- name: Set database name in website code
+- name: Set database user password in website code
   sudo: false
   local_action: replace
     dest="{{ working_directory }}/{{ web_site_name }}/settings.py"
-    regexp="(.*'PASSWORD':\s*').*('.*)"
-    replace='\1{{ database_password }}\2'
+    regexp="(.*'PASSWORD':\s*).*"
+    replace='\1"{{ database_password }}"\2'
 
 
 - name: Sychronizing web files to server

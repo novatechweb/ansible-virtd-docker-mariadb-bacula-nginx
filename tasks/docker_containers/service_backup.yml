@@ -11,7 +11,7 @@
   replace:
     dest: "{{ docker_projects_dir }}/{{ build_system_docker_repos.Backup_Restore.dir_name }}/Dockerfile"
     regexp: '(ENV\s+DATABASE_PASSWORD\s+).*'
-    replace: '\1{{ buildsystem_database_root_password }}'
+    replace: '\1 {{ buildsystem_database_root_password }}'
 
 - name: Build docker image ----- Test Station Backup service
   docker_image:

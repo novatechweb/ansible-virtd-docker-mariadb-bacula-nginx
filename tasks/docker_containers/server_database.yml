@@ -6,13 +6,13 @@
   replace:
     dest: "{{ docker_projects_dir }}/{{ build_system_docker_repos.TestStation_database_server.dir_name }}/Dockerfile"
     regexp: '(ENV\s+MYSQL_ROOT_PASSWORD\s+).*'
-    replace: '\1{{ buildsystem_database_root_password }}'
+    replace: '\1 {{ buildsystem_database_root_password }}'
 
 - name: Setting db name, for the bs docker container
   replace:
     dest: "{{ docker_projects_dir }}/{{ build_system_docker_repos.TestStation_database_server.dir_name }}/Dockerfile"
     regexp: '(ENV\s+MYSQL_DATABASE\s+).*'
-    replace: '\1{{ buildsystem_database_name }}'
+    replace: '\1 {{ buildsystem_database_name }}'
 
 - name: Build docker image ----- Test Station database server
   docker_image:

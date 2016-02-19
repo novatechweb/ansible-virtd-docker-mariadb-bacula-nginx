@@ -10,7 +10,6 @@
 #====================================================
 # The following are static set variables.
 #----------------------------------------------------
-BUILDSYSTEM=buildsystem.novatech-llc.com
 SUPPORTSITE_SERVER=www.novatech-llc.com
 SSH_OPTIONS="-i /root/.ssh/id_rsa_buildsystem -oStrictHostKeyChecking=no -oUser=root"
 #----------------------------------------------------
@@ -35,17 +34,15 @@ case ${1} in
     restore_buildsystem)
         if [ -e $BUILDSYSTEM_SQL_RESTORE_FILE ]; then
             echo "Restore BS MySQL"
-            mysql --host=$BUILDSYSTEM --user=root --password=$DATABASE_PASSWORD < $BUILDSYSTEM_SQL_RESTORE_FILE
+            mysql --host=test_station_mysql_server --user=root --password=$DATABASE_PASSWORD < $BUILDSYSTEM_SQL_RESTORE_FILE
         fi
         if [ -e $BUILDSYSTEM_TFTP_RESTORE_FILE ]; then
             echo "Restore BS TFTP"
-            scp $SSH_OPTIONS $BUILDSYSTEM_TFTP_RESTORE_FILE $BUILDSYSTEM:/tmp/tftp_files.tgz
-            ssh $SSH_OPTIONS $BUILDSYSTEM "tar -xz -f /tmp/tftp_files.tgz        --directory=/"
+            tar -xz -f $BUILDSYSTEM_TFTP_RESTORE_FILE        --directory=/
         fi
         if [ -e $BUILDSYSTEM_TEST_CLIENT_RESTORE_FILE ]; then
             echo "Restore BS Test Client"
-            scp $SSH_OPTIONS $BUILDSYSTEM_TEST_CLIENT_RESTORE_FILE $BUILDSYSTEM:/tmp/test_client_files.tgz
-            ssh $SSH_OPTIONS $BUILDSYSTEM "tar -xz -f /tmp/test_client_files.tgz --directory=/"
+            tar -xz -f $BUILDSYSTEM_TEST_CLIENT_RESTORE_FILE --directory=/
         fi
     ;;
 
@@ -53,19 +50,15 @@ case ${1} in
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         # MySQL backup
         echo "Backup BS MySQL"
-        mysqldump --host=$BUILDSYSTEM --user=root --password=$DATABASE_PASSWORD --all-databases --events --triggers --result-file=$BUILDSYSTEM_SQL_BACKUP_FILE
+        mysqldump --host=test_station_mysql_server --user=root --password=$DATABASE_PASSWORD --all-databases --events --triggers --result-file=$BUILDSYSTEM_SQL_BACKUP_FILE
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         # tftp file backup
         echo "Backup BS TFTP"
-        ssh $SSH_OPTIONS $BUILDSYSTEM "tar -cz -f /tmp/tftp_files.tgz        --directory=/ /opt/tftp_files"
-        scp $SSH_OPTIONS $BUILDSYSTEM:/tmp/tftp_files.tgz        $BUILDSYSTEM_TFTP_BACKUP_FILE
-        ssh $SSH_OPTIONS $BUILDSYSTEM "rm -f /tmp/tftp_files.tgz"
+        tar -cz -f $BUILDSYSTEM_TFTP_BACKUP_FILE        --directory=/ /opt/tftp_files
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         # static test client files stored on the server
         echo "Backup BS Test Client"
-        ssh $SSH_OPTIONS $BUILDSYSTEM "tar -cz -f /tmp/test_client_files.tgz --directory=/ /opt/test_client_files"
-        scp $SSH_OPTIONS $BUILDSYSTEM:/tmp/test_client_files.tgz $BUILDSYSTEM_TEST_CLIENT_BACKUP_FILE
-        ssh $SSH_OPTIONS $BUILDSYSTEM "rm -f /tmp/test_client_files.tgz"
+        tar -cz -f $BUILDSYSTEM_TEST_CLIENT_BACKUP_FILE --directory=/ /opt/test_client_files
     ;;
 
     cleanup_buildsystem)

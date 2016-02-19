@@ -102,6 +102,13 @@
       owner: root
       group: root
       mode: 'u=rw,g=,o='
+  - name: Copy build system credentials to /etc dir
+    copy:
+      src: ./credentials/buildsystem.novatech-llc.com
+      dest: /etc/ansible-credentials/
+      owner: root
+      group: root
+      mode: 'u=rw,g=,o='
   - name: set directory permissions for /etc/ansible-credentials/
     file:
       state: directory

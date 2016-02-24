@@ -1,10 +1,10 @@
 #!/bin/sh
 #
-# This script backs up bacula bootstrap files (*.bsr) to github
+# This script backs up bacula bootstrap files (BackupCatalog.bsr and bacula-fd.bsr) to github
 
 set -e
 
-# A repository that is used as a backup for the bacula bootstrap file: /var/spool/bacula/%n.bsr
+# A repository that is used as a backup for the bacula bootstrap file: /var/spool/bacula/{BackupCatalog,bacula-fd}.bsr
 repo_name=bacula.bootstrap.backup
 github_repo=git@github.com:novatechweb/${repo_name}.git
 
@@ -31,11 +31,11 @@ fi
 
 cd ${bacula_home}
 rm 2>&1 -rf ${bacula_home}/${repo_name}
-if ls -1 ${bacula_home}/*.bsr; then
-    # There are *.bsr files. no need to restore them
+if ls -1 ${bacula_home}/{BackupCatalog,bacula-fd}.bsr; then
+    # The {BackupCatalog,bacula-fd}.bsr files exist, no need to restore them
     restore_bsr='false'
 else
-    # there isn't any *.bsr files currently on the machine
+    # The {BackupCatalog,bacula-fd}.bsr files do not exist, restore them
     restore_bsr='true'
 fi
 
@@ -81,8 +81,8 @@ else
     git 2>&1 reset origin/${fqdn}
 fi
 
-echo >&2 '[ Add all the bacula bootstrap files ]'
-git 2>&1 add *.bsr
+echo >&2 '[ Add BackupCatalog.bsr and bacula-fd.bsr bootstrap files ]'
+git 2>&1 add BackupCatalog.bsr bacula-fd.bsr
 
 echo >&2 '[ Commit changes, or if there are no changes, exit the script ]'
 git 2>&1 commit -sm 'commit bacula bootstrap file changes' || exit 0

@@ -15,7 +15,6 @@
     module: git
     repo: "{{ web_site_repo_url }}"
     dest: "{{ working_directory }}/{{ web_site_name }}"
-    version: "django_1-7-1"
     force: yes
 
 - name: Set datebase name in website code

@@ -28,7 +28,7 @@ repository_images:
     tag: '9.4'
   phpldapadmin:
     image: osixia/phpldapadmin
-    tag: '0.5.1'
+    tag: 'latest'
   phpmyadmin:
     image: corbinu/docker-phpmyadmin
     tag: latest

@@ -1,6 +1,6 @@
 ---
 
-- hosts: all
+- hosts: bacula
   remote_user: root
   roles:
   - name: Setup the ansible remote user

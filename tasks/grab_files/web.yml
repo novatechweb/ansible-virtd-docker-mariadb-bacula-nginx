@@ -36,7 +36,7 @@
   local_action: replace
     dest="{{ working_directory }}/{{ web_site_name }}/settings.py"
     regexp="(.*'PASSWORD':\s*).*"
-    replace='\1"{{ database_password }}"\2'
+    replace='\1"{{ database_password }}",'
 
 
 - name: Sychronizing web files to server

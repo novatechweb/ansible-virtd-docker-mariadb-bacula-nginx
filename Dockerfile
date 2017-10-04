@@ -19,7 +19,8 @@ RUN apt-get update  && \
                     libpython-dev=2.7* && \
      rm -rf /var/lib/apt/lists/*
 #---------------------------
-RUN rm -rf /var/www/html && \
+RUN rm -rf /var/www/html \
+           /etc/apache2/mods-available/mpm_event.conf && \
     mkdir -p /var/lock/apache2 \
              /var/run/apache2 \
              /var/log/apache2 \
@@ -44,6 +45,7 @@ RUN  tar -x -f /openssl.tar --directory=/
 COPY ./config_files/CustomerSupportSite.conf /etc/apache2/sites-available/CustomerSupportSite.conf
 COPY ./config_files/apache2.conf             /etc/apache2/apache2.conf
 COPY ./config_files/httpd.conf               /etc/apache2/httpd.conf
+COPY ./config_files/mpm_event.conf           /etc/apache2/mods-available/mpm_event.conf
 
 RUN /usr/sbin/a2dissite 000-default
 

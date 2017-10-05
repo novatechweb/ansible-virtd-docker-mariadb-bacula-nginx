@@ -32,7 +32,8 @@ RUN rm -rf /var/www/html \
 #---------------------------
 RUN pip install "django<1.8" \
                 "mysqlclient>=1.3" \
-                "pyserial>=2.7"
+                "pyserial>=2.7" \
+                "sqlparse<0.3"
 #---------------------------
 
 COPY ./error_documents/403.shtml /srv/www/ErrorDocument/403.shtml

@@ -4,6 +4,32 @@ nexus_networks:
     aliases:
       - '{{ public_hostname }}'
 nexus_host_docker: true
+nexus_default_port: 8081
+
+# Nexus Backup
+nexus_docker_backup_dir: "{{ docker_backup_dir }}/NEXUS3"
+nexus_docker_backup_archive: "{{ nexus_docker_backup_dir }}/nexus3.tar.gz"
+nexus_backup_dir: '/var/nexus-backup'
+nexus_backup_blob_filter:
+  - permanent
+# Shall we configure backup ?
+nexus_backup_configure: true
+# Backup time cron expression
+nexus_backup_manual: true
+# Shall we rotate backups ? No effect if nexus_backup_configure is false
+nexus_backup_rotate: false
+nexus_backup_keep_rotations: 1  # Keep 4 backup rotation by default (current + last 3)
+nexus_backup_task_name: db and blobstores backup
+
+nexus_email_server_enabled: true
+nexus_email_server_host: "mail.novatech-llc.com"
+nexus_email_server_port: 587
+nexus_email_server_username: "wiki"
+nexus_email_server_password: "{{ nexus_email_password }}"
+nexus_email_from_address: "nexus@novatech-llc.com"
+nexus_email_subject_prefix: "[NEXUS]"
+nexus_email_tls_enabled: true
+nexus_email_tls_required: true
 
 nexus_ldap_realm: true
 ldap_connections:
@@ -118,6 +144,13 @@ nexus_local_users:
     password: "{{ nexus_buildbot_password }}"
     roles:
       - Developers # role ID here
+  - username: bacula
+    first_name: Bacula
+    last_name: Backups
+    email: bacula@novatech-llc.com
+    password: "{{ nexus_bacula_password }}"
+    roles:
+      - Backup
 
 nexus_delete_default_blobstore: false
 nexus_blob_split: false     # True - blobstores per format

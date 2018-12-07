@@ -1,1 +1,5 @@
 nexus_version: 3.16.1
+nexus_networks:
+  - name: '{{ docker_network_frontend }}'
+    aliases:
+      - '{{ public_hostname }}'

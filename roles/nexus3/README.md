@@ -441,7 +441,7 @@ nexus_npm_bearer_token_realm: false
 nexus_docker_bearer_token_realm: false  # required for docker anonymous access
 ```
 
-The Remote User Realm can also be enabled with 
+The Remote User Realm can also be enabled with
 
 ```yaml
 nexus_rut_auth_realm: true

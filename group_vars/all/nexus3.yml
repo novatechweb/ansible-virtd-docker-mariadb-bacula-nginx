@@ -3,3 +3,94 @@ nexus_networks:
   - name: '{{ docker_network_frontend }}'
     aliases:
       - '{{ public_hostname }}'
+nexus_host_docker: true
+
+nexus_ldap_realm: true
+ldap_connections:
+  - ldap_name: 'NovaTech LDAP' # used as a key to update the ldap config
+    ldap_protocol: 'ldap' # ldap or ldaps
+    ldap_hostname: 'ldap.novatech-llc.com'
+    ldap_port: 389
+    ldap_auth: 'simple'
+    ldap_auth_username: 'cn=proxyagent,dc=novatech'
+    ldap_auth_password: '{{ openldap_proxyagent_password }}'
+    ldap_search_base: 'dc=novatech'
+    ldap_user_base_dn: 'ou=user'
+    #ldap_user_filter: '(cn=*)' # (optional)
+    ldap_user_object_class: 'inetOrgPerson'
+    ldap_user_id_attribute: 'uid'
+    ldap_user_real_name_attribute: 'cn'
+    ldap_user_email_attribute: 'mail'
+    ldap_map_groups_as_roles: yes
+    ldap_map_groups_as_roles_type: "static"
+    ldap_user_memberof_attribute: ""
+    ldap_group_base_dn: 'ou=group'
+    ldap_group_object_class: 'posixGroup'
+    ldap_group_id_attribute: 'cn'
+    ldap_group_member_attribute: 'memberUid'
+    ldap_group_member_format: '${username}'
+    ldap_user_subtree: false
+    ldap_group_subtree: true
+
+nexus_anonymous_access: true
+
+nexus_privileges:
+  - name: all-repos-read  # used as key to update a privilege
+    description: 'Read & Browse access to all repos'
+    repository: '*'
+    actions:
+      - read
+      - browse
+
+nexus_roles:
+  - id: anonymous
+    name: anonymous
+    description: Selective anonymous access
+    privileges: []
+    roles: []
+  - id: Backup  # can map to a LDAP group id, also used as a key to update a role
+    name: backup
+    description: Backup system
+    privileges:
+      - nx-tasks-read
+      - nx-tasks-run
+    roles: []
+  - id: Developers  # can map to a LDAP group id, also used as a key to update a role
+    name: developers
+    description: All developers
+    privileges:
+      - nx-search-read
+      - all-repos-read
+      - nx-repository-view-*-*-*
+    roles: []
+  - id: nexus.novatech-llc.com  # can map to a LDAP group id, also used as a key to update a role
+    name: novatech
+    description: All developers
+    privileges:
+      - nx-component-upload
+      - nx-repository-view-*-*-add
+      - nx-repository-view-*-*-browse
+      - nx-repository-view-*-*-read
+
+nexus_local_users:
+  - username: anonymous
+    first_name: Anonymous
+    last_name: User
+    email: anonymous@example.org
+    password: ""
+    roles:
+      - anonymous
+  - username: bacula
+    first_name: Bacula
+    last_name: Backups
+    email: bacula@novatech-llc.com
+    password: "{{ nexus_bacula_password }}"
+    roles:
+      - Backup
+  - username: buildbot # used as key to update
+    first_name: NovaTech
+    last_name: CI
+    email: buildbot@novatech-llc.com
+    password: "{{ nexus_buildbot_password }}"
+    roles:
+      - Developers # role ID here

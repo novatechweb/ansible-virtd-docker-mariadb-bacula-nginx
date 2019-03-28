@@ -1,6 +1,7 @@
 module docker_bacula 1.0;
 
 require {
+        type container_runtime_t;
         type user_tmp_t;
         type svirt_lxc_net_t;
         type usr_t;
@@ -12,7 +13,14 @@ require {
         class sock_file write;
         class dir { search setattr read create write rmdir remove_name add_name };
         class file { write execute setattr read create unlink open execute_no_trans };
+        class unix_stream_socket connectto;
 }
+
+#============= bacula_t ==============
+
+allow bacula_t container_runtime_t:unix_stream_socket connectto;
+allow bacula_t user_tmp_t:dir { write rmdir setattr remove_name create add_name };
+allow bacula_t user_tmp_t:file { write create unlink open setattr };
 
 #============= svirt_lxc_net_t ==============
 allow svirt_lxc_net_t bacula_tmp_t:dir { write rmdir setattr read remove_name create add_name };

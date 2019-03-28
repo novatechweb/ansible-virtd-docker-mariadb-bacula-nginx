@@ -7,4 +7,5 @@ require {
 }
 
 #============= bacula_t ==============
+# allow bacula processes to access the tape drive
 allow bacula_t tape_device_t:chr_file { read open write ioctl };

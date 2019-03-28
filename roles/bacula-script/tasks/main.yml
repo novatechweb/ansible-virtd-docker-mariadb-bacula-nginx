@@ -74,3 +74,8 @@
     path: /usr/libexec/bacula/backup-scripts
     state: absent
   when: assemble_scripts
+
+# *****************************************************************************
+# Install selinux policies
+
+- import_tasks: selinux-script-policy.yml

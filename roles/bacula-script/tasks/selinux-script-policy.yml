@@ -1,0 +1,34 @@
+- name: Install selinux packages
+  package:
+    name:
+    - checkpolicy
+    - policycoreutils-python
+
+- name: Create temp directory for policy creation
+  file:
+    path: /etc/selinux/src/bacula_script
+    state: directory
+
+- name: Copy bacula_script type enforcement file
+  copy:
+    src: bacula_script.te
+    dest: /etc/selinux/src/bacula_script/bacula_script.te
+  register: semodule_source
+
+- name: Run checkmodule on bacula_script.te
+  command: /usr/bin/checkmodule -M -m -o bacula_script.mod bacula_script.te
+  args:
+    chdir: /etc/selinux/src/bacula_script
+  when: semodule_source.changed
+
+- name: Build bacula_script module
+  command: /usr/bin/semodule_package -o bacula_script.pp -m bacula_script.mod
+  args:
+    chdir: /etc/selinux/src/bacula_script
+  when: semodule_source.changed
+
+- name: Install bacula_script module
+  command: /usr/sbin/semodule -i bacula_script.pp
+  args:
+    chdir: /etc/selinux/src/bacula_script
+  when: semodule_source.changed

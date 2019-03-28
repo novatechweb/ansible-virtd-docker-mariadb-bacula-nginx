@@ -1,26 +1,34 @@
+- name: Install selinux packages
+  package:
+    name:
+    - checkpolicy
+    - policycoreutils-python
+
 - name: Create temp directory for policy creation
-  command: mktemp -d /tmp/ansible-bacula-storage.XXXXXXXX
-  register: bacula_storage_tmp_dir
+  file:
+    path: /etc/selinux/src/baculatape
+    state: directory
+
 - name: Copy baculatape type enforcement file
   copy:
     src: baculatape.te
-    dest: '{{ bacula_storage_tmp_dir.stdout }}/baculatape.te'
-    owner: root
-    group: root
-    mode: 0640
+    dest: /etc/selinux/src/baculatape/baculatape.te
+  register: semodule_source
+
 - name: Run checkmodule on baculatape.te
   command: /usr/bin/checkmodule -M -m -o baculatape.mod baculatape.te
   args:
-    chdir: "{{ bacula_storage_tmp_dir.stdout }}"
+    chdir: /etc/selinux/src/baculatape
+  when: semodule_source.changed
+
 - name: Build baculatape module
   command: /usr/bin/semodule_package -o baculatape.pp -m baculatape.mod
   args:
-    chdir: "{{ bacula_storage_tmp_dir.stdout }}"
+    chdir: /etc/selinux/src/baculatape
+  when: semodule_source.changed
+
 - name: Install baculatape module
   command: /usr/sbin/semodule -i baculatape.pp
   args:
-    chdir: "{{ bacula_storage_tmp_dir.stdout }}"
-- name: Delete temp directory
-  file:
-    path: '{{ bacula_storage_tmp_dir.stdout }} '
-    state: absent
+    chdir: /etc/selinux/src/baculatape
+  when: semodule_source.changed

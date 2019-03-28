@@ -1,7 +1,9 @@
 ---
 # file: roles/docker-exim4/tasks/main.yaml
 
-# set the selinux policy to enable log-rotation of the exim4 logs
+# *****************************************************************************
+# Install selinux policies
+
 - import_tasks: selinux-docker-log_rotate.yml
 
 - name: docker_container.conf dir

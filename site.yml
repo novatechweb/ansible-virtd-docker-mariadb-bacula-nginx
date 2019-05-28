@@ -10,7 +10,7 @@
   tags: bacula
   roles:
   - role: mariadb
-    mariadb_open_firewall: true
+    mariadb_open_firewall: false
     mariadb_remote_root_access: false
   - role: bacula-director
     tags: bacula-director

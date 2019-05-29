@@ -84,7 +84,7 @@
       public_hostname: '{{ nexus_hostname }}'
   - name: Build and start the SVN Docker container
     role: docker-svn
-    svn_repos: 'ddio NCD_Release'
+    svn_repos: 'ddio NCD_Release hardware'
     tags:
     - svn_container
   - name: Build and start the openldap Docker container

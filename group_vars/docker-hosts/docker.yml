@@ -8,3 +8,21 @@ docker_name_prefix: ''
 
 # the user name portion of the docker image name
 docker_registry_username: novatechweb
+
+# the base directory where the docker projects will be checked out
+docker_projects_dir: '/opt/docker/{{ docker_image_tag }}'
+docker_restore_config_base_dir: '/etc/docker_container.conf/{{ docker_image_tag }}'
+
+# restore directories to temporarly store data being restored into docker containers
+docker_backup_dir: '/tmp/docker'
+
+# docker service restart policy
+docker_restart_policy: 'always'
+
+# Network names
+docker_network_frontend: 'frontend'
+
+# docker force build images
+docker_image_force_build: true
+
+docker_storage_driver: overlay2

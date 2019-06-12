@@ -1,0 +1,156 @@
+---
+# file: roles/docker-mediawiki/tasks/main.yaml
+
+- name: Check preconditions
+  assert:
+    that:
+    - wiki_db_root_password is defined
+    - wiki_db_password is defined
+
+- name: docker_container.conf dir
+  file:
+    state: directory
+    path: '{{ docker_restore_config_base_dir }}/{{ wiki_dv_name }}'
+    owner: root
+    group: root
+    mode: 'u=rwx,g=rx,o=rx'
+    recurse: no
+
+# *****************************************************************************
+# backup script part
+
+- name: Assemble dir for backup scripts
+  file:
+    path: /usr/libexec/bacula/backup-scripts
+    state: directory
+
+- name: before_backup script part
+  template:
+    src: before_backup.j2
+    dest: /usr/libexec/bacula/backup-scripts/55.before_backup.wiki
+
+- name: after_backup script part
+  template:
+    src: after_backup.j2
+    dest: /usr/libexec/bacula/backup-scripts/55.after_backup.wiki
+
+# *****************************************************************************
+# update the Docker restore config
+
+- name: make config.sh
+  template:
+    src: config.sh.j2
+    dest: '{{ docker_restore_config_base_dir }}/{{ wiki_dv_name }}/config.sh'
+    backup: yes
+    owner: root
+    group: tape
+    mode: 'u=rw,g=r,o='
+
+- name: exists - state file
+  stat:
+    path: '{{ docker_restore_config_base_dir }}/{{ wiki_dv_name }}/restore.date.txt'
+    get_checksum: False
+    get_md5: False
+  register: st_mediawiki_restore
+
+# *****************************************************************************
+# Update or make the image.
+
+- name: Checkout image repo
+  git:
+    repo: '{{ wiki_image_repo }}'
+    version: master
+    dest: '{{ docker_projects_dir }}/docker-mediawiki'
+
+- name: copy script
+  copy:
+    remote_src: true
+    src: '{{ docker_projects_dir }}/docker-mediawiki/mediawiki.sh'
+    dest: '{{ docker_restore_config_base_dir }}/{{ wiki_dv_name }}/'
+    mode: 'u=rwx,g=rx,o=rx'
+
+- name: build image
+  docker_image:
+    name: '{{ wiki_image_name }}'
+    tag: '{{ docker_image_tag }}'
+    path: '{{ docker_projects_dir }}/docker-mediawiki'
+    force: "{{ docker_image_force_build }}"
+
+# *****************************************************************************
+# Create the data volumes
+
+- name: data-volume container (mediwiki)
+  docker_volume:
+    name: '{{ wiki_dv_name }}'
+
+- name: data-volume container (mysql)
+  docker_volume:
+    name: '{{ wiki_db_dv_name }}'
+
+# *****************************************************************************
+# Start the database
+
+- name: start container (mysql)
+  docker_container:
+    detach: true
+    env:
+      MYSQL_DATABASE: '{{ wiki_database_name }}'
+      MYSQL_ROOT_PASSWORD: '{{ wiki_db_root_password }}'
+      MYSQL_USER: '{{ wiki_db_user }}'
+      MYSQL_PASSWORD: '{{ wiki_db_password }}'
+    image: '{{ wiki_db_image_name }}'
+    name: '{{ wiki_db_container_name }}'
+    networks:
+      - name: '{{ docker_network_frontend }}'
+    purge_networks: true
+    restart_policy: '{{ docker_restart_policy }}'
+    state: started
+    volumes:
+      - '{{ wiki_db_dv_name }}:/var/lib/mysql:z'
+
+- name: wait for mysql initialization to complete
+  shell: >
+      printf 'SHOW GLOBAL STATUS\n' | docker exec -i
+      '{{ wiki_db_container_name }}'
+      mysql --host=localhost
+      --user={{ wiki_db_user | quote }}
+      --password={{ wiki_db_password | quote }}
+      '{{ wiki_database_name }}'
+  register: db_status
+  retries: 20
+  delay: 3
+  until: "db_status.rc == 0"
+
+# *****************************************************************************
+# Start the data container running
+
+- name: start container (mediwiki)
+  docker_container:
+    detach: true
+    env:
+      WIKI_HOSTNAME: '{{ wiki_hostname }}'
+      WIKI_MAIL_USER: 'wiki'
+      WIKI_MAIL_PASSWORD: '{{ wiki_email_password | quote }}'
+    hostname: '{{ wiki_container_name }}'
+    image: '{{ wiki_image_name }}:{{ docker_image_tag }}'
+    name: '{{ wiki_container_name }}'
+    networks:
+      - name: '{{ docker_network_frontend }}'
+        aliases:
+          - '{{ wiki_hostname }}'
+        links:
+          - '{{ openldap_container_name }}:wiki_ldap'
+          - '{{ wiki_db_container_name }}:wiki_db'
+    ports: '{{ wiki_port_args }}'
+    purge_networks: true
+    restart_policy: '{{ docker_restart_policy }}'
+    state: started
+    volumes:
+      - '{{ openssl_dv_name }}:/etc/ssl/private:z'
+      - '{{ wiki_dv_name }}:/var/www/html:z'
+
+# *****************************************************************************
+# restore?
+
+- include_tasks: restore.yml
+  when: st_mediawiki_restore.stat.exists == False

@@ -1,0 +1,10 @@
+# Docker container for exim4 logrotate script
+
+{{ exim4_syslog_datavolume_dir }}/exim4/*log {
+    daily
+    dateext
+    ifempty
+    rotate 14
+    missingok
+    # nomail
+}

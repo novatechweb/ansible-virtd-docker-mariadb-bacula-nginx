@@ -1,0 +1,212 @@
+[subtree "containers/buildbot-master"]
+	branch = master
+	push = git@github.com:AndrewCooper/docker-buildbot-master.git
+	remote = git@github.com:novatechweb/docker-buildbot-master.git
+[subtree "containers/buildbot-worker-ntel"]
+	branch = master
+	push = git@github.com:AndrewCooper/docker-buildbot-worker-ntel.git
+	remote = git@github.com:novatechweb/docker-buildbot-worker-ntel.git
+[subtree "containers/buildbot-worker-ptxdist"]
+	branch = master
+	push = git@github.com:AndrewCooper/docker-buildbot-worker-ptxdist.git
+	remote = git@github.com:novatechweb/docker-buildbot-worker-ptxdist.git
+[subtree "containers/docker-exim4"]
+	branch = master
+	push = git@github.com:AndrewCooper/docker-exim4.git
+	remote = git@github.com:novatechweb/docker-exim4
+[subtree "containers/docker-gitlab-data"]
+	branch = master
+	push = git@github.com:AndrewCooper/docker-gitlab.git
+	remote = git@github.com:novatechweb/docker-gitlab
+[subtree "containers/docker-mantisbt"]
+	branch = master
+	push = git@github.com:AndrewCooper/docker-mantisbt.git
+	remote = git@github.com:novatechweb/docker-mantisbt
+[subtree "containers/docker-mediawiki"]
+	branch = master
+	push = git@github.com:AndrewCooper/docker-mediawiki.git
+	remote = git@github.com:novatechweb/docker-mediawiki
+[subtree "containers/docker-mysql-data"]
+	branch = master
+	remote = git@github.com:novatechweb/docker-mysql-data
+[subtree "containers/docker-openldap"]
+	branch = master
+	push = git@github.com:AndrewCooper/docker-openldap.git
+	remote = git@github.com:novatechweb/docker-openldap
+[subtree "containers/docker-openssl"]
+	branch = master
+	push = git@github.com:AndrewCooper/docker-openssl.git
+	remote = git@github.com:novatechweb/docker-openssl
+[subtree "containers/docker-phpLDAPadmin"]
+	branch = stable
+	push = git@github.com:AndrewCooper/docker-phpLDAPadmin.git
+	remote = git@github.com:novatechweb/docker-phpLDAPadmin.git
+[subtree "containers/docker-SupportSite_http_server"]
+	branch = master
+	push = git@git.novatech-llc.com:andrew.cooper/docker-SupportSite_http_server.git
+	remote = git@git.novatech-llc.com:NovaTech-Testing/docker-SupportSite_http_server.git
+[subtree "containers/docker-svn"]
+	branch = master
+	push = git@github.com:AndrewCooper/docker-svn
+	remote = git@github.com:novatechweb/docker-svn
+[subtree "containers/docker-TestStation_cron_service"]
+	branch = master
+	remote = git@git.novatech-llc.com:NovaTech-Testing/docker-TestStation_cron_service.git
+[subtree "containers/docker-TestStation_database_data"]
+	branch = master
+	remote = git@git.novatech-llc.com:NovaTech-Testing/docker-TestStation_database_data.git
+[subtree "containers/docker-TestStation_database_server"]
+	branch = master
+	remote = git@git.novatech-llc.com:NovaTech-Testing/docker-TestStation_database_server.git
+[subtree "containers/docker-TestStation_http_data_buildsystem"]
+	branch = master
+	remote = git@git.novatech-llc.com:NovaTech-Testing/docker-TestStation_http_data_buildsystem.git
+[subtree "containers/docker-TestStation_http_data_ipkg"]
+	branch = master
+	remote = git@git.novatech-llc.com:NovaTech-Testing/docker-TestStation_http_data_ipkg.git
+[subtree "containers/docker-TestStation_http_data_ncdiso"]
+	branch = master
+	remote = git@git.novatech-llc.com:NovaTech-Testing/docker-TestStation_http_data_ncdiso.git
+[subtree "containers/docker-TestStation_http_data_ncdrelease"]
+	branch = master
+	remote = git@git.novatech-llc.com:NovaTech-Testing/docker-TestStation_http_data_ncdrelease.git
+[subtree "containers/docker-TestStation_http_data_testclient"]
+	branch = master
+	remote = git@git.novatech-llc.com:NovaTech-Testing/docker-TestStation_http_data_testclient.git
+[subtree "containers/docker-TestStation_http_server"]
+	branch = master
+	push = git@git.novatech-llc.com:andrew.cooper/docker-TestStation_http_server.git
+	remote = git@git.novatech-llc.com:NovaTech-Testing/docker-TestStation_http_server.git
+[subtree "containers/docker-TestStation_ssh_server_manualtest"]
+	branch = master
+	remote = git@git.novatech-llc.com:NovaTech-Testing/docker-TestStation_ssh_server_manualtest.git
+[subtree "containers/docker-TestStation_ssh_server"]
+	branch = master
+	remote = git@git.novatech-llc.com:NovaTech-Testing/docker-TestStation_ssh_server.git
+[subtree "containers/docker-TestStation_SupportSite_backup_restore"]
+	branch = master
+	push = git@git.novatech-llc.com:andrew.cooper/docker-TestStation_SupportSite_backup_restore.git
+	remote = git@git.novatech-llc.com:NovaTech-Testing/docker-TestStation_SupportSite_backup_restore.git
+[subtree "containers/docker-TestStation_tftp_data"]
+	branch = master
+	remote = git@git.novatech-llc.com:NovaTech-Testing/docker-TestStation_tftp_data.git
+[subtree "containers/docker-TestStation_tftp_server"]
+	branch = master
+	remote = git@git.novatech-llc.com:NovaTech-Testing/docker-TestStation_tftp_server.git
+
+[subtree "roles/bacula-catalog"]
+	branch = master
+	push = git@github.com:AndrewCooper/ansible-bacula-catalog.git
+	remote = git@github.com:novatechweb/ansible-bacula-catalog.git
+[subtree "roles/bacula-client"]
+	branch = master
+	push = git@github.com:AndrewCooper/ansible-bacula-client.git
+	remote = git@github.com:novatechweb/ansible-bacula-client.git
+[subtree "roles/bacula-console"]
+	branch = master
+	push = git@github.com:AndrewCooper/ansible-bacula-console.git
+	remote = git@github.com:novatechweb/ansible-bacula-console.git
+[subtree "roles/bacula-director"]
+	branch = master
+	push = git@github.com:AndrewCooper/ansible-bacula-director.git
+	remote = git@github.com:novatechweb/ansible-bacula-director.git
+[subtree "roles/bacula-script"]
+	branch = master
+	push = git@github.com:AndrewCooper/ansible-bacula-script.git
+	remote = git@github.com:novatechweb/ansible-bacula-script.git
+[subtree "roles/bacula-storage"]
+	branch = master
+	push = git@github.com:AndrewCooper/ansible-bacula-storage.git
+	remote = git@github.com:novatechweb/ansible-bacula-storage.git
+[subtree "roles/buildbot-master"]
+	branch = master
+	push = git@github.com:AndrewCooper/ansible-buildbot-master.git
+	remote = git@github.com:novatechweb/ansible-buildbot-master.git
+[subtree "roles/buildbot-worker-ntel"]
+	branch = master
+	push = git@github.com:AndrewCooper/ansible-buildbot-worker-ntel
+	remote = git@github.com:novatechweb/ansible-buildbot-worker-ntel.git
+[subtree "roles/buildbot-worker-ptxdist"]
+	branch = master
+	push = git@github.com:AndrewCooper/ansible-buildbot-worker-ptxdist
+	remote = git@github.com:novatechweb/ansible-buildbot-worker-ptxdist.git
+[subtree "roles/buildsystem"]
+	branch = master
+	push = git@github.com:AndrewCooper/ansible-buildsystem.git
+	remote = git@github.com:novatechweb/ansible-buildsystem.git
+[subtree "roles/docker-build-base-image"]
+	branch = master
+	remote = git@github.com:novatechweb/ansible-docker-build-base-image.git
+[subtree "roles/docker-buildsystem"]
+	branch = master
+	push = git@github.com:AndrewCooper/ansible-docker-buildsystem.git
+	remote = git@github.com:novatechweb/ansible-docker-buildsystem.git
+[subtree "roles/docker-common"]
+	branch = master
+	push = git@github.com:AndrewCooper/ansible-docker-common.git
+	remote = git@github.com:novatechweb/ansible-docker-common.git
+[subtree "roles/docker-exim4"]
+	branch = master
+	push = git@github.com:AndrewCooper/ansible-docker-exim4.git
+	remote = git@github.com:novatechweb/ansible-docker-exim4.git
+[subtree "roles/docker-gitlab"]
+	branch = master
+	push = git@github.com:AndrewCooper/ansible-docker-gitlab.git
+	remote = git@github.com:novatechweb/ansible-docker-gitlab.git
+[subtree "roles/docker-mantisbt"]
+	branch = master
+	push = git@github.com:AndrewCooper/ansible-docker-mantisbt.git
+	remote = git@github.com:novatechweb/ansible-docker-mantisbt.git
+[subtree "roles/docker-mediawiki"]
+	branch = master
+	push = git@github.com:AndrewCooper/ansible-docker-mediawiki.git
+	remote = git@github.com:novatechweb/ansible-docker-mediawiki.git
+[subtree "roles/docker-networking"]
+	branch = master
+	push = git@github.com:AndrewCooper/ansible-docker-networking.git
+	remote = git@github.com:novatechweb/ansible-docker-networking.git
+[subtree "roles/docker-openldap"]
+	branch = master
+	push = git@github.com:AndrewCooper/ansible-docker-openldap.git
+	remote = git@github.com:novatechweb/ansible-docker-openldap.git
+[subtree "roles/docker-openssl"]
+	branch = master
+	push = git@github.com:AndrewCooper/ansible-docker-openssl.git
+	remote = git@github.com:novatechweb/ansible-docker-openssl.git
+[subtree "roles/docker-pull-images"]
+	branch = master
+	remote = git@github.com:novatechweb/ansible-docker-pull-images.git
+[subtree "roles/docker-svn"]
+	branch = master
+	push = git@github.com:AndrewCooper/ansible-docker-svn.git
+	remote = git@github.com:novatechweb/ansible-docker-svn.git
+[subtree "roles/easyrsa"]
+    branch = master
+	remote = git@github.com:novatechweb/ansible-easyrsa.git
+	push = git@github.com:AndrewCooper/ansible-easyrsa.git
+[subtree "roles/haproxy"]
+    branch = master
+	remote = git@github.com:novatechweb/ansible-haproxy.git
+	push = git@github.com:AndrewCooper/ansible-haproxy.git
+[subtree "roles/libvirt-lvmpool"]
+	branch = master
+	remote = git@github.com:novatechweb/ansible-libvirt-lvmpool.git
+[subtree "roles/libvirt-vm"]
+	branch = master
+	remote = git@github.com:novatechweb/ansible-libvirt-vm.git
+[subtree "roles/mariadb"]
+	branch = master
+	push = git@github.com:AndrewCooper/ansible-mariadb.git
+	remote = git@github.com:novatechweb/ansible-mariadb.git
+[subtree "roles/nexus3"]
+	branch = master
+	push = git@github.com:AndrewCooper/nexus3-oss.git
+	remote = git@github.com:novatechweb/nexus3-oss.git
+[subtree "roles/setup-remote-user"]
+	branch = master
+	push = git@github.com:AndrewCooper/ansible-setup-remote-user.git
+	remote = git@github.com:novatechweb/ansible-setup-remote-user.git
+[subtree "roles/sshd"]
+	branch = master
+	push = git@github.com:novatechweb/ansible-openssh-server.git
+	remote = git@github.com:novatechweb/ansible-openssh-server.git

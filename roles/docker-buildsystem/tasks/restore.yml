@@ -1,0 +1,121 @@
+---
+# file: roles/docker-buildsystem/tasks/restore.yml
+
+# *****************************************************************************
+# Setup the directory where the backup and restore is to take place
+
+- name: restore dir
+  file:
+    state: directory
+    path: '{{ restore_buildsystem_docker_dir }}'
+    owner: root
+    group: tape
+    mode: 'u=rwx,g=rwx,o=rx'
+    recurse: no
+    setype: svirt_sandbox_file_t
+
+# *****************************************************************************
+# Get data from tape
+
+- name: find files
+  files_in_dir:
+    path: '{{ restore_buildsystem_docker_dir }}'
+  register: buildsystem_restore_files
+
+- name: data from tape
+  bacula:
+    command: restore
+    storage: '{{ bacula_storage }}'
+    fileset: '{{ bacula_fileset }}'
+    dest: '{{ bacula_dest }}'
+    path_to_restore: '{{ backup_buildsystem_docker_dir }}'
+  when: buildsystem_restore_files.file_list == []
+
+- name: find files
+  files_in_dir:
+    path: '{{ restore_buildsystem_docker_dir }}'
+  register: buildsystem_restore_files
+
+- name: File permissions
+  file:
+    path: '{{ restore_buildsystem_docker_dir }}/{{ item }}'
+    state: touch
+    owner: root
+    group: root
+    mode: 'u=rwx,g=rwx,o='
+  with_items: '{{ buildsystem_restore_files.file_list | default([]) }}'
+
+# *****************************************************************************
+# For old backups that included the mysql database.
+# Can remove this section once those old backups are obsolete
+
+- name: create temporary location for editing
+  tempfile:
+    path: '{{ restore_buildsystem_docker_dir }}'
+    state: file
+    suffix: sql
+  register: backup_tmpfile
+
+- name: copy database dump to temporary file
+  copy:
+    remote_src: true
+    src: '{{ restore_buildsystem_docker_dir }}/buildsystem_backup.sql'
+    dest: '{{ backup_tmpfile.path }}'
+
+- name: begin marking database dump
+  lineinfile:
+    backup: yes
+    insertafter: "^-- Current Database: `mysql`"
+    line: "-- BEGIN ANSIBLE MANAGED BLOCK"
+    path: '{{ backup_tmpfile.path }}'
+
+- name: end marking database dump
+  lineinfile:
+    backup: yes
+    insertbefore: "^-- Current Database: `protocol`"
+    line: "-- END ANSIBLE MANAGED BLOCK"
+    path: '{{ backup_tmpfile.path }}'
+
+- name: cleanup database dump
+  blockinfile:
+    backup: yes
+    marker: "-- {mark} ANSIBLE MANAGED BLOCK"
+    content: ""
+    path: '{{ backup_tmpfile.path }}'
+
+# *****************************************************************************
+# restore the build system backup
+
+- name: restore build system repositories
+  command: 'docker run --rm -v {{ restore_buildsystem_docker_dir }}:/restore:z --volumes-from={{ name_prefix }}TestStation_http_data_testclient --volumes-from={{ name_prefix }}TestStation_tftp_data --link={{ name_prefix }}TestStation_database_server:test_station_mysql_server --name Backup_Restore_BS_SS {{ name_prefix }}teststation_supportsite_backup_restore_image restore_buildsystem'
+  when: buildsystem_restore_files.file_list != []
+
+# *****************************************************************************
+# restore the build system backup
+
+- name: restore ddio repositories
+  docker_container:
+    cleanup: yes
+    command: restore_ddio
+    detach: false
+    image: '{{ name_prefix }}teststation_supportsite_backup_restore_image'
+    links:
+    - '{{ name_prefix }}TestStation_ddio_database_server:ddio_mysql_server'
+    name: 'Backup_Restore_BS_SS'
+    state: started
+    volumes:
+    - '{{ restore_buildsystem_docker_dir }}:/restore:z'
+    - '{{ name_prefix }}TestStation_tftp_ddio_data:/opt/tftp_files'
+  when: buildsystem_restore_files.file_list != []
+
+# *****************************************************************************
+# cleanup
+
+- name: Remove files
+  file:
+    path: '{{ restore_buildsystem_docker_dir }}'
+    state: absent
+
+- name: State file
+  shell: 'date --rfc-3339=seconds > {{ docker_restore_config_base_dir }}/buildsystem/restore.date.txt'
+  when: st_buildsystem_restore.stat.exists == False

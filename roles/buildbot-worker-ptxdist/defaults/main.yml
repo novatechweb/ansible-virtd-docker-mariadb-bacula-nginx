@@ -39,7 +39,10 @@ container_hostname: '{{ role_name }}'
 container_name: '{{ docker_name_prefix }}{{ container_hostname }}'
 
 # network configuration for the confainer
-container_networks: []
+container_networks:
+  - name: '{{ docker_network_frontend }}'
+    aliases:
+      - '{{ container_hostname }}'
 
 # port configuration of the container
 container_port_args: []

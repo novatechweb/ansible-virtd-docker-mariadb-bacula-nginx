@@ -12,6 +12,9 @@
       login_password: "{{ gitlab_root_password }}"
       state: present
   tasks:
+    - name: Install required packages
+      pip:
+        name: python-gitlab
     - name: "Add gitlab users with ssh public keys"
       gitlab_user:
         username: "{{ item.username }}"

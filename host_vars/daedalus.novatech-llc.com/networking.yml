@@ -3,7 +3,7 @@
 ansible_user: ansibleremote
 
 daedalus_subnet: 172.16.0.0/16
-daedalus_net_connection: "Bridge br0"
+daedalus_net_connection: "System enp5s0f0"
 
 svn_ip_addr:          172.16.0.101
 gitlab_ip_addr:       172.16.0.102

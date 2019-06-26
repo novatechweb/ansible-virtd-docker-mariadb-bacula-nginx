@@ -29,18 +29,22 @@ function nexus_task_run() {
     nexus_task_wait_state "$nexus_backup_task_id" "WAITING"
 }
 
-docker run --rm -v {{ docker_backup_dir }}:{{ docker_backup_dir }}:z \
-    debian:latest /bin/sh -c "rm -rf {{ nexus_docker_backup_dir }}"
-
 mkdir -p -m u=rwx,g=rwx,o= {{ nexus_docker_backup_dir }}
 
-docker exec {{ nexus_container_name }} /bin/sh -c "rm -rf {{ nexus_backup_dir }}/*"
-
-echo "Backing up Nexus Repository Manager database and files"
+printf '==> Backing up Nexus database\n'
+docker exec '{{ nexus_container_name }}' bash -c '\
+    chown -R nexus:nexus "{{ nexus_backup_dir }}"; \
+    rm -rf "{{ nexus_backup_dir }}/db";'
 time nexus_task_run "$nexus_backup_task_id"
 
-echo "Archiving backup"
-time docker exec -i {{ nexus_container_name }} /bin/sh -c "\
-    cd {{ nexus_backup_dir }}; tar czf - *" > {{ nexus_docker_backup_archive }}
+printf '==> Backing up Nexus blobstores\n'
+time docker run --rm \
+    --network none \
+    --volume {{ nexus_data_volume }}:/src:z \
+    --volume {{ nexus_docker_backup_dir }}:/dest:z \
+    instrumentisto/rsync-ssh:latest \
+    rsync --archive --itemize-changes --delete --ignore-missing-args \
+        /src/blobs/ \
+        /dest/blobs/
 
 {% endif %}

@@ -1,0 +1,45 @@
+#! /bin/bash
+#{{ansible_managed}}
+set -x
+
+printf '==> Restoring Nexus blobstores\n'
+time docker run --rm \
+    --network none \
+    --volume {{ nexus_docker_restore_dir }}:/src:z \
+    --volume {{ nexus_data_volume }}:{{ nexus_data_dir }}:z \
+    instrumentisto/rsync-ssh:latest \
+    rsync --archive --itemize-changes --delete --ignore-missing-args \
+        /src/blobs/ \
+        {{ nexus_data_dir }}/blobs/
+
+printf '==> Clearing old Nexus Databases\n'
+time docker run --rm \
+    --network none \
+    --volume {{ nexus_data_volume }}:{{ nexus_data_dir }}:z \
+    alpine:latest \
+    rm -rf \
+        '{{ nexus_data_dir }}/db/accesslog' \
+        '{{ nexus_data_dir }}/db/analytics' \
+        '{{ nexus_data_dir }}/db/audit' \
+        '{{ nexus_data_dir }}/db/component' \
+        '{{ nexus_data_dir }}/db/config' \
+        '{{ nexus_data_dir }}/db/security'
+
+printf '==> Restoring Nexus Databases\n'
+time docker run --rm \
+    --network none \
+    --volume {{ nexus_docker_restore_dir }}:/src:z \
+    --volume {{ nexus_data_volume }}:{{ nexus_data_dir }}:z \
+    instrumentisto/rsync-ssh:latest \
+    rsync --archive --itemize-changes --delete --ignore-missing-args \
+        /src/db/ \
+        '{{ nexus_db_restore_dir }}'
+
+printf '==> Setting permissions on restored data\n'
+time docker run --rm \
+    --network none \
+    --volume {{ nexus_data_volume }}:{{ nexus_data_dir }}:z \
+    --entrypoint=""\
+    --user root \
+    '{{ nexus_image_tag }}' \
+    /usr/bin/chown -R nexus:nexus '{{ nexus_data_dir }}'

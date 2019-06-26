@@ -1,4 +1,4 @@
-nexus_version: 3.16.1
+nexus_version: 3.16.2
 nexus_networks:
   - name: '{{ docker_network_frontend }}'
     aliases:
@@ -8,18 +8,25 @@ nexus_default_port: 8081
 
 # Nexus Backup
 nexus_docker_backup_dir: "{{ docker_backup_dir }}/NEXUS3"
-nexus_docker_backup_archive: "{{ nexus_docker_backup_dir }}/nexus3.tar.gz"
+nexus_docker_restore_dir: "{{ bacula_dest }}{{ nexus_docker_backup_dir }}"
 nexus_backup_dir: '/var/nexus-backup'
 nexus_backup_blob_filter:
   - permanent
 # Shall we configure backup ?
-nexus_backup_configure: true
+nexus_backup_configure: false
 # Backup time cron expression
 nexus_backup_manual: true
 # Shall we rotate backups ? No effect if nexus_backup_configure is false
 nexus_backup_rotate: false
 nexus_backup_keep_rotations: 1  # Keep 4 backup rotation by default (current + last 3)
-nexus_backup_task_name: db and blobstores backup
+nexus_backup_task_name: 'Database Export'
+
+nexus_restore_log: '/tmp/nexus-restore.log'
+nexus_backup_log: '/tmp/nexus-backup.log'
+
+# Nexus Blobstore Compacting
+nexus_compact_default_task_name: 'Compact "Default" Blobstore'
+nexus_compact_permanent_task_name: 'Compact "Permanent" Blobstore'
 
 nexus_email_server_enabled: true
 nexus_email_server_host: "mail.novatech-llc.com"
@@ -267,3 +274,17 @@ nexus_config_npm: false
 nexus_config_nuget: false
 nexus_config_gitlfs: false
 nexus_config_yum: false
+
+nexus_scheduled_tasks:
+- name: '{{ nexus_compact_default_task_name }}'
+  typeId: blobstore.compact
+  taskProperties:
+    blobstoreName: default
+- name: '{{ nexus_compact_permanent_task_name }}'
+  typeId: blobstore.compact
+  taskProperties:
+    blobstoreName: permanent
+- name: '{{ nexus_backup_task_name }}'
+  typeId: db.backup
+  taskProperties:
+    location: '{{ nexus_backup_dir }}/db'

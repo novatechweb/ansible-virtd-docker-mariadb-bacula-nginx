@@ -10,6 +10,10 @@
     nexus_rest_api_endpoint: "service/rest/v1"
   when: nexus_version is version_compare('3.8.0', '>=')
 
+- name: Get internal container path to nexus data
+  set_fact:
+    nexus_data_dir: '/nexus-data'
+
 - name: Get path to database restore dir (v < 3.11.0)
   set_fact:
     nexus_db_restore_dir: "{{ nexus_data_dir }}/backup"
@@ -20,14 +24,16 @@
     nexus_db_restore_dir: "{{ nexus_data_dir }}/restore-from-backup"
   when: nexus_version is version_compare('3.11.0', '>=')
 
-- name: Get internal container path to nexus data
-  set_fact:
-    nexus_data_dir: '/nexus-data'
-
 - name: Create nexus data volume
   docker_volume:
     name: '{{ nexus_data_volume }}'
     state: present
+
+- name: "Deploy backup restore script"
+  template:
+    src: "nexus-docker-blob-restore.sh.j2"
+    dest: "/sbin/nexus-blob-restore.sh"
+    mode: 0755
 
 - name: 'Check if data directory is empty (first-time install)'
   docker_container:

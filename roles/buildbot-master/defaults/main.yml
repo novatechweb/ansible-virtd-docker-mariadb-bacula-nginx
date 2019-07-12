@@ -8,7 +8,7 @@ backup_hostdir: '{{ docker_backup_dir }}/buildbot'
 buildbot_uid: 1000
 
 # numeric version of buildbot service
-buildbot_version: '1.6.0'
+buildbot_version: '2.4.0'
 
 # port number for workers to communicate with master
 buildbot_worker_port: 9989
@@ -82,6 +82,10 @@ container_volumes:
   - '{{ config_hostdir }}/ptxdist.py:{{ data_path }}/ptxdist.py'
   - '{{ config_hostdir }}/{{ buildbot_master_sshkey | basename }}:/home/buildbot/.ssh/id_rsa'
   - '{{ config_hostdir }}/known_hosts:/home/buildbot/.ssh/known_hosts'
+  - '{{ config_hostdir }}/ssl:/etc/ssl/private'
+
+# working directory of the container
+container_workdir: '{{ data_path }}'
 
 # mount path of the data volume
 data_path: '/buildbot'
@@ -94,15 +98,13 @@ image_args:
   BUILDBOT_TIMEZONE: 'America/Chicago'
   BUILDBOT_UID: '{{ buildbot_uid }}'
   BUILDBOT_VERSION: 'v{{ buildbot_version }}'
+  BUILDBOT_WORKDIR: '{{ data_path }}'
 
 # directory of the image source
 image_dir: '{{ docker_projects_dir }}/buildbot-master'
 
 # name of the image being built
 image_name: '{{ docker_registry_username }}/buildbot'
-
-# repository URI of the image source
-image_repo: '{{ buildbot_image_repo | default("https://github.com/novatechweb/docker-buildbot-master.git") }}'
 
 # restoration host directory
 restore_hostdir: '{{ bacula_dest }}{{ backup_hostdir }}'

@@ -141,6 +141,10 @@ c['builders'] = []
 
 git_lock = util.MasterLock("git")
 
+@util.renderer
+def splitPackages(props):
+    pkgstring = props.getProperty('packages')
+    return pkgstring.split(" ")
 
 class PTXDistBuild(steps.ShellSequence):
     def __init__(self, **kwargs):
@@ -183,12 +187,7 @@ class PTXDistBuild(steps.ShellSequence):
                     "--noconfirm",
                     util.Property("version"),
                     util.Interpolate("%(prop:release:#?|release|beta)s"),
-                    util.Transform(
-                        string.split,
-                        util.Property(
-                            "packages",
-                            default='')
-                    )
+                    splitPackages
                 ])),
 
             util.ShellArg(

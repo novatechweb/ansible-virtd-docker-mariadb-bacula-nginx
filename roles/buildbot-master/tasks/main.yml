@@ -25,6 +25,7 @@
     owner: '{{ buildbot_uid }}'
     mode: "u=rw,g=,o="
     unsafe_writes: yes
+  register: configs
   loop:
     - master.cfg
     - openembedded.py
@@ -39,16 +40,25 @@
     owner: '{{ buildbot_uid }}'
     mode: "u=rw,g=,o="
     unsafe_writes: yes
+  register: templates
   loop:
     - buildbot.tac
     - known_hosts
 
-- name: Checkout image repo
-  git:
-    repo: '{{ image_repo }}'
-    version: master
-    dest: '{{ image_dir }}'
-    force: true
+- name: Create image source directory
+  file:
+    path: "{{ image_dir }}"
+    state: directory
+
+- name: Deploy image source
+  synchronize:
+    archive: yes
+    checksum: yes
+    compress: yes
+    delete: yes
+    src: docker/
+    dest: '{{ image_dir }}/'
+  register: deploy_source
 
 - name: Create buildbot master image
   docker_image:
@@ -56,7 +66,7 @@
     name: '{{ image_name }}'
     path: '{{ image_dir }}'
     tag: '{{ docker_image_tag }}'
-    force: true
+    force: '{{ deploy_source.changed }}'
 
 - name: Start buildbot container
   docker_container:
@@ -68,3 +78,5 @@
     volumes: '{{ container_volumes }}'
     ports: '{{ container_port_args }}'
     state: started
+    restart: '{{ configs.changed or templates.changed or deploy_source.changed }}'
+    working_dir: '{{ container_workdir }}'

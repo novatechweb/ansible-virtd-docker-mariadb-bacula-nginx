@@ -1,5 +1,20 @@
 ---
-buildbot_version: 1.6.0
-buildbot_worker_port: 9989
+buildbot_version: 2.4.0
+buildbot_worker_port: '9989'
 buildbot_worker_ntel: worker-ntel
 buildbot_worker_ptxdist: worker-ptxdist
+
+buildbot_master_connection_string: "
+  ssl
+  :port=9989
+  :certKey=/etc/ssl/private/master.pem
+  :privateKey=/etc/ssl/private/master.key
+  :extraCertChain=/etc/ssl/private/ca.pem"
+
+buildbot_worker_connection_string: "
+  tls
+  :host=buildbot.novatech-llc.com
+  :port=9989
+  :certificate=/etc/ssl/private/worker.pem
+  :privateKey=/etc/ssl/private/worker.key
+  :trustRoots=/etc/ssl/private"

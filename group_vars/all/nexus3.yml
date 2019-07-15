@@ -57,7 +57,7 @@ ldap_connections:
     ldap_map_groups_as_roles: yes
     ldap_map_groups_as_roles_type: "static"
     ldap_user_memberof_attribute: ""
-    ldap_group_base_dn: 'ou=group'
+    ldap_group_base_dn: 'cn=nexus.novatech-llc.com,ou=group'
     ldap_group_object_class: 'posixGroup'
     ldap_group_id_attribute: 'cn'
     ldap_group_member_attribute: 'memberUid'
@@ -105,29 +105,46 @@ nexus_roles:
       - nx-repository-view-raw-xorg-browse
       - nx-repository-view-raw-xorg-read
     roles: []
-  - id: Backup  # can map to a LDAP group id, also used as a key to update a role
+  - id: Backup
     name: backup
     description: Backup system
     privileges:
       - nx-tasks-read
       - nx-tasks-run
     roles: []
-  - id: Developers  # can map to a LDAP group id, also used as a key to update a role
-    name: developers
-    description: All developers
+  - id: Buildbot
+    name: buildbot
+    description: Build robots
     privileges:
       - nx-search-read
       - all-repos-read
       - nx-repository-view-*-*-*
     roles: []
-  - id: nexus.novatech-llc.com  # can map to a LDAP group id, also used as a key to update a role
-    name: novatech
-    description: All developers
+  - id: admin
+    name: novatech-admin
+    description: NovaTech Administrators
+    privileges: []
+    roles:
+      - nx-admin
+  - id: developer
+    name: novatech-developer
+    description: NovaTech Development Team
     privileges:
       - nx-component-upload
-      - nx-repository-view-*-*-add
-      - nx-repository-view-*-*-browse
-      - nx-repository-view-*-*-read
+      - nx-repository-view-*-*-*
+    roles: []
+  - id: hardware
+    name: novatech-hardware
+    description: NovaTech Hardware Team
+    privileges:
+      - nx-component-upload
+      - nx-repository-view-raw-public-releases-add
+      - nx-repository-view-raw-public-releases-browse
+      - nx-repository-view-raw-public-releases-read
+      - nx-repository-view-raw-test-fixtures-add
+      - nx-repository-view-raw-test-fixtures-browse
+      - nx-repository-view-raw-test-fixtures-read
+    roles: []
 
 nexus_local_users:
   - username: anonymous
@@ -144,20 +161,13 @@ nexus_local_users:
     password: "{{ nexus_bacula_password }}"
     roles:
       - Backup
-  - username: buildbot # used as key to update
+  - username: buildbot
     first_name: NovaTech
     last_name: CI
     email: buildbot@novatech-llc.com
     password: "{{ nexus_buildbot_password }}"
     roles:
-      - Developers # role ID here
-  - username: bacula
-    first_name: Bacula
-    last_name: Backups
-    email: bacula@novatech-llc.com
-    password: "{{ nexus_bacula_password }}"
-    roles:
-      - Backup
+      - Buildbot
 
 nexus_delete_default_blobstore: false
 nexus_blob_split: false     # True - blobstores per format
@@ -239,6 +249,10 @@ nexus_repos_raw_hosted:
     write_policy: allow  # one of "allow", "allow_once" or "deny"
     blob_store: default
   - name: public-releases
+    strict_content_validation: false
+    write_policy: allow  # one of "allow", "allow_once" or "deny"
+    blob_store: permanent
+  - name: test-fixtures
     strict_content_validation: false
     write_policy: allow  # one of "allow", "allow_once" or "deny"
     blob_store: permanent

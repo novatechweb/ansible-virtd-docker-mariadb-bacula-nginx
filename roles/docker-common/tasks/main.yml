@@ -7,6 +7,12 @@
 - import_tasks: engine-debian.yml
   when: ansible_os_family == "Debian"
 
+- name: Start docker service
+  service:
+    name: docker
+    enabled: yes
+    state: started
+
 - import_tasks: packages.yml
 
 - import_tasks: configure.yml

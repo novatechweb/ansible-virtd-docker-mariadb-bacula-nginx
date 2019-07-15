@@ -70,7 +70,7 @@ RUN curl ${PTK_URI} \
 ARG BUILDBOT_UID=1000
 COPY buildbot/ /home/buildbot/
 RUN useradd --comment "Buildbot Server" --home-dir "/home/buildbot" --shell "/bin/bash" --uid ${BUILDBOT_UID} --user-group buildbot \
-&&  mkdir -p --mode=0600 "/home/buildbot/.ssh" \
+&&  mkdir -p --mode=0700 "/home/buildbot/.ssh" \
 &&  chown -v -R buildbot:buildbot "/buildbot" \
 &&  chown -v -R buildbot:buildbot "/home/buildbot"
 

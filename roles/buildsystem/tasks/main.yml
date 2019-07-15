@@ -35,3 +35,23 @@
     db_new_user_password:    "{{ buildsystem_database_build_password }}"
     db_new_user_permissions: ["SELECT ON *.*"]
     db_grant_cmd_end:        ";"
+
+- import_tasks: create_db_user.yml
+  vars:
+    db_host:                 "{{ build_ip_addr }}"
+    db_admin_user:           "root"
+    db_admin_user_password:  "{{ buildsystem_database_root_password }}"
+    db_new_user:             "remote_update"
+    db_new_user_password:    "{{ buildsystem_database_remote_update_password }}"
+    db_new_user_permissions: ["SELECT ON *.*"]
+    db_grant_cmd_end:        ";"
+
+- import_tasks: create_db_user.yml
+  vars:
+    db_host:                 "{{ build_ip_addr }}"
+    db_admin_user:           "root"
+    db_admin_user_password:  "{{ buildsystem_database_root_password }}"
+    db_new_user:             "replication"
+    db_new_user_password:    "{{ buildsystem_database_replication_password }}"
+    db_new_user_permissions: ["SELECT ON *.*"]
+    db_grant_cmd_end:        ";"

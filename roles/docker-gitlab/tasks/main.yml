@@ -141,3 +141,9 @@
   retries: 10
   delay: 30
   until: check is success
+
+# *****************************************************************************
+# post-install configuration
+
+- include_tasks: configuration.yml
+  become: false

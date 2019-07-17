@@ -1,0 +1,17 @@
+- name: Add gitlab users with ssh public keys
+  gitlab_user:
+    state:        present
+    server_url:   "https://{{ gitlab_hostname }}/"
+    login_token:    "{{ gitlab_root_private_token }}"
+
+    username:     "{{ newuser.username     | default(omit) }}"
+    name:         "{{ newuser.name         | default(omit) }}"
+    email:        "{{ newuser.email        | default(omit) }}"
+    password:     "{{ newuser.password     | default(omit) }}"
+    sshkey_file:  "{{ newuser.sshkey_file  | default(omit) }}"
+    sshkey_name:  "{{ newuser.sshkey_name  | default(omit) }}"
+    group:        "{{ newuser.group        | default(omit) }}"
+    access_level: "{{ newuser.access_level | default(omit) }}"
+    confirm:      "{{ newuser.confirm      | default(omit) }}"
+    isadmin:      "{{ newuser.isadmin      | default(omit) }}"
+    external:     "{{ newuser.external     | default(omit) }}"

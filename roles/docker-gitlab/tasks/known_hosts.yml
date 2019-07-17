@@ -1,0 +1,23 @@
+---
+- name: Scan Gitlab ssh keys
+  command: ssh-keyscan {{ gitlab_hostname }}
+  register: gitlab_keys
+  changed_when: false
+
+- name: Create known_hosts file
+  become: false
+  known_hosts:
+    hash_host: no
+    key: '{{ item }}'
+    name: '{{ gitlab_hostname }}'
+    state: present
+  loop: "{{gitlab_keys.stdout_lines}}"
+
+- name: Create known_hosts file
+  become: true
+  known_hosts:
+    hash_host: no
+    key: '{{ item }}'
+    name: '{{ gitlab_hostname }}'
+    state: present
+  loop: "{{gitlab_keys.stdout_lines}}"

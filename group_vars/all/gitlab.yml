@@ -1,0 +1,74 @@
+---
+
+# the name of the gitlab container
+gitlab_container_name: '{{ docker_name_prefix }}gitlab'
+
+gitlab_tokens:
+- user: root
+  name: Ansible API Access
+  token: "{{ gitlab_root_private_token }}"
+  scopes: ["api"]
+
+- user: buildbot
+  name: Buildbot API Access
+  token: "{{ gitlab_user_buildbot_token }}"
+  scopes: ["api"]
+
+gitlab_hooks:
+- hook_url: "http://buildbot:8080/change_hook/gitlab"
+  hook_validate_certs: yes
+  merge_requests_events: yes
+  project: ntel/setup-scripts
+  push_events: yes
+  token: "{{ buildbot_webhook_secret }}"
+
+gitlab_oauth_applications:
+- name: Buildbot
+  redirect_uri: "https://{{buildbot_hostname}}/auth/login"
+  scopes: ["api","read_user","sudo","read_repository","openid"]
+  application_id_file: "{{gitlab_oauth_buildbot_id_file}}"
+  secret_file: "{{gitlab_oauth_buildbot_secret_file}}"
+
+gitlab_users:
+- username: ansible
+  name: Ansible Automation Tool
+  email: ansible@novatech-llc.com
+  password: "{{ gitlab_user_ansibleremote_password }}"
+  sshkey_file: "{{ lookup('file', ansibleremote_user_public_key ) }}"
+  sshkey_name: "ansibleremote user"
+
+- username: ansible
+  name: Ansible Automation Tool
+  email: ansible@novatech-llc.com
+  password: "{{ gitlab_user_ansibleremote_password }}"
+  sshkey_file: "{{ lookup('file', ansibleremote_root_public_key ) }}"
+  sshkey_name: "ansibleremote root"
+
+- username: buildbot
+  name: Build Robot
+  email: buildbot@novatech-llc.com
+  password: "{{ gitlab_user_buildbot_password }}"
+  sshkey_file: "{{ lookup('file', buildbot_master_sshkey + '.pub') }}"
+  sshkey_name: "buildbot-master"
+
+- username: buildbot
+  name: Build Robot
+  email: buildbot@novatech-llc.com
+  password: "{{ gitlab_user_buildbot_password }}"
+  sshkey_file: "{{ lookup('file', buildbot_worker_ntel_sshkey + '.pub') }}"
+  sshkey_name: "buildbot-worker-ntel"
+
+- username: buildbot
+  name: Build Robot
+  email: buildbot@novatech-llc.com
+  password: "{{ gitlab_user_buildbot_password }}"
+  sshkey_file: "{{ lookup('file', buildbot_worker_ptxdist_sshkey + '.pub') }}"
+  sshkey_name: "buildbot-worker-ptxdist"
+
+- username: buildbot
+  name: Build Robot
+  email: buildbot@novatech-llc.com
+  password: "{{ gitlab_user_buildbot_password }}"
+  confirm: no
+  group: ntel/setup-scripts
+  access_level: developer

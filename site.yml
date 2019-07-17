@@ -117,9 +117,6 @@
 - name: Setup LDAP users
   import_playbook: ldap_entries.yml
 
-- name: Setup Gitlab users
-  import_playbook: gitlab_users.yml
-
 - name: Setup the buildbot containers
   import_playbook: buildbot.yml
 

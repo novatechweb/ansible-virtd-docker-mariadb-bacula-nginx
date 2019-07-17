@@ -1,0 +1,19 @@
+# Gitlab Create Change hook
+- name: Create Buildbot change hooks
+  gitlab_hooks:
+    state:         present
+    api_url:       "https://{{ gitlab_hostname }}/api"
+    private_token: "{{ gitlab_root_private_token }}"
+
+    hook_url:              '{{ newhook.hook_url              | default(omit) }}'
+    # hook_validate_certs:   '{{ newhook.hook_validate_certs   | default(omit) }}'
+    issues_events:         '{{ newhook.issues_events         | default(omit) }}'
+    job_events:            '{{ newhook.job_events            | default(omit) }}'
+    merge_requests_events: '{{ newhook.merge_requests_events | default(omit) }}'
+    note_events:           '{{ newhook.note_events           | default(omit) }}'
+    pipeline_events:       '{{ newhook.pipeline_events       | default(omit) }}'
+    project:               '{{ newhook.project               | default(omit) }}'
+    push_events:           '{{ newhook.push_events           | default(omit) }}'
+    tag_push_events:       '{{ newhook.tag_push_events       | default(omit) }}'
+    token:                 '{{ newhook.token                 | default(omit) }}'
+    wiki_page_events:      '{{ newhook.wiki_page_events      | default(omit) }}'

@@ -1,0 +1,2 @@
+echo "umount {{ bacula_storage }}" | bconsole
+mt -f '{{ bacula_storage_device_archive_device }}' eject

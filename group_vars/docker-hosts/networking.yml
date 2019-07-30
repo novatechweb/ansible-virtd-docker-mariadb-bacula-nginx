@@ -12,9 +12,7 @@ gitlab_port_args:
 - "{{ gitlab_ip_addr }}:22:22"
 
 wiki_hostname: wiki.novatech-llc.com
-wiki_port_args:
-- "{{ wiki_ip_addr }}:80:80"
-- "{{ wiki_ip_addr }}:443:443"
+wiki_port_args: []
 
 mantisbt_hostname: mantis.novatech-llc.com
 mantisbt_port_args:
@@ -63,6 +61,8 @@ haproxy_port_args:
 - "{{ nexus_ip_addr }}:443:443"
 - "{{ phpldapadmin_ip_addr }}:80:80"
 - "{{ phpldapadmin_ip_addr }}:443:443"
+- "{{ wiki_ip_addr }}:80:80"
+- "{{ wiki_ip_addr }}:443:443"
 
 ddio_hostname: ddio.novatech-llc.com
 ddio_port_args: []

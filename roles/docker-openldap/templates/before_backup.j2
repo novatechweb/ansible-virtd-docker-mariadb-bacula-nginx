@@ -5,7 +5,7 @@
 docker run --rm -v {{ docker_backup_dir }}:/tmp/import_export:z debian:latest bash -c "rm -rf /tmp/import_export/LDAP"
 mkdir -p -m u=rwx,g=rwx,o= {{ openldap_docker_backup_dir }}
 docker run --rm \
-    --volumes-from {{ openldap_dv_name }} \
+    --volumes-from {{ openldap_container_name }} \
     -v {{ openldap_docker_backup_dir }}:/tmp/import_export:z \
     {{ openldap_image_name }}:{{ docker_image_tag }} backup
 {% endif %}

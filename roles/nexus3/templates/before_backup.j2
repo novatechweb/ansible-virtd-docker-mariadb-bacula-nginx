@@ -36,6 +36,14 @@ docker exec '{{ nexus_container_name }}' bash -c '\
     chown -R nexus:nexus "{{ nexus_backup_dir }}"; \
     rm -rf "{{ nexus_backup_dir }}/db";'
 time nexus_task_run "$nexus_backup_task_id"
+time docker run --rm \
+    --network none \
+    --volume {{ nexus_backup_volume }}:/src:z \
+    --volume {{ nexus_docker_backup_dir }}:/dest:z \
+    instrumentisto/rsync-ssh:latest \
+    rsync --archive --itemize-changes --delete --ignore-missing-args \
+        /src/db/ \
+        /dest/db/
 
 printf '==> Backing up Nexus blobstores\n'
 time docker run --rm \

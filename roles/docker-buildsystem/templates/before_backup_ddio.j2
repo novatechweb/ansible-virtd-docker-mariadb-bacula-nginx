@@ -15,7 +15,7 @@ docker run --rm \
 mkdir -p -m u=rwx,g=rwx,o= {{ backup_buildsystem_docker_dir }}
 docker run --rm \
     -v {{ backup_buildsystem_docker_dir }}:/backup:z \
-    --volumes-from={{ name_prefix }}TestStation_tftp_ddio_data \
+    --volumes-from={{ name_prefix }}TestStation_tftp_ddio_server \
     --link={{ name_prefix }}TestStation_ddio_database_server:ddio_mysql_server \
     --name Backup_Restore_BS_SS \
     {{ name_prefix }}teststation_supportsite_backup_restore_image \

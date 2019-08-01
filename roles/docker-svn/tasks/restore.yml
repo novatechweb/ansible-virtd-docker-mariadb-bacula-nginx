@@ -50,7 +50,7 @@
 
 - name: restore svn repositories
   docker_container:
-    command: ['import', '{{ svn_repos }}']
+    command: ['restore', '{{ svn_repos }}']
     detach: False
     image: '{{ svn_image_name }}:{{ docker_image_tag }}'
     name: 'svn_restore'

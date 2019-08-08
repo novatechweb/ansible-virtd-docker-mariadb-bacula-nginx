@@ -10,3 +10,8 @@
       name: grafana
     tags:
       - grafana_container
+  - name: Build and start the Prometheus Docker container
+    import_role:
+      name: prometheus
+    tags:
+      - prometheus_container

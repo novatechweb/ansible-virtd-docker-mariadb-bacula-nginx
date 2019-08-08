@@ -81,3 +81,10 @@ grafana_ldap:
           org_role: Admin
         - group_dn: "*"
           org_role: Viewer
+
+# Datasources to configure
+grafana_datasources:
+- name: "Prometheus"
+  type: "prometheus"
+  access: "proxy"
+  url: "http://prometheus:9090"

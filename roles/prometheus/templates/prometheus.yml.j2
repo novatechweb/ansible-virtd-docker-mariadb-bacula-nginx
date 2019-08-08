@@ -1,0 +1,34 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+{{ ansible_managed | comment }}
+# http://prometheus.io/docs/operating/configuration/
+
+global:
+  {{ prometheus_config_global | to_nice_yaml(indent=2) | indent(2, False) }}
+  external_labels:
+    {{ prometheus_config_external_labels | to_nice_yaml(indent=2) | indent(4, False) }}
+
+{% if prometheus_config_remote_read != [] %}
+remote_read:
+  {{ prometheus_remote_read | to_nice_yaml(indent=2) | indent(2, False) }}
+{% endif %}
+
+{% if prometheus_config_remote_write != [] %}
+remote_write:
+  {{ prometheus_config_remote_write | to_nice_yaml(indent=2) | indent(2, False) }}
+{% endif %}
+
+rule_files:
+  - {{ prometheus_config_dir }}/rules/*.rules
+
+{% if prometheus_config_alertmanager | length > 0 %}
+alerting:
+  alertmanagers:
+  {{ prometheus_config_alertmanager | to_nice_yaml(indent=2) | indent(2,False) }}
+  {% if prometheus_config_alert_relabel | length > 0 %}
+  alert_relabel_configs:
+  {{ prometheus_config_alert_relabel | to_nice_yaml(indent=2) | indent(2,False) }}
+  {% endif %}
+{% endif %}
+
+scrape_configs:
+  {{ prometheus_config_scrape_configs | to_nice_yaml(indent=2) | indent(2,False) }}

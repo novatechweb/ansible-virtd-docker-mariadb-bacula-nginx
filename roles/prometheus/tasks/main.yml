@@ -1,0 +1,80 @@
+---
+# tasks file for prometheus
+
+- name: create prometheus configuration directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: '{{ prometheus_uid }}'
+    group: '{{ prometheus_uid }}'
+    mode: 0770
+  with_items:
+    - "{{ prometheus_etc_volume }}"
+    - "{{ prometheus_etc_volume }}/conf.d"
+    - "{{ prometheus_etc_volume }}/rules"
+    - "{{ prometheus_etc_volume }}/file_sd"
+
+- name: configure prometheus
+  template:
+    src: "{{ prometheus_config_file_template }}"
+    dest: "{{ prometheus_etc_volume }}/{{ prometheus_config_file }}"
+    owner: '{{ prometheus_uid }}'
+    group: '{{ prometheus_uid }}'
+    mode: 0640
+  notify:
+    - reload prometheus
+
+- name: alerting rules file
+  template:
+    src: "{{ prometheus_alert_rules_template }}"
+    dest: "{{ prometheus_etc_volume }}/rules/ansible_managed.rules"
+    owner: '{{ prometheus_uid }}'
+    group: '{{ prometheus_uid }}'
+    mode: 0640
+  when:
+    - prometheus_config_alertmanager != []
+    - prometheus_alert_rules != []
+  notify:
+    - reload prometheus
+
+- name: configure prometheus static targets
+  template:
+    src: "{{ promtetheus_target_template }}"
+    dest: "{{ prometheus_etc_volume }}/file_sd/{{ item.key }}.yml"
+    force: true
+    owner: '{{ prometheus_uid }}'
+    group: '{{ prometheus_uid }}'
+    mode: 0640
+  with_dict: "{{ prometheus_targets }}"
+  when: prometheus_targets != {}
+  notify:
+    - reload prometheus
+
+- name: start prometheus container
+  docker_container:
+    command: '{{ prometheus_command | flatten }}'
+    comparisons: {'*': strict}
+    detach: yes
+    healthcheck:
+      test: ['CMD', 'wget', '--spider', 'http://localhost:{{ prometheus_port }}/api/v1/status/flags']
+    hostname: '{{ prometheus_hostname }}'
+    image: '{{ prometheus_image }}'
+    name: '{{ prometheus_container }}'
+    networks: '{{ prometheus_networks }}'
+    networks_cli_compatible: yes
+    ports: '{{ prometheus_port_args }}'
+    pull: yes
+    purge_networks: yes
+    restart_policy: '{{ prometheus_restart_policy }}'
+    state: started
+    volumes: '{{ prometheus_volumes }}'
+
+- meta: flush_handlers
+
+- name: Wait for prometheus to start
+  docker_container_info:
+    name: '{{ prometheus_container }}'
+  register: prometheus_info
+  until: prometheus_info['container']['State']['Health']['Status'] == 'healthy'
+  retries: 5
+  delay: 10

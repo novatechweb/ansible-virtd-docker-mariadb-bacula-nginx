@@ -111,7 +111,7 @@ gitlab_rails['gravatar_ssl_url'] = 'https://seccdn.libravatar.org/avatar/%{hash}
 
 ### Monitoring settings
 ###! IP whitelist controlling access to monitoring endpoints
-# gitlab_rails['monitoring_whitelist'] = ['127.0.0.0/8']
+gitlab_rails['monitoring_whitelist'] = ['127.0.0.0/8','::1/128','172.0.0.0/8']
 ###! Time between sampling of unicorn socket metrics, in seconds
 # gitlab_rails['monitoring_unicorn_sampler_interval'] = 10
 
@@ -558,7 +558,7 @@ gitlab_rails['smtp_tls'] = true
 ##! put an empty string on the command line
 # gitlab_workhorse['pprof_listen_addr'] = "''"
 
-# gitlab_workhorse['prometheus_listen_addr'] = "localhost:9229"
+gitlab_workhorse['prometheus_listen_addr'] = "0.0.0.0:9229"
 
 # gitlab_workhorse['dir'] = "/var/opt/gitlab/gitlab-workhorse"
 # gitlab_workhorse['log_directory'] = "/var/log/gitlab/gitlab-workhorse"
@@ -616,8 +616,8 @@ gitlab_rails['smtp_tls'] = true
 # unicorn['worker_processes'] = 2
 
 ### Advanced settings
-# unicorn['listen'] = '127.0.0.1'
-# unicorn['port'] = 8080
+unicorn['listen'] = '0.0.0.0'
+unicorn['port'] = 8080
 # unicorn['socket'] = '/var/opt/gitlab/gitlab-rails/sockets/gitlab.socket'
 # unicorn['pidfile'] = '/opt/gitlab/var/unicorn/unicorn.pid'
 # unicorn['tcp_nopush'] = true
@@ -643,9 +643,9 @@ gitlab_rails['smtp_tls'] = true
 # sidekiq['log_format'] = "default"
 # sidekiq['shutdown_timeout'] = 4
 # sidekiq['concurrency'] = 25
-# sidekiq['metrics_enabled'] = true
-# sidekiq['listen_address'] = 127.0.0.1
-# sidekiq['listen_port'] = 8082
+sidekiq['metrics_enabled'] = true
+sidekiq['listen_address'] = '0.0.0.0'
+sidekiq['listen_port'] = 8082
 
 ################################################################################
 ## gitlab-shell
@@ -1053,7 +1053,7 @@ nginx['ssl_dhparam'] = "/etc/ssl/private/dhparam.pem" # Path to dhparams.pem, eg
 ##! Docs: https://docs.gitlab.com//omnibus/settings/configuration.html#configuring-runtime-directory
 ################################################################################
 
-# runtime_dir '/run'
+runtime_dir '/dev/shm'
 
 ################################################################################
 ## Git
@@ -1375,7 +1375,12 @@ nginx['ssl_dhparam'] = "/etc/ssl/private/dhparam.pem" # Path to dhparams.pem, eg
 ##! Docs: https://docs.gitlab.com/ce/administration/monitoring/prometheus/
 ################################################################################
 
-# prometheus['enable'] = true
+###! **To enable only Monitoring service in this machine, uncomment
+###!   the line below.**
+###! Docs: https://docs.gitlab.com/ce/administration/high_availability
+# monitoring_role['enable'] = true
+
+prometheus['enable'] = false
 # prometheus['monitor_kubernetes'] = true
 # prometheus['username'] = 'gitlab-prometheus'
 # prometheus['uid'] = nil
@@ -1433,7 +1438,7 @@ nginx['ssl_dhparam'] = "/etc/ssl/private/dhparam.pem" # Path to dhparams.pem, eg
 ##! Docs: https://docs.gitlab.com/ce/administration/monitoring/prometheus/alertmanager.html
 ################################################################################
 
-# alertmanager['enable'] = true
+alertmanager['enable'] = false
 # alertmanager['home'] = '/var/opt/gitlab/alertmanager'
 # alertmanager['log_directory'] = '/var/log/gitlab/alertmanager'
 # alertmanager['admin_email'] = 'admin@example.com'
@@ -1451,7 +1456,7 @@ nginx['ssl_dhparam'] = "/etc/ssl/private/dhparam.pem" # Path to dhparams.pem, eg
 ##! Docs: https://docs.gitlab.com/ce/administration/monitoring/prometheus/node_exporter.html
 ################################################################################
 
-# node_exporter['enable'] = true
+node_exporter['enable'] = false
 # node_exporter['home'] = '/var/opt/gitlab/node-exporter'
 # node_exporter['log_directory'] = '/var/log/gitlab/node-exporter'
 # node_exporter['flags'] = {
@@ -1466,25 +1471,25 @@ nginx['ssl_dhparam'] = "/etc/ssl/private/dhparam.pem" # Path to dhparams.pem, eg
 ##! Docs: https://docs.gitlab.com/ce/administration/monitoring/prometheus/redis_exporter.html
 ################################################################################
 
-# redis_exporter['enable'] = true
+redis_exporter['enable'] = true
 # redis_exporter['log_directory'] = '/var/log/gitlab/redis-exporter'
 # redis_exporter['flags'] = {
 #   'redis.addr' => "unix://#{node['gitlab']['gitlab-rails']['redis_socket']}",
 # }
 
 ##! Advanced settings. Should be changed only if absolutely needed.
-# redis_exporter['listen_address'] = 'localhost:9121'
+redis_exporter['listen_address'] = '0.0.0.0:9121'
 
 ################################################################################
 ## Prometheus Postgres exporter
 ##! Docs: https://docs.gitlab.com/ce/administration/monitoring/prometheus/postgres_exporter.html
 ################################################################################
 
-# postgres_exporter['enable'] = true
+postgres_exporter['enable'] = true
 # postgres_exporter['home'] = '/var/opt/gitlab/postgres-exporter'
 # postgres_exporter['log_directory'] = '/var/log/gitlab/postgres-exporter'
 # postgres_exporter['flags'] = {}
-# postgres_exporter['listen_address'] = 'localhost:9187'
+postgres_exporter['listen_address'] = '0.0.0.0:9187'
 
 ################################################################################
 ## Prometheus Gitlab monitor
@@ -1497,8 +1502,8 @@ nginx['ssl_dhparam'] = "/etc/ssl/private/dhparam.pem" # Path to dhparams.pem, eg
 # gitlab_monitor['home'] = "/var/opt/gitlab/gitlab-monitor"
 
 ##! Advanced settings. Should be changed only if absolutely needed.
-# gitlab_monitor['listen_address'] = 'localhost'
-# gitlab_monitor['listen_port'] = '9168'
+gitlab_monitor['listen_address'] = '0.0.0.0'
+gitlab_monitor['listen_port'] = '9168'
 
 # To completely disable prometheus, and all of it's exporters, set to false
 # prometheus_monitoring['enable'] = true
@@ -1521,7 +1526,7 @@ nginx['ssl_dhparam'] = "/etc/ssl/private/dhparam.pem" # Path to dhparams.pem, eg
 # }
 # gitaly['socket_path'] = "/var/opt/gitlab/gitaly/gitaly.socket"
 # gitaly['listen_addr'] = "localhost:8075"
-# gitaly['prometheus_listen_addr'] = "localhost:9236"
+gitaly['prometheus_listen_addr'] = "0.0.0.0:9236"
 # gitaly['logging_format'] = "json"
 # gitaly['logging_sentry_dsn'] = "https://<key>:<secret>@sentry.io/<project>"
 # gitaly['logging_ruby_sentry_dsn'] = "https://<key>:<secret>@sentry.io/<project>"

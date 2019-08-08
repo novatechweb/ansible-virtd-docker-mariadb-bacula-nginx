@@ -67,6 +67,7 @@
     - ddio
     - easyrsa
     - grafana
+    - prometheus
     tags:
     - docker_networking
   - name: Build the openssl Docker volume

@@ -25,3 +25,20 @@
       name: promtail
     tags:
       - promtail_container
+  - name: Start node-exporter service
+    import_role:
+      name: cloudalchemy.node-exporter
+    tags:
+      - node-exporter
+
+- name: Setup Buildbot worker system
+  hosts: builder
+  become: true
+  become_user: root
+  become_method: sudo
+  tasks:
+  - name: Start node-exporter service
+    import_role:
+      name: cloudalchemy.node-exporter
+    tags:
+      - node-exporter

@@ -1,0 +1,9 @@
+---
+# handlers file for loki
+
+- name: restart loki
+  become: true
+  docker_container:
+    name: '{{ loki_container }}'
+    restart: yes
+    state: started

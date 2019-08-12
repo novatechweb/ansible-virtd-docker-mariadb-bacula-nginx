@@ -1,0 +1,19 @@
+---
+# custom file for loki
+
+loki_container: "{{ docker_name_prefix }}loki"
+
+loki_hostname: "loki.novatech-llc.com"
+
+loki_image: "grafana/loki:1.4.1"
+
+loki_networks:
+- name: '{{ docker_network_frontend }}'
+  aliases:
+  - '{{ loki_container }}'
+
+loki_port_args: []
+
+loki_restart_policy: '{{ docker_restart_policy }}'
+
+loki_etc_volume: "{{ docker_restore_config_base_dir }}/loki"

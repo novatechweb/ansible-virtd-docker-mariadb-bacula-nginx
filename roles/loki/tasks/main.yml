@@ -1,0 +1,50 @@
+---
+# tasks file for loki
+
+- name: Ensure loki configuration directories exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ loki_uid }}"
+    group: "{{ loki_gid }}"
+  with_items:
+    - "{{ loki_etc_volume }}"
+
+- name: Create loki main configuration file
+  template:
+    src: "{{ loki_config_template }}"
+    dest: "{{ loki_etc_volume }}/{{ loki_config_file }}"
+    owner: "{{ loki_uid }}"
+    group: "{{ loki_gid }}"
+    mode: 0640
+  notify: restart loki
+
+- name: Start loki container
+  docker_container:
+    command: '{{ loki_command }}'
+    comparisons: {'*': strict}
+    detach: true
+    env: '{{ loki_env }}'
+    healthcheck:
+      test: ['CMD', 'wget', '--spider', 'http://localhost:{{ loki_port_listen }}/ready']
+    hostname: '{{ loki_hostname }}'
+    image: '{{ loki_image }}'
+    name: '{{ loki_container }}'
+    networks: '{{ loki_networks }}'
+    networks_cli_compatible: yes
+    ports: '{{ loki_port_args }}'
+    pull: yes
+    purge_networks: yes
+    restart_policy: '{{ loki_restart_policy }}'
+    state: started
+    volumes: '{{ loki_volumes }}'
+
+- meta: flush_handlers
+
+- name: Wait for loki to start
+  docker_container_info:
+    name: '{{ loki_container }}'
+  register: loki_info
+  until: loki_info['container']['State']['Health']['Status'] == 'healthy'
+  retries: 10
+  delay: 10

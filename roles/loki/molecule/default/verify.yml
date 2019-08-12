@@ -1,0 +1,36 @@
+---
+# This is an example playbook to execute Ansible tests.
+
+- name: Verify
+  hosts: all
+  become: true
+  pre_tasks:
+    - name: Include module default variables
+      include_vars:
+        file: "{{ playbook_dir }}/../../defaults/main.yml"
+    - name: Include module standard variables
+      include_vars:
+        file: "{{ playbook_dir }}/../../vars/main.yml"
+
+  tasks:
+    - name: Get loki container information
+      docker_container_info:
+        name: '{{ loki_container }}'
+      register: loki_info
+
+    - name: Assert loki container is running and healthy
+      assert:
+        that:
+          - loki_info['container']['State']['Health']['Status'] == 'healthy'
+
+    - name: Grab actual loki port
+      set_fact:
+        loki_host_port: "{{ loki_info['container']['NetworkSettings']['Ports'][loki_port_listen+'/tcp'][0]['HostPort'] }}"
+
+    - name: Assert loki is responding
+      uri:
+        method: GET
+        return_content: yes
+        status_code: 200
+        url: http://localhost:{{ loki_host_port }}/ready
+      register: health

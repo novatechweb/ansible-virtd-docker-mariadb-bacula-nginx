@@ -15,3 +15,8 @@
       name: prometheus
     tags:
       - prometheus_container
+  - name: Build and start the Loki Docker container
+    import_role:
+      name: loki
+    tags:
+      - loki_container

@@ -1,0 +1,449 @@
+---
+# defaults file for promtail
+
+promtail_image: "grafana/promtail:1.4.1"
+promtail_container: "{{ docker_name_prefix}}promtail"
+
+promtail_networks:
+- name: '{{ docker_network_frontend }}'
+  aliases:
+  - '{{ promtail_container }}'
+
+promtail_port_args:
+- '{{promtail_port_listen}}:{{promtail_port_listen}}'
+promtail_port_listen: 9080
+
+promtail_restart_policy: '{{ docker_restart_policy }}'
+
+promtail_volumes:
+- "{{ promtail_etc_volume }}:{{ promtail_etc_dir }}"
+- "/var/log:/var/log/{{ inventory_hostname }}:ro"
+- "{{ gitlab_lv_name }}:/var/log/gitlab:ro"
+- "/var/lib/docker/containers:/var/log/containers:ro"
+
+promtail_etc_volume: "{{ docker_restore_config_base_dir }}/promtail"
+
+# Configuration
+promtail_client_configs:
+- url: http://{{ loki_container }}:3100/api/prom/push
+
+promtail_scrape_configs:
+- job_name: buildbot
+  pipeline_stages:
+  - docker: {}
+  - labels:
+      stream:
+  - output:
+      source: log
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: buildbot
+      host: '{{ inventory_hostname }}'
+      __path__: /var/log/containers/158eea7a4adea9e6e8035a0ed7204097aeddc5beb384cfe61597e2a7a52a0ce0/*-json.log
+
+- job_name: easyrsa
+  pipeline_stages:
+  - docker: {}
+  - labels:
+      stream:
+  - output:
+      source: log
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: easyrsa
+      host: '{{ inventory_hostname }}'
+      __path__: /var/log/containers/a18e1c2c64248f4f9a906c9fcd423d8c10194c9ca3942d150725ab6eba38fa3a/*-json.log
+
+- job_name: exim4
+  pipeline_stages:
+  - docker: {}
+  - labels:
+      stream:
+  - output:
+      source: log
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: exim4
+      host: '{{ inventory_hostname }}'
+      __path__: /var/log/containers/cb18044faaeb8e207164072db13ded3021c054d594fc93b505885d947715caf1/*-json.log
+
+- job_name: gitlab
+  pipeline_stages:
+  - docker: {}
+  static_configs:
+  - targets:
+     - localhost
+    labels:
+     job: gitlab
+     host: '{{ inventory_hostname }}'
+     __path__: /var/log/gitlab/gitlab-rails/*.log
+
+- job_name: grafana
+  pipeline_stages:
+  - docker: {}
+  - labels:
+      stream:
+  - output:
+      source: log
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: grafana
+      host: '{{ inventory_hostname }}'
+      __path__: /var/log/containers/94867b95b08c3a02782da4f5696b46b52d5d04e6505a6906d4a24a698735843a/*-json.log
+
+- job_name: haproxy
+  pipeline_stages:
+  - docker: {}
+  - labels:
+      stream:
+  - output:
+      source: log
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: haproxy
+      host: '{{ inventory_hostname }}'
+      __path__: /var/log/containers/194bb9c162dd03c3f20119a9f9035fa88b2b8c9d8efc3a0e4d24755a53bbb0d6/*-json.log
+
+- job_name: ldap
+  pipeline_stages:
+  - docker: {}
+  - labels:
+      stream:
+  - output:
+      source: log
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: ldap
+      host: '{{ inventory_hostname }}'
+      __path__: /var/log/containers/804f4959b5a1d2087025441d7ab45756475cf707d430fb5eb809093f08a10fdc/*-json.log
+
+- job_name: loki
+  pipeline_stages:
+  - docker: {}
+  - labels:
+      stream:
+  - output:
+      source: log
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: loki
+      host: '{{ inventory_hostname }}'
+      __path__: /var/log/containers/7743eacf68499c74863d67f6594b326894020cb68e70a961d8644d14e0d761ee/*-json.log
+
+- job_name: journal
+  journal:
+    path: /var/log/{{ inventory_hostname }}/journal
+    labels:
+      job: systemd-journal
+  relabel_configs:
+    - source_labels: ['__journal__systemd_unit']
+      target_label: 'unit'
+
+- job_name: mantisbt
+  pipeline_stages:
+  - json:
+      expressions:
+        log: log
+        dockerts: time
+        stream: stream
+  - json:
+      source: log
+      expressions:
+        timestamp: time
+        method: method
+        status: status
+        size: size
+        servetime: servetime
+  - timestamp:
+      source: timestamp
+      format: '2006-01-02 15:04:05.000000'
+  - labels:
+      stream:
+      request:
+      method:
+      status:
+  - metrics:
+      http_response_duration_microseconds:
+        type: Histogram
+        description: "response time of http request, in microseconds"
+        source: servetime
+        config:
+          buckets: [10000.0,25000.0,50000.0,100000.0,250000.0,500000.0,1000000.0,2500000.0,5000000.0,10000000.0,25000000.0]
+  - output:
+      source: log
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: mantisbt
+      host: '{{ inventory_hostname }}'
+      __path__: /var/log/containers/227c6cb0d29b3e9691f30b84297a681c1b4599046b6347e85388f6b9f2e49b19/*-json.log
+
+- job_name: mantisbt_db
+  pipeline_stages:
+  - docker: {}
+  - labels:
+      stream:
+  - output:
+      source: log
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: mantisbt_db
+      host: '{{ inventory_hostname }}'
+      __path__: /var/log/containers/b75e9cd45a71a72698a39a472ffed358e61c8bbc431c57103155ab6948c00d25/*-json.log
+
+- job_name: nexus3
+  pipeline_stages:
+  - docker: {}
+  - labels:
+      stream:
+  - output:
+      source: log
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: nexus3
+      host: '{{ inventory_hostname }}'
+      __path__: /var/log/containers/f6226eb2970b1cc2b029865e04ce5a0994e0f3514c224f22459b846a6a529bd0/*-json.log
+
+- job_name: phpldapadmin
+  pipeline_stages:
+  - docker: {}
+  - labels:
+      stream:
+  - output:
+      source: log
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: phpldapadmin
+      host: '{{ inventory_hostname }}'
+      __path__: /var/log/containers/0e5858b7094fcc3b4bd79b251560d0bb75f2d4667fb8ae1065be7a707fe879e8/*-json.log
+
+- job_name: prometheus
+  pipeline_stages:
+  - docker: {}
+  - labels:
+      stream:
+  - output:
+      source: log
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: prometheus
+      host: '{{ inventory_hostname }}'
+      __path__: /var/log/containers/8633322c6627dde7eb6c8389c677f22673e177bbf0d37079e1b79b210ec620a2/*-json.log
+
+- job_name: promtail
+  pipeline_stages:
+  - docker: {}
+  - labels:
+      stream:
+  - output:
+      source: log
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: promtail
+      host: '{{ inventory_hostname }}'
+      __path__: /var/log/containers/d72c0035d183eebf665246a70030bbc78ed1cacd257057f32e25f15d03a9ea44/*-json.log
+
+- job_name: svn
+  pipeline_stages:
+  - json:
+      expressions:
+        log: log
+        dockerts: time
+        stream: stream
+  - json:
+      source: log
+      expressions:
+        timestamp: time
+        method: method
+        status: status
+        size: size
+        servetime: servetime
+  - timestamp:
+      source: timestamp
+      format: '2006-01-02 15:04:05.000000'
+  - labels:
+      stream:
+      request:
+      method:
+      status:
+  - metrics:
+      http_response_duration_microseconds:
+        type: Histogram
+        description: "response time of http request, in microseconds"
+        source: servetime
+        config:
+          buckets: [10000.0,25000.0,50000.0,100000.0,250000.0,500000.0,1000000.0,2500000.0,5000000.0,10000000.0,25000000.0]
+  - output:
+      source: log
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: svn
+      host: '{{ inventory_hostname }}'
+      __path__: /var/log/containers/d8c7e1833c33f1beb3da63eb6cad4303dfe9c7e6fe736c4057d4817c2f0ab1d8/*-json.log
+
+- job_name: system
+  pipeline_stages:
+  - docker: {}
+  static_configs:
+  - targets:
+     - localhost
+    labels:
+     job: varlog
+     host: '{{ inventory_hostname }}'
+     __path__: /var/log/{{ inventory_hostname }}/*.log
+
+- job_name: TestStation_database_server
+  pipeline_stages:
+  - docker: {}
+  - labels:
+      stream:
+  - output:
+      source: log
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: TestStation_database_server
+      host: '{{ inventory_hostname }}'
+      __path__: /var/log/containers/46e51d2bf8c28825c682cfa053f0cfe0ca413e72d7e0b4cd935e5d78fd36ce03/*-json.log
+
+- job_name: TestStation_ddio_database_server
+  pipeline_stages:
+  - docker: {}
+  - labels:
+      stream:
+  - output:
+      source: log
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: TestStation_ddio_database_server
+      host: '{{ inventory_hostname }}'
+      __path__: /var/log/containers/d565f63b5c153327f325f8ffd5b654739f819f72eebab489845f213251f26152/*-json.log
+
+#{ "time":"2020-01-24 14:13:30.474513", "client":"-", "module":"-", "level":"error", "pid":"104", "tid":"140622471669504", "oserror":"-", "message":"* board_number, serial_number, pcb_revision, bom_revision: 815 1321 D 1 ", "referer":"-", }
+#{ "time":"2020-01-24 20:13:44.706550", "client":"172.16.73.121", "host":"172.16.0.105", "request":"/orion/xmlrpc/", "query":"", "method":"POST", "status":"200", "userAgent":"xmlrpclib.py/1.0.1 (by www.pythonware.com)", "referer":"-", "protocol":"HTTP/1.0", "size":"219", "servetime":"13511", "errorid":"-", "pid":"105", }
+- job_name: TestStation_http_server
+  pipeline_stages:
+  - json:
+      expressions:
+        log: log
+        dockerts: time
+        stream: stream
+  - json:
+      source: log
+      expressions:
+        timestamp: time
+        method: method
+        status: status
+        size: size
+        servetime: servetime
+  - timestamp:
+      source: timestamp
+      format: '2006-01-02 15:04:05.000000'
+  - labels:
+      stream:
+      request:
+      method:
+      status:
+  - metrics:
+      http_response_duration_microseconds:
+        type: Histogram
+        description: "response time of http request, in microseconds"
+        source: servetime
+        config:
+          buckets: [10000.0,25000.0,50000.0,100000.0,250000.0,500000.0,1000000.0,2500000.0,5000000.0,10000000.0,25000000.0]
+  - output:
+      source: log
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: TestStation_http_server
+      host: '{{ inventory_hostname }}'
+      __path__: /var/log/containers/989129f386aa234c777af7859385da3a409cca6408846af2ee3b3637a25d6601/*-json.log
+
+# { "time":"2020-01-25 14:41:03.194787", "client":"-", "host":"-", "module":"core", "level":"notice", "pid":"1", "tid":"-", "errorid":"-", "oserror":"-", "message":"AH00094: Command line: 'apache2 -D FOREGROUND'", "referer":"-", }
+# { "time":"2020-01-25 14:41:19.603009", "client":"172.18.0.10", "host":"wiki.novatech-llc.com", "request":"/index.php/Main_Page", "query":"", "method":"GET", "status":"304", "userAgent":"Mozilla/5.0 (X11; Linux x86_64; rv:72.0) Gecko/20100101 Firefox/72.0", "referer":"-", "protocol":"HTTP/1.1", "size":"0", "servetime":"365548", "errorid":"-", "pid":"87", }
+- job_name: wiki
+  pipeline_stages:
+  - json:
+      expressions:
+        log: log
+        dockerts: time
+        stream: stream
+  - json:
+      source: log
+      expressions:
+        timestamp: time
+        method: method
+        status: status
+        size: size
+        servetime: servetime
+  - timestamp:
+      source: timestamp
+      format: '2006-01-02 15:04:05.000000'
+  - labels:
+      stream:
+      request:
+      method:
+      status:
+  - metrics:
+      http_response_duration_microseconds:
+        type: Histogram
+        description: "response time of http request, in microseconds"
+        source: servetime
+        config:
+          buckets: [10000.0,25000.0,50000.0,100000.0,250000.0,500000.0,1000000.0,2500000.0,5000000.0,10000000.0,25000000.0]
+  - output:
+      source: log
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: wiki
+      host: '{{ inventory_hostname }}'
+      __path__: /var/log/containers/c0b75a9be6858b070e5ebeb7afbe34c7c2e280981ac41dcbca2903dfbbb1479b/*-json.log
+
+- job_name: wiki_db
+  pipeline_stages:
+  - docker: {}
+  - labels:
+      stream:
+  - output:
+      source: log
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: wiki_db
+      host: '{{ inventory_hostname }}'
+      __path__: /var/log/containers/32132dbdfc935d6b4700d83c7c3a329e10980d56235deab8f4c886680140fb93/*-json.log

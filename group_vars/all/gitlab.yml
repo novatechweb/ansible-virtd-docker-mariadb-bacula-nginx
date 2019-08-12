@@ -2,6 +2,7 @@
 
 # the name of the gitlab container
 gitlab_container_name: '{{ docker_name_prefix }}gitlab'
+gitlab_lv_name: 'gitlab_LV'
 
 gitlab_tokens:
 - user: root

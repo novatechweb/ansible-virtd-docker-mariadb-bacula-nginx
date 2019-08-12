@@ -1,0 +1,9 @@
+---
+# handlers file for promtail
+
+- name: restart promtail
+  become: true
+  docker_container:
+    name: '{{ promtail_container }}'
+    restart: yes
+    state: started

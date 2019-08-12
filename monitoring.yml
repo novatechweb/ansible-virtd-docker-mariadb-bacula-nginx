@@ -20,3 +20,8 @@
       name: loki
     tags:
       - loki_container
+  - name: Build and start the promtail Docker containers
+    import_role:
+      name: promtail
+    tags:
+      - promtail_container

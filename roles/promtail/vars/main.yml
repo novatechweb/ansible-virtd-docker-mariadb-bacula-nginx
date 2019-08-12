@@ -1,0 +1,8 @@
+---
+# vars file for promtail
+
+promtail_etc_dir: "/etc/promtail"
+promtail_config_file: "promtail.yaml"
+
+# This needs to be an int for configuration template to work correctly
+promtail_port_listen: 9080

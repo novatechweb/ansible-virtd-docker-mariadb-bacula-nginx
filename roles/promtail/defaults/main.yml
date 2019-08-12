@@ -1,0 +1,64 @@
+---
+# defaults file for promtail
+
+promtail_container: "promtail"
+
+promtail_command:
+  # - -log.level=debug
+  - -config.file="{{ promtail_etc_dir }}/{{ promtail_config_file }}"
+
+promtail_env: {}
+
+promtail_hostname: "promtail.local"
+
+promtail_image: "grafana/promtail:latest"
+
+promtail_networks:
+  - name: bridge
+
+promtail_port_args:
+  - '{{ promtail_port_listen }}:{{ promtail_port_listen }}'
+
+promtail_restart_policy: 'no'
+
+promtail_etc_volume: "/etc/promtail"
+promtail_volumes:
+  - "{{ promtail_etc_volume }}:{{ promtail_etc_dir }}"
+
+# Configuration Defaults
+promtail_config_template: "promtail.yaml.j2"
+
+promtail_server_config:
+  http_listen_port: "{{ promtail_port_listen }}"
+
+promtail_positions_config:
+  filename: '{{promtail_etc_dir}}/positions.yaml'
+
+promtail_client_configs:
+  - url: 'http://localhost:3100/api/prom/push'
+
+promtail_scrape_configs:
+  - job_name: system
+    pipeline_stages:
+      - docker:
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: varlogs
+          host: yourhost
+          __path__: /var/log/*.log
+
+  - job_name: someone_service
+    pipeline_stages:
+      - docker:
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: someone_service
+          host: yourhost
+          __path__: /srv/log/someone_service/*.log
+
+promtail_target_config:
+  sync_period: "10s"

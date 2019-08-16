@@ -118,6 +118,7 @@
     volumes:
       - '{{ docker_restore_config_base_dir }}/{{ exim4_dv_name }}/passwd:/etc/exim4/passwd:z'
       - '{{ exim4_dv_name }}:/var/spool/exim4:z'
+      - '{{ exim4_syslog_datavolume_dir }}:/var/log/exim4:z'
       - '{{ openssl_dv_name }}:/etc/ssl/private:z'
 
 # *****************************************************************************

@@ -37,30 +37,30 @@
 # *****************************************************************************
 # backup script part
 
-- name: Assemble dir for backup scripts
-  file:
-    path: /usr/libexec/bacula/backup-scripts
-    state: directory
+# - name: Assemble dir for backup scripts
+#   file:
+#     path: /usr/libexec/bacula/backup-scripts
+#     state: directory
 
-- name: Create before_backup script
-  template:
-    src: before_backup.j2
-    dest: /usr/libexec/bacula/backup-scripts/55.before_backup.exim4
+# - name: Create before_backup script
+#   template:
+#     src: before_backup.j2
+#     dest: /usr/libexec/bacula/backup-scripts/55.before_backup.exim4
 
-- name: Create after_backup script
-  template:
-    src: after_backup.j2
-    dest: /usr/libexec/bacula/backup-scripts/55.after_backup.exim4
+# - name: Create after_backup script
+#   template:
+#     src: after_backup.j2
+#     dest: /usr/libexec/bacula/backup-scripts/55.after_backup.exim4
 
 # *****************************************************************************
 # update the Docker restore config
 
-- name: exists - state file
-  stat:
-    path: '{{ docker_restore_config_base_dir }}/{{ exim4_dv_name }}/restore.date.txt'
-    get_checksum: False
-    get_md5: False
-  register: st_exim4_restore
+# - name: exists - state file
+#   stat:
+#     path: '{{ docker_restore_config_base_dir }}/{{ exim4_dv_name }}/restore.date.txt'
+#     get_checksum: False
+#     get_md5: False
+#   register: st_exim4_restore
 
 # *****************************************************************************
 # Update or make the image.
@@ -83,11 +83,21 @@
 
 - name: data-volume container
   docker_volume:
-    name: '{{ exim4_cv_name }}'
-
-- name: data-volume container
-  docker_volume:
     name: '{{ exim4_dv_name }}'
+    state: present
+
+# *****************************************************************************
+# Email accounts
+
+- name: Create the email passwords file
+  lineinfile:
+    path: '{{ docker_restore_config_base_dir }}/{{ exim4_dv_name }}/passwd'
+    create: yes
+    line: '{{ item.value.user }}:{{ item.value.password }}'
+    regexp: '^{{ item.value.user }}:'
+    state: present
+  no_log: true
+  with_dict: '{{ email_accounts }}'
 
 # *****************************************************************************
 # Start the data container running
@@ -106,19 +116,12 @@
     restart_policy: '{{ docker_restart_policy }}'
     state: started
     volumes:
-      - '{{ exim4_cv_name }}:/etc/exim4:z'
+      - '{{ docker_restore_config_base_dir }}/{{ exim4_dv_name }}/passwd:/etc/exim4/passwd:z'
       - '{{ exim4_dv_name }}:/var/spool/exim4:z'
       - '{{ openssl_dv_name }}:/etc/ssl/private:z'
 
 # *****************************************************************************
 # restore?
 
-- include_tasks: restore.yml
-  when: st_exim4_restore.stat.exists == False
-
-# *****************************************************************************
-# Email accounts
-
-- name: populate email passwords
-  shell: 'docker exec {{ exim4_container_name }} /docker-entrypoint.sh add_account {{ item.value.user }} "{{ item.value.password }}"'
-  with_dict: '{{ email_accounts }}'
+# - include_tasks: restore.yml
+#   when: st_exim4_restore.stat.exists == False

@@ -1,5 +1,8 @@
 FROM alpine:3.8
 
+WORKDIR /easyrsa
+VOLUME /easyrsa
+
 RUN apk --no-cache add \
         openssh-server-pam \
         openssh-client \
@@ -11,11 +14,15 @@ RUN apk --no-cache add \
 &&  ssh-keygen -A \
 &&  /usr/sbin/sshd -t
 
+COPY entrypoint.sh /entrypoint.sh
 
 ARG EASYRSA_UID=1000
-WORKDIR /home/easyrsa
 RUN adduser -h "/home/easyrsa" -s "/bin/ash" -D -u ${EASYRSA_UID} easyrsa \
 &&  mkdir -p -m 0700 "/home/easyrsa/.ssh" \
-&&  chown -v -R easyrsa:easyrsa "/home/easyrsa"
+&&  chown -v -R easyrsa:easyrsa "/home/easyrsa" \
+&&  mkdir -p -m 0750 "/easyrsa" \
+&&  chown -v -R easyrsa:easyrsa "/easyrsa" \
+&&  echo "cd /easyrsa" > "/home/easyrsa/.profile" \
+&&  chmod 0755 "/entrypoint.sh"
 
-CMD ["/usr/sbin/sshd","-D","-e"]
+CMD ["/entrypoint.sh"]

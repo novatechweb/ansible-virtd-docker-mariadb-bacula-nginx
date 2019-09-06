@@ -5,7 +5,6 @@
 - name: Check conditions
   assert:
     that:
-    - buildbot_admin_password is defined
     - buildbot_master_sshkey is defined
 
 - name: Create buildbot data volume
@@ -45,6 +44,10 @@
     - buildbot.tac
     - known_hosts
 
+- import_tasks: ca-cert.yml
+
+- import_tasks: server-cert.yml
+
 - name: Create image source directory
   file:
     path: "{{ image_dir }}"
@@ -75,8 +78,12 @@
     image: '{{ image_name }}:{{ docker_image_tag }}'
     name: '{{ container_name }}'
     networks: '{{ container_networks }}'
-    volumes: '{{ container_volumes }}'
     ports: '{{ container_port_args }}'
+    restart: '{{
+      configs.changed
+      or templates.changed
+      or deploy_source.changed }}'
+    restart_policy: '{{ docker_restart_policy }}'
     state: started
-    restart: '{{ configs.changed or templates.changed or deploy_source.changed }}'
+    volumes: '{{ container_volumes }}'
     working_dir: '{{ container_workdir }}'

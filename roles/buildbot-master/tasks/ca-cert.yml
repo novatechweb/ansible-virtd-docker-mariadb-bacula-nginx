@@ -1,0 +1,44 @@
+- delegate_to: localhost
+  become: no
+  block:
+  - name: Makes sure the local dir for ssl files exists
+    delegate_to: localhost
+    file:
+      mode: 0700
+      path: '{{ buildbot_ca_key | dirname }}'
+      state: directory
+
+  - name: Generate ca key
+    delegate_to: localhost
+    openssl_privatekey:
+      path: '{{ buildbot_ca_key }}'
+      size: 8192
+      type: RSA
+      state: present
+    register: ca_key
+
+  - name: Generate ca.csr
+    delegate_to: localhost
+    openssl_csr:
+      path: '{{ buildbot_ca_csr }}'
+      privatekey_path: '{{ buildbot_ca_key }}'
+      basic_constraints:
+      - "CA:TRUE"
+      CN: cert_auth_ts.novatech-llc.com
+      O: NovaTech
+      OU: Orion
+      C: US
+      ST: Kansas
+      L: Lenexa
+      state: present
+    when: ca_key.changed
+
+  - name: Generate ca.pem
+    delegate_to: localhost
+    openssl_certificate:
+      csr_path: '{{ buildbot_ca_csr }}'
+      path: '{{ buildbot_ca_pem }}'
+      privatekey_path: '{{ buildbot_ca_key }}'
+      provider: selfsigned
+      selfsigned_not_after: '+3650d'
+    when: ca_key.changed

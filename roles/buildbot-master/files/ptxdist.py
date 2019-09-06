@@ -23,10 +23,22 @@ collections = {
 # a Worker object, specifying a unique worker name and password.  The same
 # worker name and password must be configured on the worker.
 c['workers'] = [
-    worker.Worker("worker-ptxdist", "pass", max_builds=3),
-    worker.Worker("orion-i686-slave", "pass", max_builds=1),
-    worker.Worker("orion-armeb-xscale-slave", "pass", max_builds=1),
-    worker.Worker("orion-am335x-slave", "pass", max_builds=1),
+    worker.Worker(
+        os.getenv('BUILDBOT_WORKER_PTXDIST'),
+        os.getenv('BUILDBOT_WORKER_PTXDIST_PASS'),
+        max_builds=3),
+    worker.Worker(
+        "orion-i686-slave",
+        os.getenv('BUILDBOT_WORKER_PTXDIST_PASS'),
+        max_builds=1),
+    worker.Worker(
+        "orion-armeb-xscale-slave",
+        os.getenv('BUILDBOT_WORKER_PTXDIST_PASS'),
+        max_builds=1),
+    worker.Worker(
+        "orion-am335x-slave",
+        os.getenv('BUILDBOT_WORKER_PTXDIST_PASS'),
+        max_builds=1),
 ]
 
 acceptance_test_repourl = 'git@git.novatech-llc.com:NovaTech-Testing/AcceptanceTests.git'

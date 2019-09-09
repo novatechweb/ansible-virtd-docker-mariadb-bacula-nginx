@@ -14,7 +14,8 @@ RUN apt-get update && \
 						  rsync=3.1* && \
     rm -rf /var/lib/apt/lists/*
 #---------------------------
-RUN pip install "django<1.8" \
+RUN pip install "django<1.9" \
+                "django-contrib-comments<1.9" \
                 "mysqlclient>=1.3" \
                 "pyserial>=2.7"
 #---------------------------
@@ -41,4 +42,3 @@ RUN chmod 777 /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["sshd"]
-

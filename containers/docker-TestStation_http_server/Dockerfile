@@ -24,13 +24,14 @@ RUN rm -rf /var/www/html && \
     mkdir -p /var/lock/apache2 \
              /var/run/apache2 \
              /var/log/apache2 \
-             /var/www/html && \ 
+             /var/www/html && \
     chown -R www-data:www-data /var/lock/apache2 \
                                /var/run/apache2 \
                                /var/log/apache2 \
                                /var/www/html
 #---------------------------
-RUN pip install "django<1.8" \
+RUN pip install "django<1.9" \
+                "django-contrib-comments<1.9" \
                 "mysqlclient>=1.3" \
                 "pyserial>=2.7" \
                 "sqlparse<0.3"

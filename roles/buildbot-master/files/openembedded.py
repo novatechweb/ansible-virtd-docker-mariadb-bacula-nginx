@@ -62,7 +62,6 @@ c['schedulers'] = [
             "ntel-orionlx-plus",
             "ntel-orion-io",
             "ntel-qemux86-64",
-            "ntel-all",
         ],
         change_filter=util.ChangeFilter(
             category='push',
@@ -85,7 +84,6 @@ c['schedulers'] = [
             "ntel-orionlx-plus",
             "ntel-orion-io",
             "ntel-qemux86-64",
-            "ntel-all",
         ],
         change_filter=util.ChangeFilter(
             category='merge_request',
@@ -109,7 +107,6 @@ c['schedulers'] = [
             "ntel-orionlx-plus",
             "ntel-orion-io",
             "ntel-qemux86-64",
-            "ntel-all",
         ],
         codebases=[
             util.CodebaseParameter(
@@ -160,7 +157,6 @@ c['schedulers'] = [
             "ntel-orionlx-plus",
             "ntel-orion-io",
             "ntel-qemux86-64",
-            "ntel-all",
         ],
         change_filter=util.ChangeFilter(
             codebase=DEFAULT_CODEBASE,
@@ -510,31 +506,5 @@ c['builders'].append(
         properties={
             'machine': 'qemux86-64',
             'repository': DEFAULT_REPO,
-        }
-    ))
-
-multiconfig = ['orionlx-cpx', 'orionlx-plus', 'orionlxm', 'orion-io']
-c['builders'].append(
-    util.BuilderConfig(
-        description="Orion (all)",
-        name="ntel-all",
-        workernames=["worker-ntel"],
-        factory=BitBakeFactory(
-            BitBake(" gdk-pixbuf-native:do_cleanall"
-                    " multiconfig:orionlx-cpx:gdk-pixbuf-native:do_cleanall"
-                    " multiconfig:orionlx-plus:gdk-pixbuf-native:do_cleanall",
-                    name="cleanup"),
-            BitBake(" orion-graphical-image"
-                    " multiconfig:orionlx-cpx:orionlx-cpx-swu-image"
-                    " multiconfig:orionlx-cpx:orionlx-cpx-disk-swu-image"
-                    " multiconfig:orionlx-plus:orionlx-plus-swu-image"
-                    " multiconfig:orionlxm:orionlxm-swu-image"
-                    " multiconfig:orion-io:orion-io-swu-image",
-                    name="images"),
-        ),
-        properties={
-            'machine': 'qemux86-64',
-            'repository': DEFAULT_REPO,
-            'multiconfig': ' '.join(multiconfig),
         }
     ))

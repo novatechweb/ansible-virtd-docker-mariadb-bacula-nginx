@@ -19,13 +19,10 @@
     mode: 0640
     backup: yes
 
-- name: Check if baculatape selinux module exists
-  command: semodule -l 
-  register: baculatape_pp
-  changed_when: false
+# *****************************************************************************
+# Install selinux policies
 
 - import_tasks: selinux-tape-policy.yml
-  when: "'baculatape\t1.0' not in baculatape_pp.stdout_lines"
 
 - name: Make sure bacula user is in the tape group
   user:

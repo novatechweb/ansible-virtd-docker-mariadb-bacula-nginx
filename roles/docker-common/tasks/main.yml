@@ -7,16 +7,22 @@
 - import_tasks: engine-debian.yml
   when: ansible_os_family == "Debian"
 
+- name: Start docker service
+  service:
+    name: docker
+    enabled: yes
+    state: started
+
 - import_tasks: packages.yml
 
 - import_tasks: configure.yml
 
 
-- name: Check if baculavirt selinux module exists
-  stat:
-    path: /etc/selinux/targeted/modules/active/modules/docker_bacula.pp
-  register: docker_bacula_pp
-  when: ansible_os_family == "RedHat"
+# *****************************************************************************
+# Install selinux policies
 
-- include_tasks: selinux-backula-policy.yml
-  when: (docker_bacula_pp.stat.exists is defined) and (docker_bacula_pp.stat.exists == false)
+- import_tasks: selinux-bacula-policy.yml
+
+- import_tasks: selinux-setlink-policy.yml
+
+- import_tasks: selinux-signals-policy.yml

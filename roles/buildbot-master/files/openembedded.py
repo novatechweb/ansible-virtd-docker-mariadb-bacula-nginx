@@ -485,6 +485,7 @@ c['builders'].append(
         factory=BitBakeFactory(
             BitBake("-c cleanall gdk-pixbuf-native librsvg-native gtk-icon-utils-native", name="cleanup"),
             BitBake("orionlx-plus-swu-image", name="swu image"),
+            BitBake("orionlx-plus-disk-swu-image", name="disk swu image"),
             BitBake("orion-graphical-image -c populate_sdk", name="SDK"),
         ),
         properties={

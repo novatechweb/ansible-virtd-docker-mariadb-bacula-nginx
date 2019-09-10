@@ -10,6 +10,7 @@
   with_items:
     - mariadb-server
     - mariadb
+    - MySQL-python
 - name: Config MariaDB server
   template:
     src: ansible.cnf.j2

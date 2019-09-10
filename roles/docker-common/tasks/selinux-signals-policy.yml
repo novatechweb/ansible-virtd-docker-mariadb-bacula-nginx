@@ -1,0 +1,34 @@
+- name: Install selinux packages
+  package:
+    name:
+    - checkpolicy
+    - policycoreutils-python
+
+- name: Create temp directory for policy creation
+  file:
+    path: /etc/selinux/src/docker_signals
+    state: directory
+
+- name: Copy docker_signals type enforcement file
+  copy:
+    src: docker_signals.te
+    dest: /etc/selinux/src/docker_signals/docker_signals.te
+  register: semodule_source
+
+- name: Run checkmodule on docker_signals.te
+  command: /usr/bin/checkmodule -M -m -o docker_signals.mod docker_signals.te
+  args:
+    chdir: /etc/selinux/src/docker_signals
+  when: semodule_source.changed
+
+- name: Build docker_signals module
+  command: /usr/bin/semodule_package -o docker_signals.pp -m docker_signals.mod
+  args:
+    chdir: /etc/selinux/src/docker_signals
+  when: semodule_source.changed
+
+- name: Install docker_signals module
+  command: /usr/sbin/semodule -i docker_signals.pp
+  args:
+    chdir: /etc/selinux/src/docker_signals
+  when: semodule_source.changed

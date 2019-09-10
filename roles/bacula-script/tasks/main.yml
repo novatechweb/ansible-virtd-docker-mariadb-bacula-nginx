@@ -30,18 +30,34 @@
     group: tape
     mode: 'u=rwx,g=rwx,o=rx'
 
-- name: Create before_backup script
+- name: Create before_backup script header
   template:
-    src: before_backup.j2
+    src: before_backup_head.j2
     dest: /usr/libexec/bacula/backup-scripts/00.before_backup
     owner: bacula
     group: tape
     mode: 'u=rw,g=rw,o=r'
 
-- name: Create after_backup script
+- name: Create before_backup script footer
   template:
-    src: after_backup.j2
+    src: before_backup_foot.j2
+    dest: /usr/libexec/bacula/backup-scripts/99.before_backup
+    owner: bacula
+    group: tape
+    mode: 'u=rw,g=rw,o=r'
+
+- name: Create after_backup script header
+  template:
+    src: after_backup_head.j2
     dest: /usr/libexec/bacula/backup-scripts/00.after_backup
+    owner: bacula
+    group: tape
+    mode: 'u=rw,g=rw,o=r'
+
+- name: Create after_backup script footer
+  template:
+    src: after_backup_foot.j2
+    dest: /usr/libexec/bacula/backup-scripts/99.after_backup
     owner: bacula
     group: tape
     mode: 'u=rw,g=rw,o=r'
@@ -74,3 +90,8 @@
     path: /usr/libexec/bacula/backup-scripts
     state: absent
   when: assemble_scripts
+
+# *****************************************************************************
+# Install selinux policies
+
+- import_tasks: selinux-script-policy.yml

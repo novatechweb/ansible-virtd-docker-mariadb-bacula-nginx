@@ -1,0 +1,41 @@
+
+module bacula_script 1.0;
+
+require {
+	class dir {add_name create remove_name rmdir search setattr write};
+	class file {create execute_no_trans execute open read setattr unlink write};
+	class lnk_file {create unlink};
+
+	type bacula_admin_exec_t;
+	type bacula_spool_t;
+	type bacula_t;
+	type container_runtime_exec_t;
+	type ssh_exec_t;
+	type ssh_keygen_exec_t;
+	type svirt_sandbox_file_t;
+	type sysctl_net_t;
+}
+
+#============= bacula_t ==============
+# allow bacula processes to run bconsole
+allow bacula_t bacula_admin_exec_t:file {execute_no_trans execute};
+
+# allow bacula processes to run git from backup script in bacula home dir
+allow bacula_t bacula_spool_t:lnk_file {create unlink};
+
+# allow bacula processes to run docker from backup script
+allow bacula_t container_runtime_exec_t:file {execute_no_trans execute};
+
+# allow bacula processes to run git+ssh from backup script
+allow bacula_t ssh_exec_t:file {execute_no_trans execute};
+
+# allow bacula processes to run ssh-keygen from backup script
+allow bacula_t ssh_keygen_exec_t:file {execute_no_trans execute};
+
+# allow bacula processes to manipulate files and directories in docker-owned locations
+allow bacula_t svirt_sandbox_file_t:dir {add_name create remove_name rmdir setattr write};
+allow bacula_t svirt_sandbox_file_t:file {create setattr unlink write};
+
+# allow bacula processes to check /proc/sys/net/core/somaxconn
+allow bacula_t sysctl_net_t:dir search;
+allow bacula_t sysctl_net_t:file {open read};

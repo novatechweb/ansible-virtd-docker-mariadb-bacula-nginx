@@ -1,0 +1,34 @@
+- name: Install selinux packages
+  package:
+    name:
+    - checkpolicy
+    - policycoreutils-python
+
+- name: Create temp directory for policy creation
+  file:
+    path: /etc/selinux/src/docker_setlink
+    state: directory
+
+- name: Copy docker_setlink type enforcement file
+  copy:
+    src: docker_setlink.te
+    dest: /etc/selinux/src/docker_setlink/docker_setlink.te
+  register: semodule_source
+
+- name: Run checkmodule on docker_setlink.te
+  command: /usr/bin/checkmodule -M -m -o docker_setlink.mod docker_setlink.te
+  args:
+    chdir: /etc/selinux/src/docker_setlink
+  when: semodule_source.changed
+
+- name: Build docker_setlink module
+  command: /usr/bin/semodule_package -o docker_setlink.pp -m docker_setlink.mod
+  args:
+    chdir: /etc/selinux/src/docker_setlink
+  when: semodule_source.changed
+
+- name: Install docker_setlink module
+  command: /usr/sbin/semodule -i docker_setlink.pp
+  args:
+    chdir: /etc/selinux/src/docker_setlink
+  when: semodule_source.changed

@@ -78,6 +78,8 @@
     name: '{{ gitlab_container_name }}'
     networks:
       - name: '{{ docker_network_frontend }}'
+        aliases:
+          - '{{ gitlab_hostname }}'
     ports: '{{ gitlab_port_args }}'
     purge_networks: true
     restart_policy: '{{ docker_restart_policy }}'
@@ -139,3 +141,9 @@
   retries: 10
   delay: 30
   until: check is success
+
+# *****************************************************************************
+# post-install configuration
+
+- include_tasks: configuration.yml
+  become: false

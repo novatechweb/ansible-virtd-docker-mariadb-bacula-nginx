@@ -1,0 +1,11 @@
+module docker_signals 1.0;
+
+require {
+	class process sigchld;
+
+	type kernel_t;
+	type svirt_lxc_net_t;
+}
+
+# Allow a container process to send sigchld signals
+allow svirt_lxc_net_t kernel_t:process sigchld;

@@ -1,0 +1,43 @@
+# - name: Create Gitlab OAuth applications
+- name: Create Oauth application using API
+  uri:
+    body:
+      name:         '{{ newapplication.name }} ({{ ansible_date_time.iso8601 }})'
+      redirect_uri: '{{ newapplication.redirect_uri }}'
+      scopes:       '{{ newapplication.scopes | join(",") }}'
+    body_format: json
+    headers:
+      Private-Token: '{{ gitlab_root_private_token }}'
+    method: POST
+    return_content: yes
+    url: "https://{{ gitlab_hostname }}/api/v4/applications"
+    status_code: [200,201]
+  register: application_response
+
+- name: Create for OAuth application id directory
+  become: false
+  local_action:
+    module: file
+    dest: '{{ newapplication.application_id_file | dirname }}'
+    state: directory
+
+- name: Create OAuth application id file
+  become: false
+  local_action:
+    module: copy
+    content: '{{ application_response.json.application_id }}'
+    dest: '{{ newapplication.application_id_file }}'
+
+- name: Create for OAuth secret directory
+  become: false
+  local_action:
+    module: file
+    dest: '{{ newapplication.secret_file | dirname }}'
+    state: directory
+
+- name: Create OAuth secret file
+  become: false
+  local_action:
+    module: copy
+    content: '{{ application_response.json.secret }}'
+    dest: '{{ newapplication.secret_file }}'

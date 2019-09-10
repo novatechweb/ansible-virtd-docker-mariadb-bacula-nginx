@@ -1,0 +1,32 @@
+---
+- name: Install required packages
+  become: true
+  pip:
+    name: pyapi-gitlab
+
+- name: Create known_hosts files with Gitlab host keys
+  include_tasks: known_hosts.yml
+
+- name: Create Gitlab Personal Access tokens
+  include_tasks: personal_tokens.yml
+  loop: '{{ gitlab_tokens }}'
+  loop_control:
+    loop_var: newtoken
+
+- name: Create Gitlab OAuth applications
+  include_tasks: oauth_applications.yml
+  loop: '{{ gitlab_oauth_applications }}'
+  loop_control:
+    loop_var: newapplication
+
+- name: Create Gitlab local users
+  include_tasks: users.yml
+  loop: "{{ gitlab_users }}"
+  loop_control:
+    loop_var: newuser
+
+- name: Create Gitlab project hooks
+  include_tasks: hooks.yml
+  loop: '{{ gitlab_hooks }}'
+  loop_control:
+    loop_var: newhook

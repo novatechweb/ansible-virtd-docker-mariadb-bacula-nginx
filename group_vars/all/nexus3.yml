@@ -1,4 +1,4 @@
-nexus_version: 3.16.1
+nexus_version: 3.16.2
 nexus_networks:
   - name: '{{ docker_network_frontend }}'
     aliases:
@@ -8,18 +8,25 @@ nexus_default_port: 8081
 
 # Nexus Backup
 nexus_docker_backup_dir: "{{ docker_backup_dir }}/NEXUS3"
-nexus_docker_backup_archive: "{{ nexus_docker_backup_dir }}/nexus3.tar.gz"
+nexus_docker_restore_dir: "{{ bacula_dest }}{{ nexus_docker_backup_dir }}"
 nexus_backup_dir: '/var/nexus-backup'
 nexus_backup_blob_filter:
   - permanent
 # Shall we configure backup ?
-nexus_backup_configure: true
+nexus_backup_configure: false
 # Backup time cron expression
 nexus_backup_manual: true
 # Shall we rotate backups ? No effect if nexus_backup_configure is false
 nexus_backup_rotate: false
 nexus_backup_keep_rotations: 1  # Keep 4 backup rotation by default (current + last 3)
-nexus_backup_task_name: db and blobstores backup
+nexus_backup_task_name: 'Database Export'
+
+nexus_restore_log: '/tmp/nexus-restore.log'
+nexus_backup_log: '/tmp/nexus-backup.log'
+
+# Nexus Blobstore Compacting
+nexus_compact_default_task_name: 'Compact "Default" Blobstore'
+nexus_compact_permanent_task_name: 'Compact "Permanent" Blobstore'
 
 nexus_email_server_enabled: true
 nexus_email_server_host: "mail.novatech-llc.com"
@@ -50,7 +57,7 @@ ldap_connections:
     ldap_map_groups_as_roles: yes
     ldap_map_groups_as_roles_type: "static"
     ldap_user_memberof_attribute: ""
-    ldap_group_base_dn: 'ou=group'
+    ldap_group_base_dn: 'cn=nexus.novatech-llc.com,ou=group'
     ldap_group_object_class: 'posixGroup'
     ldap_group_id_attribute: 'cn'
     ldap_group_member_attribute: 'memberUid'
@@ -98,29 +105,46 @@ nexus_roles:
       - nx-repository-view-raw-xorg-browse
       - nx-repository-view-raw-xorg-read
     roles: []
-  - id: Backup  # can map to a LDAP group id, also used as a key to update a role
+  - id: Backup
     name: backup
     description: Backup system
     privileges:
       - nx-tasks-read
       - nx-tasks-run
     roles: []
-  - id: Developers  # can map to a LDAP group id, also used as a key to update a role
-    name: developers
-    description: All developers
+  - id: Buildbot
+    name: buildbot
+    description: Build robots
     privileges:
       - nx-search-read
       - all-repos-read
       - nx-repository-view-*-*-*
     roles: []
-  - id: nexus.novatech-llc.com  # can map to a LDAP group id, also used as a key to update a role
-    name: novatech
-    description: All developers
+  - id: admin
+    name: novatech-admin
+    description: NovaTech Administrators
+    privileges: []
+    roles:
+      - nx-admin
+  - id: developer
+    name: novatech-developer
+    description: NovaTech Development Team
     privileges:
       - nx-component-upload
-      - nx-repository-view-*-*-add
-      - nx-repository-view-*-*-browse
-      - nx-repository-view-*-*-read
+      - nx-repository-view-*-*-*
+    roles: []
+  - id: hardware
+    name: novatech-hardware
+    description: NovaTech Hardware Team
+    privileges:
+      - nx-component-upload
+      - nx-repository-view-raw-public-releases-add
+      - nx-repository-view-raw-public-releases-browse
+      - nx-repository-view-raw-public-releases-read
+      - nx-repository-view-raw-test-fixtures-add
+      - nx-repository-view-raw-test-fixtures-browse
+      - nx-repository-view-raw-test-fixtures-read
+    roles: []
 
 nexus_local_users:
   - username: anonymous
@@ -137,20 +161,13 @@ nexus_local_users:
     password: "{{ nexus_bacula_password }}"
     roles:
       - Backup
-  - username: buildbot # used as key to update
+  - username: buildbot
     first_name: NovaTech
     last_name: CI
     email: buildbot@novatech-llc.com
     password: "{{ nexus_buildbot_password }}"
     roles:
-      - Developers # role ID here
-  - username: bacula
-    first_name: Bacula
-    last_name: Backups
-    email: bacula@novatech-llc.com
-    password: "{{ nexus_bacula_password }}"
-    roles:
-      - Backup
+      - Buildbot
 
 nexus_delete_default_blobstore: false
 nexus_blob_split: false     # True - blobstores per format
@@ -235,6 +252,10 @@ nexus_repos_raw_hosted:
     strict_content_validation: false
     write_policy: allow  # one of "allow", "allow_once" or "deny"
     blob_store: permanent
+  - name: test-fixtures
+    strict_content_validation: false
+    write_policy: allow  # one of "allow", "allow_once" or "deny"
+    blob_store: permanent
 nexus_repos_raw_proxy:
   - name: debian
     remote_url: 'http://ftp.us.debian.org/debian/'
@@ -267,3 +288,17 @@ nexus_config_npm: false
 nexus_config_nuget: false
 nexus_config_gitlfs: false
 nexus_config_yum: false
+
+nexus_scheduled_tasks:
+- name: '{{ nexus_compact_default_task_name }}'
+  typeId: blobstore.compact
+  taskProperties:
+    blobstoreName: default
+- name: '{{ nexus_compact_permanent_task_name }}'
+  typeId: blobstore.compact
+  taskProperties:
+    blobstoreName: permanent
+- name: '{{ nexus_backup_task_name }}'
+  typeId: db.backup
+  taskProperties:
+    location: '{{ nexus_backup_dir }}/db'

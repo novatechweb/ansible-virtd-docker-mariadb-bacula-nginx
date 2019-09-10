@@ -1,0 +1,34 @@
+- name: Install selinux packages
+  package:
+    name:
+    - checkpolicy
+    - policycoreutils-python
+
+- name: Create temp directory for policy creation
+  file:
+    path: /etc/selinux/src/docker_bacula
+    state: directory
+
+- name: Copy docker_bacula type enforcement file
+  copy:
+    src: docker_bacula.te
+    dest: /etc/selinux/src/docker_bacula/docker_bacula.te
+  register: semodule_source
+
+- name: Run checkmodule on docker_bacula.te
+  command: /usr/bin/checkmodule -M -m -o docker_bacula.mod docker_bacula.te
+  args:
+    chdir: /etc/selinux/src/docker_bacula
+  when: semodule_source.changed
+
+- name: Build docker_bacula module
+  command: /usr/bin/semodule_package -o docker_bacula.pp -m docker_bacula.mod
+  args:
+    chdir: /etc/selinux/src/docker_bacula
+  when: semodule_source.changed
+
+- name: Install docker_bacula module
+  command: /usr/sbin/semodule -i docker_bacula.pp
+  args:
+    chdir: /etc/selinux/src/docker_bacula
+  when: semodule_source.changed

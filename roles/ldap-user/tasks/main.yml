@@ -10,6 +10,19 @@
     - entry_class is defined
     - entry_attributes is defined
 
+- name: Install required system packages
+  package:
+    name:
+    - gcc
+    - python-devel
+    - openldap-devel
+    state: present
+
+- name: Install required python packages
+  pip:
+    name: python-ldap
+    state: present
+
 - name: Ensure entry exists
   ldap_entry:
     server_uri: '{{ server_uri }}'

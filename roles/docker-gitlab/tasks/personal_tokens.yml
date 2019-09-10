@@ -1,0 +1,14 @@
+
+# There is no API for this, so we run this directly in Gitlab's container
+- name: Create Gitlab Personal Access Token for Ansible
+  command: >
+    docker exec {{ gitlab_container_name }}
+    gitlab-rails runner
+      'user=User.find_by_username("{{ newtoken.user }}");
+        token=PersonalAccessToken.find_or_create_by(user: user, name: "{{ newtoken.name }}");
+        token.expires_at=Time.now + 3.months;
+        token.revoked=false;
+        token.scopes={{ newtoken.scopes | to_json }};
+        token.token="{{ newtoken.token }}";
+        token.save!'
+  register: token_response

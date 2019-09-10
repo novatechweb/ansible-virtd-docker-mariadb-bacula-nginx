@@ -11,5 +11,7 @@ do
 done
 
 set -e
-ansible-playbook bootstrap.yml -i ${inventory_file} --ask-pass
-ansible-playbook site.yml -i ${inventory_file}
+ansible-playbook bootstrap.yml \
+    -i ${inventory_file} \
+    -e ansible_user=root \
+    --ask-pass

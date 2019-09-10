@@ -10,7 +10,7 @@
   tags: bacula
   roles:
   - role: mariadb
-    mariadb_open_firewall: true
+    mariadb_open_firewall: false
     mariadb_remote_root_access: false
   - role: bacula-director
     tags: bacula-director
@@ -84,7 +84,7 @@
       public_hostname: '{{ nexus_hostname }}'
   - name: Build and start the SVN Docker container
     role: docker-svn
-    svn_repos: 'ddio NCD_Release'
+    svn_repos: 'ddio NCD_Release hardware'
     tags:
     - svn_container
   - name: Build and start the openldap Docker container
@@ -116,9 +116,6 @@
 
 - name: Setup LDAP users
   import_playbook: ldap_entries.yml
-
-- name: Setup Gitlab users
-  import_playbook: gitlab_users.yml
 
 - name: Setup the buildbot containers
   import_playbook: buildbot.yml

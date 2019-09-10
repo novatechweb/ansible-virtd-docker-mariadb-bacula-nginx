@@ -1,0 +1,11 @@
+module docker_setlink 1.0;
+
+require {
+    class netlink_socket { bind create getattr };
+
+    type svirt_lxc_net_t;
+}
+
+# Allow a container process to open IPC sockets
+#!!!! This avc can be allowed using the boolean 'virt_sandbox_use_netlink'
+allow svirt_lxc_net_t self:netlink_socket { bind create getattr };

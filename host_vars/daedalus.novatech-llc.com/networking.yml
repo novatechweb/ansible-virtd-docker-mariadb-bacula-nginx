@@ -19,3 +19,4 @@ buildbot_ip_addr:     172.16.0.110
 nexus_ip_addr:        172.16.0.111
 ddio_ip_addr:         172.16.0.112
 easyrsa_ip_addr:      172.16.0.113
+linuxserver_ip_addr:  172.16.0.4

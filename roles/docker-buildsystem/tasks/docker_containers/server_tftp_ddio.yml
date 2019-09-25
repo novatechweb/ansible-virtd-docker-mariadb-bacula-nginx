@@ -14,7 +14,7 @@
     detach: True
     image: "{{ name_prefix }}teststation_tftp_ddio_image"
     name: "{{ name_prefix }}TestStation_tftp_ddio_server"
-    ports: "{{ linuxserver_ip_addr }}:69:69/udp"
+    ports: "{{ ddio_ip_addr }}:69:69/udp"
     state: "{{ container_start_state_nondata }}"
     restart_policy: '{{ docker_restart_policy }}'
     volumes:

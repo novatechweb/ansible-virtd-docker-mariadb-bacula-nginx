@@ -4,7 +4,7 @@
 # This will generate passwords for these accounts.
 - assert:
     that:
-    - buildbot_worker_ntel_password is defined
+    - buildbot_worker_ntel_passwd is defined
     - buildbot_worker_ntel_sshkey is defined
 
 - name: Create buildbot cache volume
@@ -64,6 +64,7 @@
     owner: '{{ buildbot_uid }}'
     mode: "u=rw,g=,o="
     unsafe_writes: yes
+  register: configs
   loop:
     - '{{ buildbot_worker_ntel_sshkey }}'
 
@@ -75,7 +76,9 @@
     owner: '{{ buildbot_uid }}'
     mode: "u=rw,g=,o="
     unsafe_writes: yes
+  register: templates
   loop:
+    - buildbot.tac
     - known_hosts
     - netrc
     - pydistutils.cfg
@@ -89,12 +92,15 @@
     mode: 'u=rwx,g=rx,o=rx'
     unsafe_writes: yes
 
+- import_tasks: worker-cert.yml
+
 - name: Checkout image repo
   git:
     repo: '{{ image_repo }}'
     version: master
     dest: '{{ image_dir }}'
     force: true
+  register: deploy_source
 
 - name: Create buildbot worker image
   docker_image:
@@ -102,7 +108,7 @@
     name: '{{ image_name }}'
     path: '{{ image_dir }}'
     tag: '{{ docker_image_tag }}'
-    force: true
+    force: '{{ deploy_source.changed }}'
 
 - name: Start buildbot worker container
   docker_container:
@@ -111,6 +117,11 @@
     image: '{{ image_name }}:{{ docker_image_tag }}'
     name: '{{ container_name }}'
     networks: '{{ container_networks }}'
-    volumes: '{{ container_volumes }}'
     ports: '{{ container_port_args }}'
+    restart: '{{
+      configs.changed
+      or templates.changed
+      or deploy_source.changed }}'
+    restart_policy: '{{ docker_restart_policy }}'
     state: started
+    volumes: '{{ container_volumes }}'

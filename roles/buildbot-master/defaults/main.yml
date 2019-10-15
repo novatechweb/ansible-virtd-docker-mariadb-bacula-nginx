@@ -8,7 +8,7 @@ backup_hostdir: '{{ docker_backup_dir }}/buildbot'
 buildbot_uid: 1000
 
 # numeric version of buildbot service
-buildbot_version: '1.6.0'
+buildbot_version: '2.4.0'
 
 # port number for workers to communicate with master
 buildbot_worker_port: 9989
@@ -44,11 +44,11 @@ container_env:
   BUILDBOT_SMTP_PASS: '{{ buildbot_email_password }}'
   BUILDBOT_WEB_PORT: '{{buildbot_http_port}}'
   BUILDBOT_WEB_URL: 'https://{{ buildbot_hostname }}/'
-  BUILDBOT_WORKER_PORT: '{{buildbot_worker_port}}'
-  BUILDBOT_WORKER_NTEL: 'worker-ntel'
-  BUILDBOT_WORKER_NTEL_PASS: '{{ buildbot_worker_ntel_password }}'
-  BUILDBOT_WORKER_PTXDIST: 'worker-ptxdist'
-  BUILDBOT_WORKER_PTXDIST_PASS: '{{ buildbot_worker_ptxdist_password }}'
+  BUILDBOT_WORKER_PORT: '{{ buildbot_master_connection_string }}'
+  BUILDBOT_WORKER_NTEL: '{{ buildbot_worker_ntel }}'
+  BUILDBOT_WORKER_NTEL_PASS: '{{ buildbot_worker_ntel_passwd }}'
+  BUILDBOT_WORKER_PTXDIST: '{{ buildbot_worker_ptxdist }}'
+  BUILDBOT_WORKER_PTXDIST_PASS: '{{ buildbot_worker_ptxdist_passwd }}'
   GITLAB_URI: 'https://{{ gitlab_hostname }}/'
   GITLAB_OAUTH_ID: '{{ gitlab_oauth_buildbot_id }}'
   GITLAB_OAUTH_SECRET: '{{ gitlab_oauth_buildbot_secret }}'
@@ -82,6 +82,10 @@ container_volumes:
   - '{{ config_hostdir }}/ptxdist.py:{{ data_path }}/ptxdist.py'
   - '{{ config_hostdir }}/{{ buildbot_master_sshkey | basename }}:/home/buildbot/.ssh/id_rsa'
   - '{{ config_hostdir }}/known_hosts:/home/buildbot/.ssh/known_hosts'
+  - '{{ config_hostdir }}/ssl:/etc/ssl/private'
+
+# working directory of the container
+container_workdir: '{{ data_path }}'
 
 # mount path of the data volume
 data_path: '/buildbot'
@@ -94,15 +98,13 @@ image_args:
   BUILDBOT_TIMEZONE: 'America/Chicago'
   BUILDBOT_UID: '{{ buildbot_uid }}'
   BUILDBOT_VERSION: 'v{{ buildbot_version }}'
+  BUILDBOT_WORKDIR: '{{ data_path }}'
 
 # directory of the image source
 image_dir: '{{ docker_projects_dir }}/buildbot-master'
 
 # name of the image being built
 image_name: '{{ docker_registry_username }}/buildbot'
-
-# repository URI of the image source
-image_repo: '{{ buildbot_image_repo | default("https://github.com/novatechweb/docker-buildbot-master.git") }}'
 
 # restoration host directory
 restore_hostdir: '{{ bacula_dest }}{{ backup_hostdir }}'

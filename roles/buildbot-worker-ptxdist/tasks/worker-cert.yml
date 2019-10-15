@@ -1,0 +1,52 @@
+- delegate_to: localhost
+  become: no
+  block:
+  - name: Makes sure the local dir for ssl files exists
+    file:
+      mode: 0700
+      path: '{{ buildbot_worker_ptxdist_tlscsr | dirname }}'
+      state: directory
+
+  - name: Generate server key
+    openssl_privatekey:
+      path: '{{ buildbot_worker_ptxdist_tlskey }}'
+      size: 8192
+      type: RSA
+      state: present
+
+  - name: Generate server req
+    openssl_csr:
+      path: '{{ buildbot_worker_ptxdist_tlscsr }}'
+      privatekey_path: '{{ buildbot_worker_ptxdist_tlskey }}'
+      CN: '{{ container_hostname }}'
+      O: NovaTech
+      OU: Orion
+      C: US
+      ST: Kansas
+      L: Lenexa
+      state: present
+
+  - name: Generate server cert
+    openssl_certificate:
+      csr_path: '{{ buildbot_worker_ptxdist_tlscsr }}'
+      path: '{{ buildbot_worker_ptxdist_tlspem }}'
+      privatekey_path: '{{ buildbot_worker_ptxdist_tlskey }}'
+      provider: ownca
+      ownca_not_after: "+3650d"
+      ownca_path: '{{ buildbot_ca_pem }}'
+      ownca_privatekey_path: '{{ buildbot_ca_key }}'
+
+- name: Create certificate directory on target
+  file:
+    path: '{{ config_hostdir }}/ssl'
+    state: directory
+
+- name: Copy certificates and keys to target
+  copy:
+    src: '{{ item }}'
+    dest: '{{ config_hostdir }}/ssl/'
+  loop:
+  - '{{ buildbot_ca_pem }}'
+  - '{{ buildbot_master_tlspem }}'
+  - '{{ buildbot_worker_ptxdist_tlskey }}'
+  - '{{ buildbot_worker_ptxdist_tlspem }}'

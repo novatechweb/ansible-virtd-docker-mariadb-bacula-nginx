@@ -37,7 +37,10 @@ NTEL_LAYERS = {
 # a Worker object, specifying a unique worker name and password.  The same
 # worker name and password must be configured on the worker.
 c['workers'] = [
-    worker.Worker("worker-ntel", "pass", max_builds=3),
+    worker.Worker(
+        os.getenv('BUILDBOT_WORKER_NTEL'),
+        os.getenv('BUILDBOT_WORKER_NTEL_PASS'),
+        max_builds=3),
 ]
 
 # CHANGESOURCES
@@ -190,7 +193,7 @@ def CurrentTime():
     import string
     dt = datetime.now()
     dt.replace(microsecond=0)
-    dts = string.replace(dt.isoformat(), ':', '.')
+    dts = dt.isoformat().replace(':', '.')
     return dts
 
 

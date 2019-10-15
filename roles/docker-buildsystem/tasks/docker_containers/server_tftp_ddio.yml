@@ -11,11 +11,20 @@
 
 - name: Start docker container - Test Station tftp server
   docker_container:
+    command: "/usr/sbin/in.tftpd --foreground --user tftp --address {{ ddio_ip_addr }}:69 -s /opt/tftp_files"
     detach: True
     image: "{{ name_prefix }}teststation_tftp_ddio_image"
     name: "{{ name_prefix }}TestStation_tftp_ddio_server"
-    ports: "{{ linuxserver_ip_addr }}:69:69/udp"
+    network_mode: host
     state: "{{ container_start_state_nondata }}"
     restart_policy: '{{ docker_restart_policy }}'
     volumes:
       - "{{ name_prefix }}TestStation_tftp_ddio_data:/opt/tftp_files"
+
+# Docker doesn't do this automatically when network_mode=host
+- name: Open firewall for tftp
+  firewalld:
+    permanent: yes
+    service: tftp
+    state: enabled
+    zone: public

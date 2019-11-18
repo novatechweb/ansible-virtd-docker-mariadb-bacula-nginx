@@ -26,9 +26,7 @@
     unsafe_writes: yes
   register: configs
   loop:
-    - master.cfg
-    - openembedded.py
-    - ptxdist.py
+    - novatech.py
     - '{{ buildbot_master_sshkey }}'
 
 - name: Populate config templates
@@ -41,6 +39,7 @@
     unsafe_writes: yes
   register: templates
   loop:
+    - master.cfg
     - buildbot.tac
     - known_hosts
 

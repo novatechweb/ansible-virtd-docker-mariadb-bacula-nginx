@@ -45,10 +45,10 @@ buildbot_worker_env:
   BUILDBOT_WORKER_PASS: '{{ buildbot_worker_passwd }}'
 
 # buildbot_worker_hostname
-buildbot_worker_hostname: 'buildbot-worker-ntel'
+buildbot_worker_hostname: '{{ buildbot_worker_name }}'
 
 # worker identifier
-buildbot_worker_name: 'buildbot-worker-ntel'
+buildbot_worker_name: 'buildbot-worker-ntel-morty'
 
 # worker password
 buildbot_worker_passwd:
@@ -71,7 +71,7 @@ buildbot_worker_image_args:
 buildbot_worker_image_dir: '/tmp/{{ buildbot_worker_container }}'
 
 # name of the Dockerfile to build the container's image
-buildbot_worker_image_dockerfile: 'Dockerfile'
+buildbot_worker_image_dockerfile: 'Dockerfile-morty'
 
 # name of the image being built
 buildbot_worker_image_name: '{{ buildbot_worker_container }}:latest'

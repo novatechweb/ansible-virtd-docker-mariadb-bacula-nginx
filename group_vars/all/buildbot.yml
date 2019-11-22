@@ -31,12 +31,34 @@ buildbot_client_certificates:
       C: US
       ST: Kansas
       L: Lenexa
-  - dir: '{{ buildbot_worker_ntel_creds }}'
-    csr: '{{ buildbot_worker_ntel_tlscsr }}'
-    key: '{{ buildbot_worker_ntel_tlskey }}'
-    pem: '{{ buildbot_worker_ntel_tlspem }}'
+  - dir: '{{ buildbot_worker_ntel_morty_creds }}'
+    csr: '{{ buildbot_worker_ntel_morty_tlscsr }}'
+    key: '{{ buildbot_worker_ntel_morty_tlskey }}'
+    pem: '{{ buildbot_worker_ntel_morty_tlspem }}'
     fields:
-      CN: '{{ buildbot_worker_ntel }}'
+      CN: buildbot-worker-ntel-morty'
+      O: NovaTech
+      OU: Orion
+      C: US
+      ST: Kansas
+      L: Lenexa
+  - dir: '{{ buildbot_worker_ntel_sumo_creds }}'
+    csr: '{{ buildbot_worker_ntel_sumo_tlscsr }}'
+    key: '{{ buildbot_worker_ntel_sumo_tlskey }}'
+    pem: '{{ buildbot_worker_ntel_sumo_tlspem }}'
+    fields:
+      CN: buildbot-worker-ntel-sumo'
+      O: NovaTech
+      OU: Orion
+      C: US
+      ST: Kansas
+      L: Lenexa
+  - dir: '{{ buildbot_worker_ntel_warrior_creds }}'
+    csr: '{{ buildbot_worker_ntel_warrior_tlscsr }}'
+    key: '{{ buildbot_worker_ntel_warrior_tlskey }}'
+    pem: '{{ buildbot_worker_ntel_warrior_tlspem }}'
+    fields:
+      CN: buildbot-worker-ntel-warrior'
       O: NovaTech
       OU: Orion
       C: US
@@ -62,13 +84,27 @@ buildbot_ssh_clients:
     email: buildbot@novatech-llc.com
     password: "{{ gitlab_user_buildbot_password }}"
     sshkey_name: "buildbot_master"
-  - dir: '{{ buildbot_worker_ntel_creds }}'
-    sshkey: '{{ buildbot_worker_ntel_sshkey }}'
+  - dir: '{{ buildbot_worker_ntel_morty_creds }}'
+    sshkey: '{{ buildbot_worker_ntel_morty_sshkey }}'
     username: buildbot
     name: Build Robot
     email: buildbot@novatech-llc.com
     password: "{{ gitlab_user_buildbot_password }}"
-    sshkey_name: "buildbot_worker_ntel"
+    sshkey_name: "buildbot_worker_ntel_morty"
+  - dir: '{{ buildbot_worker_ntel_sumo_creds }}'
+    sshkey: '{{ buildbot_worker_ntel_sumo_sshkey }}'
+    username: buildbot
+    name: Build Robot
+    email: buildbot@novatech-llc.com
+    password: "{{ gitlab_user_buildbot_password }}"
+    sshkey_name: "buildbot_worker_ntel_sumo"
+  - dir: '{{ buildbot_worker_ntel_warrior_creds }}'
+    sshkey: '{{ buildbot_worker_ntel_warrior_sshkey }}'
+    username: buildbot
+    name: Build Robot
+    email: buildbot@novatech-llc.com
+    password: "{{ gitlab_user_buildbot_password }}"
+    sshkey_name: "buildbot_worker_ntel_warrior"
   - dir: '{{ buildbot_worker_ptxdist_creds }}'
     sshkey: '{{ buildbot_worker_ptxdist_sshkey }}'
     username: buildbot
@@ -96,11 +132,21 @@ buildbot_env:
   BUILDBOT_WEB_PORT: '{{ buildbot_http_port }}'
   BUILDBOT_WEB_URL: 'https://{{ buildbot_hostname }}/'
   BUILDBOT_WORKER_PORT: '{{ buildbot_connection_string }}'
-  BUILDBOT_WORKER_NTEL_BETA_URI: '{{ ntel_beta_uri }}'
-  BUILDBOT_WORKER_NTEL_NAME: '{{ buildbot_worker_ntel }}'
-  BUILDBOT_WORKER_NTEL_PASS: '{{ buildbot_worker_ntel_passwd }}'
-  BUILDBOT_WORKER_NTEL_RELEASE_URI: '{{ ntel_release_uri }}'
-  BUILDBOT_WORKER_NTEL_SSTATE_URI: '{{ ntel_sstate_uri }}'
+  BUILDBOT_WORKER_NTEL_MORTY_BETA_URI: '{{ ntel_beta_uri }}'
+  BUILDBOT_WORKER_NTEL_MORTY_NAME: '{{ buildbot_worker_ntel_morty }}'
+  BUILDBOT_WORKER_NTEL_MORTY_PASS: '{{ buildbot_worker_ntel_morty_passwd }}'
+  BUILDBOT_WORKER_NTEL_MORTY_RELEASE_URI: '{{ ntel_release_uri }}'
+  BUILDBOT_WORKER_NTEL_MORTY_SSTATE_URI: '{{ ntel_sstate_uri }}'
+  BUILDBOT_WORKER_NTEL_SUMO_BETA_URI: '{{ ntel_beta_uri }}'
+  BUILDBOT_WORKER_NTEL_SUMO_NAME: '{{ buildbot_worker_ntel_sumo }}'
+  BUILDBOT_WORKER_NTEL_SUMO_PASS: '{{ buildbot_worker_ntel_sumo_passwd }}'
+  BUILDBOT_WORKER_NTEL_SUMO_RELEASE_URI: '{{ ntel_release_uri }}'
+  BUILDBOT_WORKER_NTEL_SUMO_SSTATE_URI: '{{ ntel_sstate_uri }}'
+  BUILDBOT_WORKER_NTEL_WARRIOR_BETA_URI: '{{ ntel_beta_uri }}'
+  BUILDBOT_WORKER_NTEL_WARRIOR_NAME: '{{ buildbot_worker_ntel_warrior }}'
+  BUILDBOT_WORKER_NTEL_WARRIOR_PASS: '{{ buildbot_worker_ntel_warrior_passwd }}'
+  BUILDBOT_WORKER_NTEL_WARRIOR_RELEASE_URI: '{{ ntel_release_uri }}'
+  BUILDBOT_WORKER_NTEL_WARRIOR_SSTATE_URI: '{{ ntel_sstate_uri }}'
   BUILDBOT_WORKER_PTXDIST_BETA_URI: '{{ ptxdist_beta_uri }}'
   BUILDBOT_WORKER_PTXDIST_NAME: '{{ buildbot_worker_ptxdist }}'
   BUILDBOT_WORKER_PTXDIST_PASS: '{{ buildbot_worker_ptxdist_passwd }}'
@@ -125,6 +171,12 @@ buildbot_worker_configs:
   - module: 'worker_ntel_morty'
     giturl: 'git@{{ gitlab_hostname }}:ntel/setup-scripts'
     branch: 'morty'
+  - module: 'worker_ntel_sumo'
+    giturl: 'git@{{ gitlab_hostname }}:ntel/setup-scripts'
+    branch: 'sumo'
+  - module: 'worker_ntel_warrior'
+    giturl: 'git@{{ gitlab_hostname }}:ntel/setup-scripts'
+    branch: 'warrior'
   - module: 'worker_ptxdist_master'
     giturl: 'git@{{ gitlab_hostname }}:Orion-ptxdist/workspace-ptxdist2'
     branch: 'master'
@@ -138,15 +190,35 @@ buildbot_worker_networks:
 buildbot_worker_image_dir: '{{ docker_projects_dir }}/{{ buildbot_worker_container }}'
 buildbot_worker_image_name: '{{ docker_registry_username }}/{{ buildbot_worker_container }}:{{ docker_image_tag }}'
 
-buildbot_worker_ntel: '{{ docker_name_prefix }}buildbot-worker-ntel'
-buildbot_worker_ntel_hostdir_config: '{{ docker_restore_config_base_dir }}/buildbot-worker-ntel'
-buildbot_worker_ntel_hostdir_ssl: '{{ buildbot_worker_ntel_hostdir_config }}/ssl'
-buildbot_worker_ntel_creds: '{{ playbook_dir }}/credentials/buildbot-worker-ntel'
-buildbot_worker_ntel_passwd: '{{ lookup("password", buildbot_worker_ntel_creds + "/passwd length=20") }}'
-buildbot_worker_ntel_sshkey: '{{ buildbot_worker_ntel_creds }}/id_rsa'
-buildbot_worker_ntel_tlscsr: '{{ buildbot_worker_ntel_creds }}/worker.csr'
-buildbot_worker_ntel_tlskey: '{{ buildbot_worker_ntel_creds }}/worker.key'
-buildbot_worker_ntel_tlspem: '{{ buildbot_worker_ntel_creds }}/worker.pem'
+buildbot_worker_ntel_morty: '{{ docker_name_prefix }}buildbot-worker-ntel-morty'
+buildbot_worker_ntel_morty_hostdir_config: '{{ docker_restore_config_base_dir }}/buildbot-worker-ntel-morty'
+buildbot_worker_ntel_morty_hostdir_ssl: '{{ buildbot_worker_ntel_morty_hostdir_config }}/ssl'
+buildbot_worker_ntel_morty_creds: '{{ playbook_dir }}/credentials/buildbot-worker-ntel-morty'
+buildbot_worker_ntel_morty_passwd: '{{ lookup("password", buildbot_worker_ntel_morty_creds + "/passwd length=20") }}'
+buildbot_worker_ntel_morty_sshkey: '{{ buildbot_worker_ntel_morty_creds }}/id_rsa'
+buildbot_worker_ntel_morty_tlscsr: '{{ buildbot_worker_ntel_morty_creds }}/worker.csr'
+buildbot_worker_ntel_morty_tlspem: '{{ buildbot_worker_ntel_morty_creds }}/worker.pem'
+buildbot_worker_ntel_morty_tlskey: '{{ buildbot_worker_ntel_morty_creds }}/worker.key'
+
+buildbot_worker_ntel_sumo: '{{ docker_name_prefix }}buildbot-worker-ntel-sumo'
+buildbot_worker_ntel_sumo_hostdir_config: '{{ docker_restore_config_base_dir }}/buildbot-worker-ntel-sumo'
+buildbot_worker_ntel_sumo_hostdir_ssl: '{{ buildbot_worker_ntel_sumo_hostdir_config }}/ssl'
+buildbot_worker_ntel_sumo_creds: '{{ playbook_dir }}/credentials/buildbot-worker-ntel-sumo'
+buildbot_worker_ntel_sumo_passwd: '{{ lookup("password", buildbot_worker_ntel_sumo_creds + "/passwd length=20") }}'
+buildbot_worker_ntel_sumo_sshkey: '{{ buildbot_worker_ntel_sumo_creds }}/id_rsa'
+buildbot_worker_ntel_sumo_tlscsr: '{{ buildbot_worker_ntel_sumo_creds }}/worker.csr'
+buildbot_worker_ntel_sumo_tlspem: '{{ buildbot_worker_ntel_sumo_creds }}/worker.pem'
+buildbot_worker_ntel_sumo_tlskey: '{{ buildbot_worker_ntel_sumo_creds }}/worker.key'
+
+buildbot_worker_ntel_warrior: '{{ docker_name_prefix }}buildbot-worker-ntel-warrior'
+buildbot_worker_ntel_warrior_hostdir_config: '{{ docker_restore_config_base_dir }}/buildbot-worker-ntel-warrior'
+buildbot_worker_ntel_warrior_hostdir_ssl: '{{ buildbot_worker_ntel_warrior_hostdir_config }}/ssl'
+buildbot_worker_ntel_warrior_creds: '{{ playbook_dir }}/credentials/buildbot-worker-ntel-warrior'
+buildbot_worker_ntel_warrior_passwd: '{{ lookup("password", buildbot_worker_ntel_warrior_creds + "/passwd length=20") }}'
+buildbot_worker_ntel_warrior_sshkey: '{{ buildbot_worker_ntel_warrior_creds }}/id_rsa'
+buildbot_worker_ntel_warrior_tlscsr: '{{ buildbot_worker_ntel_warrior_creds }}/worker.csr'
+buildbot_worker_ntel_warrior_tlspem: '{{ buildbot_worker_ntel_warrior_creds }}/worker.pem'
+buildbot_worker_ntel_warrior_tlskey: '{{ buildbot_worker_ntel_warrior_creds }}/worker.key'
 
 buildbot_worker_ptxdist: '{{ docker_name_prefix }}buildbot-worker-ptxdist'
 buildbot_worker_ptxdist_hostdir_config: '{{ docker_restore_config_base_dir }}/buildbot-worker-ptxdist'

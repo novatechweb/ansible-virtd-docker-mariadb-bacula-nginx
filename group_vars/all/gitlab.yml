@@ -56,8 +56,22 @@ gitlab_users:
   name: Build Robot
   email: buildbot@novatech-llc.com
   password: "{{ gitlab_user_buildbot_password }}"
-  sshkey_file: "{{ lookup('file', buildbot_worker_ntel_sshkey + '.pub') }}"
-  sshkey_name: "buildbot-worker-ntel"
+  sshkey_file: "{{ lookup('file', buildbot_worker_ntel_morty_sshkey + '.pub') }}"
+  sshkey_name: "buildbot-worker-ntel-morty"
+
+- username: buildbot
+  name: Build Robot
+  email: buildbot@novatech-llc.com
+  password: "{{ gitlab_user_buildbot_password }}"
+  sshkey_file: "{{ lookup('file', buildbot_worker_ntel_sumo_sshkey + '.pub') }}"
+  sshkey_name: "buildbot-worker-ntel-sumo"
+
+- username: buildbot
+  name: Build Robot
+  email: buildbot@novatech-llc.com
+  password: "{{ gitlab_user_buildbot_password }}"
+  sshkey_file: "{{ lookup('file', buildbot_worker_ntel_warrior_sshkey + '.pub') }}"
+  sshkey_name: "buildbot-worker-ntel-warrior"
 
 - username: buildbot
   name: Build Robot

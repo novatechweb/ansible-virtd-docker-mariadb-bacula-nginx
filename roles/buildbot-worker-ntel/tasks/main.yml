@@ -87,13 +87,13 @@
     unsafe_writes: yes
   register: credentials
   loop:
-    - src: '{{ buildbot_worker_ntel_sshkey }}'
+    - src: '{{ buildbot_worker_sshkey }}'
       dest: '{{ buildbot_worker_hostdir_config }}/{{ worker_sshkey }}'
     - src: '{{ buildbot_tlsca }}'
       dest: '{{ buildbot_worker_hostdir_ssl }}/{{ worker_tlsca }}'
-    - src: '{{ buildbot_worker_ntel_tlskey }}'
+    - src: '{{ buildbot_worker_tlskey }}'
       dest: '{{ buildbot_worker_hostdir_ssl }}/{{ worker_tlskey }}'
-    - src: '{{ buildbot_worker_ntel_tlspem }}'
+    - src: '{{ buildbot_worker_tlspem }}'
       dest: '{{ buildbot_worker_hostdir_ssl }}/{{ worker_tlspem }}'
 
 - name: Create image source directory

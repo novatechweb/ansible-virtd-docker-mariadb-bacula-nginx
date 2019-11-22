@@ -64,19 +64,50 @@
       tags:
         - always
 
-    - name: Build and start the NTEL container
+    - name: Build and start the NTEL morty container
       import_role:
         name: buildbot-worker-ntel
       vars:
-        buildbot_worker_hostdir_config: '{{ buildbot_worker_ntel_hostdir_config }}'
-        buildbot_worker_name: '{{ buildbot_worker_ntel }}'
-        buildbot_worker_passwd: '{{ buildbot_worker_ntel_passwd }}'
+        buildbot_worker_hostdir_config: '{{ buildbot_worker_ntel_morty_hostdir_config }}'
+        buildbot_worker_name: '{{ buildbot_worker_ntel_morty }}'
+        buildbot_worker_passwd: '{{ buildbot_worker_ntel_morty_passwd }}'
+        buildbot_worker_sshkey: '{{ buildbot_worker_ntel_morty_sshkey }}'
         buildbot_worker_tlsca: '{{ buildbot_ca_pem }}'
-        buildbot_worker_tlskey: '{{ buildbot_worker_ntel_tlskey }}'
-        buildbot_worker_tlspem: '{{ buildbot_worker_ntel_tlspem }}'
-
+        buildbot_worker_tlskey: '{{ buildbot_worker_ntel_morty_tlskey }}'
+        buildbot_worker_tlspem: '{{ buildbot_worker_ntel_morty_tlspem }}'
+        buildbot_worker_image_dockerfile: 'Dockerfile-morty'
       tags:
-        - buildbot-worker-ntel
+        - buildbot-worker-ntel-morty
+
+    - name: Build and start the NTEL sumo container
+      import_role:
+        name: buildbot-worker-ntel
+      vars:
+        buildbot_worker_hostdir_config: '{{ buildbot_worker_ntel_sumo_hostdir_config }}'
+        buildbot_worker_name: '{{ buildbot_worker_ntel_sumo }}'
+        buildbot_worker_passwd: '{{ buildbot_worker_ntel_sumo_passwd }}'
+        buildbot_worker_sshkey: '{{ buildbot_worker_ntel_sumo_sshkey }}'
+        buildbot_worker_tlsca: '{{ buildbot_ca_pem }}'
+        buildbot_worker_tlskey: '{{ buildbot_worker_ntel_sumo_tlskey }}'
+        buildbot_worker_tlspem: '{{ buildbot_worker_ntel_sumo_tlspem }}'
+        buildbot_worker_image_dockerfile: 'Dockerfile-sumo'
+      tags:
+        - buildbot-worker-ntel-sumo
+
+    - name: Build and start the NTEL warrior container
+      import_role:
+        name: buildbot-worker-ntel
+      vars:
+        buildbot_worker_hostdir_config: '{{ buildbot_worker_ntel_warrior_hostdir_config }}'
+        buildbot_worker_name: '{{ buildbot_worker_ntel_warrior }}'
+        buildbot_worker_passwd: '{{ buildbot_worker_ntel_warrior_passwd }}'
+        buildbot_worker_sshkey: '{{ buildbot_worker_ntel_warrior_sshkey }}'
+        buildbot_worker_tlsca: '{{ buildbot_ca_pem }}'
+        buildbot_worker_tlskey: '{{ buildbot_worker_ntel_warrior_tlskey }}'
+        buildbot_worker_tlspem: '{{ buildbot_worker_ntel_warrior_tlspem }}'
+        buildbot_worker_image_dockerfile: 'Dockerfile-warrior'
+      tags:
+        - buildbot-worker-ntel-warrior
 
     - name: Build and start the PTXdist container
       import_role:
@@ -85,8 +116,10 @@
         buildbot_worker_hostdir_config: '{{ buildbot_worker_ptxdist_hostdir_config }}'
         buildbot_worker_name: '{{ buildbot_worker_ptxdist }}'
         buildbot_worker_passwd: '{{ buildbot_worker_ptxdist_passwd }}'
+        buildbot_worker_sshkey: '{{ buildbot_worker_ptxdist_sshkey }}'
         buildbot_worker_tlsca: '{{ buildbot_ca_pem }}'
         buildbot_worker_tlskey: '{{ buildbot_worker_ptxdist_tlskey }}'
         buildbot_worker_tlspem: '{{ buildbot_worker_ptxdist_tlspem }}'
+        buildbot_worker_image_dockerfile: 'Dockerfile'
       tags:
         - buildbot-worker-ptxdist

@@ -17,6 +17,12 @@ buildbot_version: '1.6.0'
 buildbot_worker_port: '9989'
 buildbot_worker_connection_string: 'tcp:{{ buildbot_master }}:{{ buildbot_worker_port }}'
 
+# docker network for buildot worker container
+buildbot_worker_networks:
+  - name: 'workers'
+    aliases:
+      - '{{ container_hostname }}'
+
 # host path containing configuration files
 config_hostdir: '{{ docker_restore_config_base_dir }}/{{ container_name }}'
 
@@ -38,12 +44,6 @@ container_hostname: '{{ role_name }}'
 
 # the name of the container being started
 container_name: '{{ docker_name_prefix }}{{ container_hostname }}'
-
-# network configuration for the confainer
-container_networks:
-  - name: '{{ docker_network_frontend }}'
-    aliases:
-      - '{{ container_hostname }}'
 
 # port configuration of the container
 container_port_args: []

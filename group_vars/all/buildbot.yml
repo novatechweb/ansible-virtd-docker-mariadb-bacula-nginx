@@ -34,6 +34,12 @@ buildbot_master_tlscsr: '{{ buildbot_creds + "/master/server.csr" }}'
 buildbot_master_tlskey: '{{ buildbot_creds + "/master/server.key" }}'
 buildbot_master_tlspem: '{{ buildbot_creds + "/master/server.pem" }}'
 
+buildbot_worker_network: '{{ docker_name_prefix }}workers'
+buildbot_worker_networks:
+  - name: '{{ buildbot_worker_network }}'
+    aliases:
+      - '{{ buildbot_worker_hostname }}'
+
 buildbot_worker_ntel_passwd: '{{ lookup("password", buildbot_creds + "/worker_ntel/passwd length=20") }}'
 buildbot_worker_ntel_sshkey: '{{ buildbot_creds + "/worker_ntel/id_rsa" }}'
 buildbot_worker_ntel_tlscsr: '{{ buildbot_creds + "/worker_ntel/client.csr" }}'

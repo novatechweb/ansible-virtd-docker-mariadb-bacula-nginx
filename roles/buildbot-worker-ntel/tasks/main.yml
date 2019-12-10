@@ -120,6 +120,12 @@
     tag: '{{ docker_image_tag }}'
     force_source: "{{ deploy_source.changed }}"
 
+- name: Create buildbot worker network
+  docker_network:
+    name: '{{ item.name }}'
+    state: present
+  loop: '{{ buildbot_worker_networks }}'
+
 - name: Start buildbot worker container
   docker_container:
     comparisons: {'*': strict}
@@ -127,8 +133,10 @@
     hostname: '{{ container_hostname }}'
     image: '{{ image_name }}:{{ docker_image_tag }}'
     name: '{{ container_name }}'
-    networks: '{{ container_networks }}'
+    networks: '{{ buildbot_worker_networks }}'
+    networks_cli_compatible: yes
     ports: '{{ container_port_args }}'
+    purge_networks: yes
     restart: '{{
       configs.changed
       or templates.changed

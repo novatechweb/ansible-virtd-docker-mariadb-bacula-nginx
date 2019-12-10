@@ -8,7 +8,7 @@
 - name: Install required packages
   become: true
   pip:
-    name: python-gitlab
+    name: python-gitlab==1.12.1
     state: present
 
 

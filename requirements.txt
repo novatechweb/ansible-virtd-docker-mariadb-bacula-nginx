@@ -4,5 +4,5 @@ docker
 molecule
 netaddr
 passlib
-python-gitlab
+python-gitlab==1.12.1
 svn

@@ -4,7 +4,7 @@
     body:
       name:         '{{ newapplication.name }} ({{ ansible_facts.date_time.iso8601 }})'
       redirect_uri: '{{ newapplication.redirect_uri }}'
-      scopes:       '{{ newapplication.scopes | join(",") }}'
+      scopes:       '{{ newapplication.scopes | join(" ") }}'
     body_format: json
     headers:
       Private-Token: '{{ gitlab_root_private_token }}'

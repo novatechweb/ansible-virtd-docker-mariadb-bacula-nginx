@@ -1,0 +1,83 @@
+---
+grafana_hostname: "grafana.novatech-llc.com"
+
+# custom variables for grafana
+
+# the name of the container being started
+grafana_container: '{{ docker_name_prefix }}grafana'
+
+# image to run
+grafana_image: 'grafana/grafana:6.7.3'
+
+# environment passed to the container
+grafana_env: {}
+
+# local directory for configuration; bind mounted into container
+grafana_etc_volume: "{{ docker_restore_config_base_dir }}/grafana"
+
+# External Grafana address. Variable maps to "root_url" in grafana server section
+grafana_url: 'https://{{ grafana_hostname }}'
+
+# Additional options for grafana "server" section
+# This section WILL omit options for: http_addr, http_port, domain, and root_url, as those settings are set by variables listed before
+grafana_server:
+  protocol: "http"
+  enable_gzip: "true"
+
+# networks of the container
+grafana_networks:
+- name: '{{ docker_network_frontend }}'
+  aliases:
+  - '{{ grafana_container }}'
+  - '{{ grafana_hostname }}'
+
+# policy for automatically restarting container
+grafana_restart_policy: '{{ docker_restart_policy }}'
+
+# volumes mounted within the container
+grafana_storage_volume: '{{ docker_name_prefix}}grafana_DV'
+
+# Variables correspond to ones in grafana.ini configuration file
+# Security
+grafana_security:
+  admin_user: "admin"
+  admin_password: '{{ grafana_admin_password }}'
+
+# grafana authentication mechanisms
+grafana_auth:
+  ldap:
+    config_file: "{{ grafana_etc_dir }}/ldap.toml"
+    allow_sign_up: true
+
+# grafana authentication mechanisms
+grafana_ldap:
+  verbose_logging: false
+  servers:
+    host: '{{ openldap_hostname }}'
+    port: 389 # 636 for SSL
+#    use_ssl: false
+#    start_tls: false
+#    ssl_skip_verify: false
+#    root_ca_cert: /path/to/certificate.crt
+    bind_dn: 'uid=%s,ou=user,dc=novatech'
+    search_filter: '(&(objectClass=inetOrgPerson)(uid=%s))'
+    search_base_dns:
+      - 'ou=user,dc=novatech'
+    group_search_filter: '(&(objectClass=posixGroup)(memberUid=%s))'
+    group_search_filter_user_attribute: 'uid'
+    group_search_base_dns:
+      - 'ou=group,dc=novatech'
+    attributes:
+      name: givenName
+      surname: sn
+      username: uid
+      member_of: memberOf
+      email: mail
+  group_mappings:
+    - name: NovaTech
+      id: 1
+      groups:
+        - group_dn: "cn=grafana.novatech-llc.com,ou=group,dc=novatech"
+          org_role: Admin
+        - group_dn: "*"
+          org_role: Viewer

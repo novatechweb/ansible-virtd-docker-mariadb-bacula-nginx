@@ -14,6 +14,8 @@ gitlab_port_args:
 wiki_hostname: wiki.novatech-llc.com
 wiki_port_args: []
 
+grafana_port_args: []
+
 mantisbt_hostname: mantis.novatech-llc.com
 mantisbt_port_args:
 - "{{ mantisbt_ip_addr }}:80:80"

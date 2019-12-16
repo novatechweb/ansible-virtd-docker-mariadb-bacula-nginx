@@ -1,0 +1,38 @@
+---
+# This is an example playbook to execute Ansible tests.
+
+- name: Verify
+  hosts: all
+  become: true
+  pre_tasks:
+    - name: Include module default variables
+      include_vars:
+        file: "{{ playbook_dir }}/../../defaults/main.yml"
+    - name: Include module standard variables
+      include_vars:
+        file: "{{ playbook_dir }}/../../vars/main.yml"
+
+  tasks:
+  - name: Get grafana container information
+    docker_container_info:
+      name: '{{ grafana_container }}'
+    register: grafana_info
+
+  - name: Assert grafana container is running and healthy
+    assert:
+      that:
+        - grafana_info['container']['State']['Health']['Status'] == 'healthy'
+
+  - name: Grab actual grafana port
+    set_fact:
+      grafana_host_port: "{{ grafana_info['container']['NetworkSettings']['Ports'][grafana_port+'/tcp'][0]['HostPort'] }}"
+
+  - name: Assert grafana is responding
+    uri:
+      method: GET
+      return_content: yes
+      status_code: 200
+      url: http://localhost:{{ grafana_host_port }} /api/health
+    register: health
+    failed_when:
+      - health.json.database != "ok"

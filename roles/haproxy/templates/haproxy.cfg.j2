@@ -49,6 +49,9 @@ frontend container_https_in
     use_backend backend-mantisbt if is_mantisbt
     use_backend backend-wiki if is_wiki
 
+    acl is_grafana      hdr(host) eq {{ grafana_hostname }}
+    use_backend backend-grafana if is_grafana
+
 # frontend container_ldap_in
 #     mode tcp
 #     bind *:389
@@ -79,6 +82,10 @@ backend backend-exim4
 
 backend backend-gitlab
     server gitlab1 gitlab.frontend:80
+
+backend backend-grafana
+    option httpchk GET /login
+    server grafana1 {{ grafana_container }}.{{ docker_network_frontend }}:3000 check inter 30s
 
 backend backend-wiki
     server wiki1 wiki.frontend:80

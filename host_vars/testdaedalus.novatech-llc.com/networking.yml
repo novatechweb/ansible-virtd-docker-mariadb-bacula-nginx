@@ -19,3 +19,4 @@ buildbot_ip_addr:     172.16.103.110
 nexus_ip_addr:        172.16.103.111
 ddio_ip_addr:         172.16.103.112
 easyrsa_ip_addr:      172.16.103.113
+grafana_ip_addr:      '{{ ansible_facts.default_ipv4.address }}'

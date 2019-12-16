@@ -1,0 +1,67 @@
+---
+# tasks file for grafana
+
+- name: Ensure grafana configuration directories exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: '{{ grafana_uid }}'
+    group: '{{ grafana_gid }}'
+  with_items:
+    - "{{ grafana_etc_volume }}"
+    - "{{ grafana_etc_volume }}/provisioning"
+    - "{{ grafana_etc_volume }}/provisioning/dashboards"
+    - "{{ grafana_etc_volume }}/provisioning/datasources"
+    - "{{ grafana_etc_volume }}/provisioning/notifiers"
+
+- name: Create grafana main configuration file
+  template:
+    src: grafana.ini.j2
+    dest: "{{ grafana_etc_volume }}/grafana.ini"
+    owner: '{{ grafana_uid }}'
+    group: '{{ grafana_gid }}'
+    mode: 0644
+  # no_log: true
+  notify: restart grafana
+
+- name: Create grafana LDAP configuration file
+  template:
+    src: ldap.toml.j2
+    dest: "{{ grafana_etc_volume }}/ldap.toml"
+    owner: '{{ grafana_uid }}'
+    group: '{{ grafana_uid }}'
+    mode: 0640
+  when:
+    - "'ldap' in grafana_auth"
+    - "'enabled' not in grafana_auth.ldap or grafana_auth.ldap.enabled"
+  no_log: true
+  notify: restart grafana
+
+- name: Start grafana container
+  docker_container:
+    comparisons: {'*': strict}
+    detach: true
+    env: '{{ grafana_env }}'
+    healthcheck:
+      test: ['CMD', 'wget', '--spider', 'http://localhost:{{ grafana_port }}/api/health']
+    hostname: '{{ grafana_hostname }}'
+    image: '{{ grafana_image }}'
+    name: '{{ grafana_container }}'
+    networks: '{{ grafana_networks }}'
+    networks_cli_compatible: yes
+    ports: '{{ grafana_port_args }}'
+    pull: yes
+    purge_networks: yes
+    restart_policy: '{{ grafana_restart_policy }}'
+    state: started
+    volumes: '{{ grafana_volumes }}'
+
+- meta: flush_handlers
+
+- name: Wait for grafana to start
+  docker_container_info:
+    name: '{{ grafana_container }}'
+  register: grafana_info
+  until: grafana_info['container']['State']['Health']['Status'] == 'healthy'
+  retries: 5
+  delay: 10

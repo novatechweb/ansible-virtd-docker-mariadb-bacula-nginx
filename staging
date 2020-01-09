@@ -12,3 +12,9 @@ testdaedalus.novatech-llc.com
 
 [builder]
 testdaedalus.novatech-llc.com
+
+[buildbot_testers]
+testorionlx-plus
+testorionlx-cpx
+testorionlxm
+testorion-io

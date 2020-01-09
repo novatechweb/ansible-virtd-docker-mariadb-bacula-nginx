@@ -1,8 +1,9 @@
 nexus_version: 3.16.2
+nexus_hostname: nexus.novatech-llc.com
 nexus_networks:
   - name: '{{ docker_network_frontend }}'
     aliases:
-      - '{{ public_hostname }}'
+      - '{{ nexus_hostname }}'
 nexus_host_docker: true
 nexus_default_port: 8081
 nexus_monitor_container_name: '{{ docker_name_prefix }}nexus_monitor'

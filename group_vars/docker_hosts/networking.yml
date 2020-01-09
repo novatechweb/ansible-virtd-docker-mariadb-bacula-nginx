@@ -49,7 +49,6 @@ phpmyadmin_hostname: phpmyadmin.novatech-llc.com
 buildbot_port_args:
 - "{{ buildbot_ip_addr }}:9989:9989"
 
-nexus_hostname: nexus.novatech-llc.com
 nexus_port_args: []
 
 haproxy_port_args:

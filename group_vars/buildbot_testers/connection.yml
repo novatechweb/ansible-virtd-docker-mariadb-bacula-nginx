@@ -1,0 +1,3 @@
+ansible_user: novatech
+ansible_become_method: su
+ansible_become_user: root

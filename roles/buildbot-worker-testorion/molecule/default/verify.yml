@@ -1,0 +1,23 @@
+---
+# This is an example playbook to execute Ansible tests.
+
+- name: Verify
+  hosts: all
+  tasks:
+  - name: Populate service facts
+    service_facts:
+
+  - name: Verify buildbot worker service
+    assert:
+      that: ansible_facts.services["buildbot-worker@-var-lib-buildbot.service"]["state"] == "running"
+
+  - name: Verify worker connected to master
+    uri:
+      method: GET
+      return_content: yes
+      url: "http://buildbot:8080/api/v2/workers/buildbot-worker1"
+    register: buildbot_workers
+
+  - name: Verify worker connected to master
+    assert:
+      that: buildbot_workers["json"]["workers"][0]["connected_to"][0]["masterid"] == 1

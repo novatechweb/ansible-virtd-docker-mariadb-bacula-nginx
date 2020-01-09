@@ -1,0 +1,26 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+lint: |
+  set -e
+  yamllint .
+  ansible-lint
+  flake8
+platforms:
+  - name: instance-1
+    image: "geerlingguy/docker-centos7-ansible:latest"
+    override_command: False
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    pre_build_image: true
+    docker_networks:
+      - name: 'workers'
+    networks:
+      - name: 'workers'
+provisioner:
+  name: ansible
+verifier:
+  name: ansible

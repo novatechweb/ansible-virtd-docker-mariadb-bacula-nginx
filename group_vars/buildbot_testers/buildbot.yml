@@ -1,0 +1,3 @@
+---
+# A prefix to seperate containers and images without removing running containers
+docker_name_prefix: ''

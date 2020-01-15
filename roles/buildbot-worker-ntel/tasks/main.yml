@@ -94,12 +94,18 @@
 
 - import_tasks: worker-cert.yml
 
-- name: Checkout image repo
-  git:
-    repo: '{{ image_repo }}'
-    version: master
-    dest: '{{ image_dir }}'
-    force: true
+- name: Create image source directory
+  file:
+    path: "{{ image_dir }}"
+    state: directory
+
+- name: Deploy Image Source
+  synchronize:
+    archive: yes
+    checksum: yes
+    compress: yes
+    src: '{{ image_repo }}/'
+    dest: '{{ image_dir }}/'
   register: deploy_source
 
 - name: Create buildbot worker image

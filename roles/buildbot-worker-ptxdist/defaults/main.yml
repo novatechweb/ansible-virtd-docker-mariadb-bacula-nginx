@@ -81,4 +81,4 @@ image_dir: '{{ docker_projects_dir }}/{{ container_hostname }}'
 image_name: '{{ docker_registry_username }}/{{ container_hostname }}'
 
 # repository URI of the image source
-image_repo: '{{ buildbot_worker_ptxdist_image_repo | default("https://github.com/novatechweb/docker-buildbot-worker-ptxdist.git") }}'
+image_repo: '{{ role_path }}/container'

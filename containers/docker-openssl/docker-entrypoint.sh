@@ -30,7 +30,7 @@ case ${CMD} in
             --preserve-order \
             --same-owner \
             --directory="${SSL_BASE_DIR}" \
-            --file=-
+            --file="${2}"
         ;;
 
     generate)

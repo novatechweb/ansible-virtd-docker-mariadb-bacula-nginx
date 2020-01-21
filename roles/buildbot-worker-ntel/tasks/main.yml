@@ -112,6 +112,7 @@
   docker_image:
     build:
       args: '{{ image_args }}'
+      network: 'host'
       path: '{{ image_dir }}'
       pull: yes
     name: '{{ image_name }}'

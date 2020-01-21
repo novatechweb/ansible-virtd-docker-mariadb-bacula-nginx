@@ -24,5 +24,4 @@ RUN adduser -h "/home/buildbot" -s "/bin/sh" -D -u ${BUILDBOT_UID} buildbot \
 USER buildbot
 
 ENTRYPOINT [ "dumb-init" ]
-#CMD ["/usr/src/buildbot/docker/start_buildbot.sh"]
-CMD ["twistd", "--nodaemon", "--python=/buildbot/buildbot.tac"]
+CMD ["/usr/src/buildbot/docker/start_buildbot.sh"]

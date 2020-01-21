@@ -37,8 +37,6 @@
   tags:
     - buildbot
     - buildbot-worker
-    - buildbot-worker-ntel
-    - buildbot-worker-ptxdist
   vars:
     asset_host: "https://{{nexus_hostname}}/repository"
     asset_user: "buildbot"
@@ -58,9 +56,15 @@
       command: ssh-keyscan {{gitlab_hostname}}
       register: gitlab_keys
       changed_when: false
+      tags:
+        - always
     - name: Build and start the Buildbot worker container
       import_role:
         name: buildbot-worker-ntel
+      tags:
+        - buildbot-worker-ntel
     - name: Build and start the Buildbot worker container
       import_role:
         name: buildbot-worker-ptxdist
+      tags:
+        - buildbot-worker-ptxdist

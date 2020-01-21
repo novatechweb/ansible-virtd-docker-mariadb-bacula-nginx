@@ -8,14 +8,14 @@ asset_host: 'http://{{ansible_facts.default_ipv4.address}}/'
 buildbot_master: '{{ansible_facts.default_ipv4.address}}'
 
 # numeric ID of buildbot user
-buildbot_uid: 1000
+buildbot_uid: '1000'
 
 # numeric version of buildbot service
 buildbot_version: '1.2.0'
 
 # port number for workers to communicate with master
 buildbot_worker_port: '9989'
-buildbot_worker_connection_string: 'tcp:{{ buildbot_master }}:{{ buildbot_worker_port}}'
+buildbot_worker_connection_string: 'tcp:{{ buildbot_master }}:{{ buildbot_worker_port }}'
 
 # host path containing configuration files
 config_hostdir: '{{ docker_restore_config_base_dir }}/{{ container_name }}'

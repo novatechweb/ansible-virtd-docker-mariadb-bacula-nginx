@@ -16,13 +16,17 @@
 
 - name: Build docker image ----- Test Station database server
   docker_image:
+    build:
+      path: "{{ docker_projects_dir }}/{{ build_system_docker_repos.TestStation_ddio_database_server.dir_name }}"
+      pull: yes
     name: "{{ name_prefix }}teststation_ddio_database_server_image"
-    path: "{{ docker_projects_dir }}/{{ build_system_docker_repos.TestStation_ddio_database_server.dir_name }}"
+    source: build
     state: "{{ image_build_state_nondata }}"
-    force: "{{ docker_image_force_build }}"
+    force_source: "{{ docker_image_force_build }}"
 
 - name: Start docker container - Test Station database server
   docker_container:
+    comparisons: {'*': strict}
     detach: True
     image: "{{ name_prefix }}teststation_ddio_database_server_image"
     name: "{{ name_prefix }}TestStation_ddio_database_server"

@@ -1,9 +1,9 @@
 # Gitlab Create Change hook
 - name: Create Buildbot change hooks
-  gitlab_hooks:
+  gitlab_hook:
     state:         present
     api_url:       "https://{{ gitlab_hostname }}/api"
-    private_token: "{{ gitlab_root_private_token }}"
+    api_token:     "{{ gitlab_root_private_token }}"
 
     hook_url:              '{{ newhook.hook_url              | default(omit) }}'
     # hook_validate_certs:   '{{ newhook.hook_validate_certs   | default(omit) }}'

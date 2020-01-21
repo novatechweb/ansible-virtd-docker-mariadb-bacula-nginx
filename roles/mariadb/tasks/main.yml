@@ -5,12 +5,11 @@
     - mariadb_root_password is defined
 - name: Install MariaDB
   yum:
-    name: '{{ item }}'
-    state: present
-  with_items:
+    name:
     - mariadb-server
     - mariadb
     - MySQL-python
+    state: present
 - name: Config MariaDB server
   template:
     src: ansible.cnf.j2
@@ -43,4 +42,4 @@
     service: mysql
     permanent: true
     state: enabled
-  when: mariadb_open_firewall
+  when: mariadb_open_firewall | bool

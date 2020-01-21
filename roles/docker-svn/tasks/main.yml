@@ -48,10 +48,13 @@
 
 - name: build image
   docker_image:
+    build:
+      path: '{{ docker_projects_dir }}/docker-svn'
+      pull: yes
     name: '{{ svn_image_name }}'
     tag: '{{ docker_image_tag }}'
-    path: '{{ docker_projects_dir }}/docker-svn'
-    force: "{{ docker_image_force_build }}"
+    source: build
+    force_source: "{{ docker_image_force_build }}"
 
 # *****************************************************************************
 # Create the data volumes
@@ -65,6 +68,7 @@
 
 - name: start container
   docker_container:
+    comparisons: {'*': strict}
     detach: true
     env:
       SVN_HOSTNAME: '{{ svn_hostname }}'

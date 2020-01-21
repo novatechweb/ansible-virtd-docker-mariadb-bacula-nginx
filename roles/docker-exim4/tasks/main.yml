@@ -32,7 +32,7 @@
   template:
     src: dockercontainer.exim4.logrotate.j2
     dest: '/etc/logrotate.d/dockercontainer.{{ exim4_container_name }}'
-  when: ansible_os_family == "RedHat"
+  when: ansible_facts.os_family == "RedHat"
 
 # *****************************************************************************
 # backup script part
@@ -73,10 +73,13 @@
 
 - name: build image
   docker_image:
+    build:
+      path: '{{ docker_projects_dir }}/docker-exim4'
+      pull: yes
     name: '{{ exim4_image_name }}'
+    source: build
     tag: '{{ docker_image_tag }}'
-    path: '{{ docker_projects_dir }}/docker-exim4'
-    force: "{{ docker_image_force_build }}"
+    force_source: "{{ docker_image_force_build }}"
 
 # *****************************************************************************
 # Create the data volumes
@@ -104,6 +107,7 @@
 
 - name: start container
   docker_container:
+    comparisons: {'*': strict}
     name: '{{ exim4_container_name }}'
     hostname: '{{ exim4_container_name }}'
     image: '{{ exim4_image_name }}:{{ docker_image_tag }}'

@@ -1,11 +1,11 @@
 ---
 
 - name: Include OS specific variables.
-  include_vars: "configure-{{ ansible_os_family }}.yml"
+  include_vars: "configure-{{ ansible_facts.os_family }}.yml"
 
 - name: Include OS specific selinux libs and utils if needed
-  include: "selinux-{{ ansible_os_family }}.yml"
-  when: ansible_selinux.status is defined and ansible_selinux.status == "enabled"
+  include: "selinux-{{ ansible_facts.os_family }}.yml"
+  when: ansible_facts.selinux.status is defined and ansible_facts.selinux.status == "enabled"
 
 - name: Check if SystemD service is installed
   stat:
@@ -18,7 +18,7 @@
 - include: nexus_install.yml
 
 - include: httpd_reverse_proxy_config.yml
-  when: httpd_setup_enable
+  when: httpd_setup_enable | bool
 
 - include: admin_password_setup.yml
 
@@ -64,7 +64,7 @@
 
 - name: "Digest splited blob list var"
   include_vars: blob_vars.yml
-  when: nexus_blob_split
+  when: nexus_blob_split | bool
 
 - include: create_blobstore_each.yml
   with_items: "{{ nexus_blobstores }}"
@@ -83,7 +83,7 @@
 
     - include: create_repo_maven_group_each.yml
       with_items: "{{ nexus_repos_maven_group }}"
-  when: nexus_config_maven
+  when: nexus_config_maven | bool
 
 - block:
     - include: create_repo_docker_hosted_each.yml
@@ -94,7 +94,7 @@
 
     - include: create_repo_docker_group_each.yml
       with_items: "{{ nexus_repos_docker_group }}"
-  when: nexus_config_docker
+  when: nexus_config_docker | bool
 
 - block:
     - include: create_repo_pypi_proxy_each.yml
@@ -105,7 +105,7 @@
 
     - include: create_repo_pypi_group_each.yml
       with_items: "{{ nexus_repos_pypi_group }}"
-  when: nexus_config_pypi
+  when: nexus_config_pypi | bool
 
 - block:
     - include: create_repo_raw_proxy_each.yml
@@ -116,7 +116,7 @@
 
     - include: create_repo_raw_group_each.yml
       with_items: "{{ nexus_repos_raw_group }}"
-  when: nexus_config_raw
+  when: nexus_config_raw | bool
 
 - block:
     - include: create_repo_rubygems_proxy_each.yml
@@ -127,7 +127,7 @@
 
     - include: create_repo_rubygems_group_each.yml
       with_items: "{{ nexus_repos_rubygems_group }}"
-  when: nexus_config_rubygems
+  when: nexus_config_rubygems | bool
 
 - block:
     - include: create_repo_bower_proxy_each.yml
@@ -138,7 +138,7 @@
 
     - include: create_repo_bower_group_each.yml
       with_items: "{{ nexus_repos_bower_group }}"
-  when: nexus_config_bower
+  when: nexus_config_bower | bool
 
 - block:
     - include: create_repo_npm_proxy_each.yml
@@ -149,7 +149,7 @@
 
     - include: create_repo_npm_group_each.yml
       with_items: "{{ nexus_repos_npm_group }}"
-  when: nexus_config_npm
+  when: nexus_config_npm | bool
 
 - block:
     - include: create_repo_nuget_proxy_each.yml
@@ -158,19 +158,19 @@
       with_items: "{{ nexus_repos_nuget_hosted }}"
     - include: create_repo_nuget_group_each.yml
       with_items: "{{ nexus_repos_nuget_group }}"
-  when: nexus_config_nuget
+  when: nexus_config_nuget | bool
 
 
 - include: create_repo_gitlfs_hosted_each.yml
   with_items: "{{ nexus_repos_gitlfs_hosted }}"
-  when: nexus_config_gitlfs
+  when: nexus_config_gitlfs | bool
 
 - block:
     - include: create_repo_yum_hosted_each.yml
       with_items: "{{ nexus_repos_yum_hosted }}"
     - include: create_repo_yum_proxy_each.yml
       with_items: "{{ nexus_repos_yum_proxy }}"
-  when: nexus_config_yum
+  when: nexus_config_yum | bool
 
 - include: call_script.yml
   vars:

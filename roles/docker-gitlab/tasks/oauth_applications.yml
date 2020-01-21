@@ -2,7 +2,7 @@
 - name: Create Oauth application using API
   uri:
     body:
-      name:         '{{ newapplication.name }} ({{ ansible_date_time.iso8601 }})'
+      name:         '{{ newapplication.name }} ({{ ansible_facts.date_time.iso8601 }})'
       redirect_uri: '{{ newapplication.redirect_uri }}'
       scopes:       '{{ newapplication.scopes | join(",") }}'
     body_format: json

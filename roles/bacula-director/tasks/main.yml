@@ -7,10 +7,9 @@
     - mariadb_bacula_password is defined
 - name: Install/setup Bacula Director
   yum:
-    name: '{{ item }}'
-    state: present
-  with_items:
+    name:
     - bacula-director
+    state: present
 - name: Assemble dir for backup scripts
   file:
     path: /usr/libexec/bacula/backup-scripts

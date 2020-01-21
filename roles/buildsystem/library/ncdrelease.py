@@ -10,9 +10,6 @@ from datetime import datetime
 import logging
 import os
 import shutil
-from string import lstrip as left_strip
-from string import replace as str_replace
-from string import rstrip as right_strip
 import tarfile
 import time
 import zipfile
@@ -274,8 +271,8 @@ def clean_checkout_path(checkout_path):
 
 def checkout(client, url, base_dir, svn_repo, is_directory=True):
 	if base_dir is not None:
-		section_path = left_strip(str_replace(url, svn_repo, ''), '/')
-		basedir = right_strip(base_dir, '/')
+		section_path = url.replace(svn_repo, '').lstrip('/')
+		basedir = base_dir.rstrip('/')
 
 		full_checkout_path = os.path.join(basedir, section_path)
 		client.export(url, full_checkout_path, recurse=is_directory)

@@ -1,8 +1,16 @@
 ---
-- name: Install required packages
+- name: Remove obsolete packages
   become: true
   pip:
     name: pyapi-gitlab
+    state: absent
+
+- name: Install required packages
+  become: true
+  pip:
+    name: python-gitlab
+    state: present
+
 
 - name: Create known_hosts files with Gitlab host keys
   include_tasks: known_hosts.yml

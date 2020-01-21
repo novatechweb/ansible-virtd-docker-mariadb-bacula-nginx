@@ -12,7 +12,7 @@
         - httpd
         - mod_ssl
         - rsync
-      when: ansible_os_family == 'RedHat'
+      when: ansible_facts.os_family == 'RedHat'
 
     - block:
         - name: Install needed dependencie for role testing (debian/ubuntu)
@@ -28,6 +28,6 @@
         - name: Enable needed apache modules
           shell: a2enmod ssl rewrite proxy proxy_http headers
 
-      when: ansible_os_family == 'Debian'
+      when: ansible_facts.os_family == 'Debian'
 
 - include: "../sync-nexus-package.yml"

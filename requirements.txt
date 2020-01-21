@@ -1,8 +1,8 @@
-ansible==2.7.11
+ansible==2.8.4
 ansible-lint
 docker
 molecule
 netaddr
 passlib
-pyapi-gitlab
+python-gitlab
 svn

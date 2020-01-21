@@ -6,10 +6,9 @@
     - bacula_monitor_password is defined
 - name: Install/setup Bacula Storage
   yum:
-    name: '{{ item }}'
-    state: present
-  with_items:
+    name:
     - bacula-storage
+    state: present
 - name: Configure Bacula Storage
   template:
     src: bacula-sd.conf.j2

@@ -27,7 +27,7 @@
     tags: bacula-catalog
 
 - name: Prepare Docker host systems
-  hosts: docker-hosts
+  hosts: docker_hosts
   remote_user: ansibleremote
   become: true
   become_user: root

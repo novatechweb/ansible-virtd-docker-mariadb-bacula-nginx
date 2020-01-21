@@ -2,10 +2,10 @@
 # file: roles/docker-common/tasks/main.yaml
 
 - import_tasks: engine-redhat.yml
-  when: ansible_os_family == "RedHat"
+  when: ansible_facts.os_family == "RedHat"
 
 - import_tasks: engine-debian.yml
-  when: ansible_os_family == "Debian"
+  when: ansible_facts.os_family == "Debian"
 
 - name: Start docker service
   service:

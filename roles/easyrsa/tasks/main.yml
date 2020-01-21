@@ -29,15 +29,19 @@
 
 - name: Build Docker image from Dockerfile
   docker_image:
-    buildargs: '{{ image_args }}'
-    force: '{{ deploy_source.changed }}'
+    build:
+      args: '{{ image_args }}'
+      path: '{{ image_dir }}'
+      pull: yes
+    force_source: '{{ deploy_source.changed }}'
     name: '{{ image_name }}'
-    path: '{{ image_dir }}'
+    source: build
     state: present
   register: build_image
 
 - name: Run container
   docker_container:
+    comparisons: {'*': strict}
     detach: true
     hostname: '{{ container_hostname }}'
     image: '{{ image_name }}'

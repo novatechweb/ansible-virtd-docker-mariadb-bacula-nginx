@@ -4,7 +4,7 @@ testdaedalus.novatech-llc.com
 [daedalus]
 testdaedalus.novatech-llc.com
 
-[docker-hosts]
+[docker_hosts]
 testdaedalus.novatech-llc.com
 
 [buildsystem]

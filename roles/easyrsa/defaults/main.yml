@@ -6,14 +6,14 @@ backup_archive: easyrsa.tar.gz
 backup_hostdir: '{{ docker_backup_dir }}/easyrsa'
 
 # port number for workers to communicate with master
-easyrsa_ssh_port: 22
+easyrsa_ssh_port: '22'
 
 # The hostname passed as an envirnment variable into the container
 easyrsa_ip_addr: '127.0.0.1'
 easyrsa_hostname: easyrsa.example.com
 easyrsa_port_args:
   - '{{easyrsa_ssh_port}}'
-easyrsa_uid: 1000
+easyrsa_uid: '1000'
 
 # host path containing configuration files
 config_hostdir: '{{ docker_restore_config_base_dir }}/{{ container_name }}'

@@ -28,6 +28,7 @@ buildbot_ca_pem: '{{ buildbot_creds + "/ssl/ca.pem" }}'
 
 buildbot_email_password: '{{ lookup("password", buildbot_creds + "/buildbot@novatech-llc.com length=20 chars=ascii_letters,digits") }}'
 
+buildbot_master_dhparam: '{{ buildbot_creds + "/master/dhparam.pem" }}'
 buildbot_master_sshkey: '{{ buildbot_creds + "/master/id_rsa" }}'
 buildbot_master_tlscsr: '{{ buildbot_creds + "/master/server.csr" }}'
 buildbot_master_tlskey: '{{ buildbot_creds + "/master/server.key" }}'

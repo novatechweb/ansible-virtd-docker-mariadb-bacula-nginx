@@ -1,0 +1,10 @@
+---
+# vars file for nexus-monitor
+
+nexus_monitor_command:
+  - "--host={{ nexus_monitor_host }}"
+  - "--user={{ nexus_monitor_user }}"
+  - "--password={{ nexus_monitor_pass }}"
+  # - "--port={{ nexus_monitor_port }}"
+
+nexus_monitor_port: "9184"

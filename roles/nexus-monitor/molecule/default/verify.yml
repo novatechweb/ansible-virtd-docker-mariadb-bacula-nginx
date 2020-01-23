@@ -1,0 +1,29 @@
+---
+# This is an example playbook to execute Ansible tests.
+
+- name: Verify
+  hosts: all
+  become: true
+  pre_tasks:
+    - name: Include module default variables
+      include_vars:
+        file: "{{ playbook_dir }}/../../defaults/main.yml"
+    - name: Include module standard variables
+      include_vars:
+        file: "{{ playbook_dir }}/../../vars/main.yml"
+
+  tasks:
+    - name: Assert nexus-monitor is responding
+      uri:
+        method: GET
+        return_content: yes
+        status_code: 200
+        url: http://localhost:{{ nexus_monitor_port }}/
+      register: nexus_metrics
+
+    - debug:
+        var: nexus_metrics
+    - name: Assert nexus-monitor gathered metrics from mock nexus
+      assert:
+        that:
+          - '"nexus_up 1.0" in nexus_metrics.content'

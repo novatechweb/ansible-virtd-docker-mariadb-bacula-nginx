@@ -1,0 +1,18 @@
+---
+# defaults file for nexus-monitor
+
+# Monitoring package for Nexus3 Repository Manager
+nexus_monitor_version: 0.2.2
+nexus_monitor_image_name: 'ocadotechnology/nexus-exporter:{{ nexus_monitor_version }}'
+nexus_monitor_container_name: 'nexus-monitor'
+nexus_monitor_host: "http://nexus/"
+nexus_monitor_user: "monitor"
+nexus_monitor_pass: "monitor"
+
+nexus_monitor_networks:
+  - name: 'nexus-monitor'
+
+nexus_monitor_port_args:
+    - '{{ nexus_monitor_port }}:{{ nexus_monitor_port }}'
+
+nexus_monitor_restart_policy: 'no'

@@ -177,6 +177,11 @@ prometheus_scrape_configs:
   static_configs:
   - targets:
     - "{{wiki_monitor_container_name}}:9117"
+# https://github.com/ocadotechnology/nexus-exporter
+- job_name: nexus3
+  static_configs:
+  - targets:
+    - "{{nexus_monitor_container_name}}:{{nexus_monitor_port}}"
 
 # Alternative config file name, searched in ansible templates path.
 # prometheus_config_file: 'prometheus.yml.j2'

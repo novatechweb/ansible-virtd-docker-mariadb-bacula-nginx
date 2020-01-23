@@ -155,6 +155,24 @@
       - '{{ wiki_dv_name }}:/var/www/html:z'
 
 # *****************************************************************************
+# Start the monitoring container running
+
+- name: start container (mediwiki_monitor)
+  docker_container:
+    command:
+      - "--scrape-uri={{ wiki_monitor_scrape_uri }}"
+      - "--telemetry.address={{ wiki_monitor_telemetry_address }}"
+      - "--telemetry.endpoint={{ wiki_monitor_telemetry_endpoint }}"
+    comparisons: {'*': strict}
+    detach: true
+    image: '{{ wiki_monitor_image_name }}'
+    name: '{{ wiki_monitor_container_name }}'
+    networks:
+      - name: '{{ docker_network_frontend }}'
+    purge_networks: true
+    restart_policy: '{{ docker_restart_policy }}'
+
+# *****************************************************************************
 # restore?
 
 - include_tasks: restore.yml

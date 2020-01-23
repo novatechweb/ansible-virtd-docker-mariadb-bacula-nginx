@@ -162,6 +162,21 @@ prometheus_scrape_configs:
   static_configs:
   - targets:
     - "{{ promtail_container }}:{{ promtail_port_listen }}"
+# https://github.com/Lusitaniae/apache_exporter
+- job_name: TestStation_http_server
+  static_configs:
+  - targets:
+    - "{{teststation_http_monitor_container_name}}:9117"
+# https://github.com/Lusitaniae/apache_exporter
+- job_name: mantisbt
+  static_configs:
+  - targets:
+    - "{{mantisbt_monitor_container_name}}:9117"
+# https://github.com/Lusitaniae/apache_exporter
+- job_name: wiki
+  static_configs:
+  - targets:
+    - "{{wiki_monitor_container_name}}:9117"
 
 # Alternative config file name, searched in ansible templates path.
 # prometheus_config_file: 'prometheus.yml.j2'

@@ -181,6 +181,24 @@
       - '{{ mantisbt_dv_name }}:/var/www/html:z'
 
 # *****************************************************************************
+# Start the monitoring container running
+
+- name: start container (mantisbt_monitor)
+  docker_container:
+    command:
+      - "--scrape-uri={{ mantisbt_monitor_scrape_uri }}"
+      - "--telemetry.address={{ mantisbt_monitor_telemetry_address }}"
+      - "--telemetry.endpoint={{ mantisbt_monitor_telemetry_endpoint }}"
+    comparisons: {'*': strict}
+    detach: true
+    image: '{{ mantisbt_monitor_image_name }}'
+    name: '{{ mantisbt_monitor_container_name }}'
+    networks:
+      - name: '{{ docker_network_frontend }}'
+    purge_networks: true
+    restart_policy: '{{ docker_restart_policy }}'
+
+# *****************************************************************************
 # remove the MySQL config in the restore directory
 
 - name: cleanup - import mysql config

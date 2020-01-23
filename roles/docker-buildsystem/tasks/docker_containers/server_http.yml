@@ -29,3 +29,17 @@
       - "{{ name_prefix }}TestStation_http_data_ncdrelease"
       - "{{ name_prefix }}TestStation_http_data_testclient"
       - "{{ name_prefix }}TestStation_tftp_data"
+
+- name: Start docker container - Test Station http server
+  docker_container:
+    command:
+      - "--scrape-uri={{ teststation_http_monitor_scrape_uri }}"
+      - "--telemetry.address={{ teststation_http_monitor_telemetry_address }}"
+      - "--telemetry.endpoint={{ teststation_http_monitor_telemetry_endpoint }}"
+    comparisons: {'*': strict}
+    detach: True
+    image: "{{ teststation_http_monitor_image_name }}"
+    links: "{{ name_prefix }}TestStation_http_server:TestStation_http_server"
+    name: "{{ teststation_http_monitor_container_name }}"
+    state: "{{ container_start_state_nondata }}"
+    restart_policy: '{{ docker_restart_policy }}'

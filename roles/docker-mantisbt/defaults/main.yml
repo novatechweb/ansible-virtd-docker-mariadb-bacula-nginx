@@ -39,6 +39,13 @@ mantisbt_db_dv_name: '{{ docker_name_prefix }}mantisbt_db_DV'
 mantisbt_docker_backup_dir: '{{ docker_backup_dir }}/MANTISBT'
 mantisbt_docker_restore_dir: '{{ bacula_dest }}{{ mantisbt_docker_backup_dir }}'
 
+# Monitoring package for MantisBT
+mantisbt_monitor_image_name: 'lusotycoon/apache-exporter:v0.8.0'
+mantisbt_monitor_container_name: '{{ docker_name_prefix }}mantisbt_monitor'
+mantisbt_monitor_scrape_uri: "http://{{ mantisbt_container_name }}/server-status?auto" #URI to apache stub status page. (default "http://localhost/server-status/?auto")
+mantisbt_monitor_telemetry_address: ":9117" #Address on which to expose metrics. (default ":9117")
+mantisbt_monitor_telemetry_endpoint: "/metrics" #Path under which to expose metrics. (default "/metrics")
+
 # files restored from tape
 mantisbt_static_backup_file: '/mantisbt.tar'
 mantisbt_database_backup_file: '/mantisbtdb.sql'

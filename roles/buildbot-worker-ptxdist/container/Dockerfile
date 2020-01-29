@@ -41,6 +41,7 @@ RUN apt-get update \
         python-dev \
         python-libxml2 \
         python-tdb \
+        python3-dev \
         ruby \
         subversion \
         ss-dev \
@@ -57,8 +58,8 @@ RUN apt-get update \
 #
 ARG BUILDBOT_VERSION
 RUN wget https://bootstrap.pypa.io/get-pip.py \
-&&  python get-pip.py --no-cache-dir \
-&&  pip --no-cache-dir install \
+&&  python3 get-pip.py --no-cache-dir \
+&&  python3 -m pip --no-cache-dir install \
         'virtualenv' \
         'twisted[tls]' \
         buildbot-worker${BUILDBOT_VERSION:+==${BUILDBOT_VERSION}} \

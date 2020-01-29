@@ -47,8 +47,8 @@ RUN echo "dash dash/sh boolean false" \
 # Install required python packages, and twisted
 ARG BUILDBOT_VERSION
 RUN wget https://bootstrap.pypa.io/get-pip.py \
-&&  python get-pip.py --no-cache-dir \
-&&  pip --no-cache-dir install \
+&&  python3 get-pip.py --no-cache-dir \
+&&  python3 -m pip --no-cache-dir install \
     'twisted[tls]' \
     buildbot-worker==${BUILDBOT_VERSION} \
 &&  rm -rf get-pip.py

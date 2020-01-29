@@ -68,6 +68,29 @@ buildbot_client_certificates:
       ST: Kansas
       L: Lenexa
 
+buildbot_ssh_clients:
+  - dir: '{{ buildbot_creds }}'
+    sshkey: '{{ buildbot_sshkey }}'
+    username: buildbot
+    name: Build Robot
+    email: buildbot@novatech-llc.com
+    password: "{{ gitlab_user_buildbot_password }}"
+    sshkey_name: "buildbot_master"
+  - dir: '{{ buildbot_worker_ntel_creds }}'
+    sshkey: '{{ buildbot_worker_ntel_sshkey }}'
+    username: buildbot
+    name: Build Robot
+    email: buildbot@novatech-llc.com
+    password: "{{ gitlab_user_buildbot_password }}"
+    sshkey_name: "buildbot_worker_ntel"
+  - dir: '{{ buildbot_worker_ptxdist_creds }}'
+    sshkey: '{{ buildbot_worker_ptxdist_sshkey }}'
+    username: buildbot
+    name: Build Robot
+    email: buildbot@novatech-llc.com
+    password: "{{ gitlab_user_buildbot_password }}"
+    sshkey_name: "buildbot_worker_ptxd"
+
 buildbot_creds: '{{ playbook_dir + "/credentials/buildbot" }}'
 buildbot_sshkey: '{{ buildbot_creds }}/id_rsa'
 buildbot_tlsca:  '{{ buildbot_ca_pem }}'

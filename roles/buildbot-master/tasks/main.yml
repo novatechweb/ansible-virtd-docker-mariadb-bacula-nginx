@@ -58,6 +58,8 @@
     unsafe_writes: yes
   register: credentials
   loop:
+    - src: '{{ buildbot_sshkey }}'
+      dest: '{{ config_hostdir }}/{{ buildbot_sshkey | basename }}'
     - src: '{{ buildbot_tlsca }}'
       dest: '{{ config_hostdir }}/ssl/ca.pem'
     - src: '{{ buildbot_tlskey }}'

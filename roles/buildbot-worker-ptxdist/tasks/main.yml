@@ -56,18 +56,6 @@
     path: '{{ config_hostdir }}'
     state: directory
 
-- name: Populate config files
-  copy:
-    src: "{{ item }}"
-    dest: "{{ config_hostdir }}/{{ item | basename }}"
-    group: '{{ buildbot_uid }}'
-    owner: '{{ buildbot_uid }}'
-    mode: "u=rw,g=,o="
-    unsafe_writes: yes
-  register: configs
-  loop:
-    - '{{ buildbot_worker_ptxdist_sshkey }}'
-
 - name: Populate config templates
   template:
     src: "{{ item }}.j2"
@@ -99,6 +87,8 @@
     unsafe_writes: yes
   register: credentials
   loop:
+    - src: '{{ buildbot_worker_ptxdist_sshkey }}'
+      dest: '{{ config_hostdir }}/{{ buildbot_worker_ptxdist_sshkey | basename }}'
     - src: '{{ buildbot_tlsca }}'
       dest: '{{ config_hostdir }}/ssl/ca.pem'
     - src: '{{ buildbot_worker_ptxdist_tlskey }}'

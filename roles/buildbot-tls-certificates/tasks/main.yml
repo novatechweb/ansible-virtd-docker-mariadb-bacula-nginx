@@ -13,3 +13,10 @@
     client_certificate_pem: '{{ item.pem }}'
     client_certificate_fields: '{{ item.fields }}'
   loop: '{{ buildbot_client_certificates }}'
+
+- name: Generate Client SSH keypairs
+  include_tasks: ssh-key.yml
+  vars:
+    client_sshkey_dir: '{{ item.dir }}'
+    client_sshkey: '{{ item.sshkey }}'
+  loop: '{{ buildbot_ssh_clients }}'

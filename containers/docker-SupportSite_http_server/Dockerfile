@@ -24,13 +24,14 @@ RUN rm -rf /var/www/html \
     mkdir -p /var/lock/apache2 \
              /var/run/apache2 \
              /var/log/apache2 \
-             /var/www/html && \ 
+             /var/www/html && \
     chown -R www-data:www-data /var/lock/apache2 \
                                /var/run/apache2 \
                                /var/log/apache2 \
                                /var/www/html
 #---------------------------
-RUN pip install "django<1.8" \
+RUN pip install "django<1.9" \
+                "django-contrib-comments<1.9" \
                 "mysqlclient>=1.3" \
                 "pyserial>=2.7" \
                 "sqlparse<0.3"
@@ -41,7 +42,7 @@ COPY ./error_documents/404.shtml /srv/www/ErrorDocument/404.shtml
 COPY ./error_documents/500.shtml /srv/www/ErrorDocument/500.shtml
 
 COPY ./openssl.tar /openssl.tar
-RUN  tar -x -f /openssl.tar --directory=/ 
+RUN  tar -x -f /openssl.tar --directory=/
 
 COPY ./config_files/CustomerSupportSite.conf /etc/apache2/sites-available/CustomerSupportSite.conf
 COPY ./config_files/apache2.conf             /etc/apache2/apache2.conf

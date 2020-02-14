@@ -73,3 +73,5 @@ easyrsa_port_args:
 
 prometheus_hostname: prometheus.novatech-llc.com
 prometheus_port_args: []
+
+selenium_hub_port_args: []

@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include selenium-hub"
+      include_role:
+        name: "selenium-hub"

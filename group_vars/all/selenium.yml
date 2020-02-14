@@ -1,0 +1,61 @@
+---
+# group_vars file for selenium-hub
+
+# selenium version
+selenium_hub_version: '3.141.59-zirconium'
+
+# selenium_hub_hostname
+selenium_hub_hostname: 'selenium.novatech-llc.com'
+
+# the name of the container being started
+selenium_hub_container: '{{ docker_name_prefix }}selenium'
+
+# the name of the container being started
+selenium_hub_env:
+  GRID_HUB_HOST: '0.0.0.0'
+  GRID_HUB_PORT: '{{ selenium_hub_port }}'
+
+# network configuration for the confainer
+selenium_hub_networks:
+  - name: '{{ buildbot_worker_network }}'
+    aliases:
+      - '{{ selenium_hub_hostname }}'
+  - name: '{{ selenium_node_network }}'
+    aliases:
+      - '{{ selenium_hub_hostname }}'
+
+# port configuration of the container
+selenium_hub_port: '4444'
+
+# list of nodes to start
+selenium_nodes:
+  - name: 'selenium-node-firefox-orionlxplus'
+    image: 'selenium/node-firefox:{{selenium_hub_version}}'
+  - name: 'selenium-node-firefox-orionlxcpx'
+    image: 'selenium/node-firefox:{{selenium_hub_version}}'
+  - name: 'selenium-node-firefox-orionlxm'
+    image: 'selenium/node-firefox:{{selenium_hub_version}}'
+  - name: 'selenium-node-firefox-orionio'
+    image: 'selenium/node-firefox:{{selenium_hub_version}}'
+  - name: 'selenium-node-chrome-orionlxplus'
+    image: 'selenium/node-chrome:{{selenium_hub_version}}'
+  - name: 'selenium-node-chrome-orionlxcpx'
+    image: 'selenium/node-chrome:{{selenium_hub_version}}'
+  - name: 'selenium-node-chrome-orionlxm'
+    image: 'selenium/node-chrome:{{selenium_hub_version}}'
+  - name: 'selenium-node-chrome-orionio'
+    image: 'selenium/node-chrome:{{selenium_hub_version}}'
+
+# the name of the container being started
+selenium_node_env:
+  HUB_HOST: '{{ selenium_hub_hostname }}'
+  HUB_PORT: '{{ selenium_hub_port }}'
+  GRID_DEBUG: 'true'
+
+# network for selenium nodes
+selenium_node_network: '{{ docker_name_prefix }}selenium'
+selenium_node_networks:
+  - name: '{{ selenium_node_network }}'
+
+# amount of shared memory to devote to selenium browser
+selenium_node_shm: '2G'

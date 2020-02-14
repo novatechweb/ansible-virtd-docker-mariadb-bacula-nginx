@@ -1,0 +1,27 @@
+---
+
+- name: Install/Setup Docker images and containers on threadripper
+  hosts: builder
+  tasks:
+  - import_role:
+      name: selenium-hub
+    tags: selenium-hub
+
+  - name: Create selenium container networks
+    docker_network:
+      name: '{{ item.name }}'
+      state: present
+    loop: '{{ selenium_node_networks }}'
+
+  - name: Start Selenium node {{ item.name }}
+    docker_container:
+      comparisons: {'*': strict}
+      name: '{{ item.name }}'
+      env: '{{ selenium_node_env }}'
+      image: '{{ item.image }}'
+      networks: '{{ selenium_node_networks }}'
+      networks_cli_compatible: yes
+      purge_networks: true
+      shm_size: '{{ selenium_node_shm }}'
+      state: started
+    loop: '{{ selenium_nodes }}'

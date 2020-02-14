@@ -1,0 +1,29 @@
+---
+# defaults file for selenium-hub
+
+# name of the image to be run
+selenium_hub_image: 'selenium/hub:{{ selenium_hub_version }}'
+
+# selenium version
+selenium_hub_version: '3.141.59-zirconium'
+
+# selenium_hub_hostname
+selenium_hub_hostname: '{{ selenium_hub_container }}'
+
+# the name of the container being started
+selenium_hub_container: 'selenium'
+
+# the name of the container being started
+selenium_hub_env:
+  GRID_HUB_HOST: '0.0.0.0'
+  GRID_HUB_PORT: '4444'
+
+# network configuration for the confainer
+selenium_hub_networks:
+  - name: bridge
+
+# port configuration of the container
+selenium_hub_port_args: []
+
+# volumes mounted within the container
+selenium_hub_volumes: []

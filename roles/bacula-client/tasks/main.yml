@@ -17,3 +17,39 @@
   changed_when: false
 - name: Enable and start Bacula Client
   service: name=bacula-fd enabled=yes state=started
+
+#####
+
+- name: Configure client encryption
+  import_tasks: encryption.yml
+
+- name: Configure Second Bacula Client
+  template:
+    src: bacula-fd2-encrypted.conf.j2
+    dest: '{{ bacula_encrypted_config_file }}'
+    owner: bacula
+    group: bacula
+    mode: 0640
+    backup: yes
+
+- name: Test Bacula client configuration
+  command: |
+    /usr/sbin/bacula-fd -t
+    -c {{ bacula_encrypted_config_file }}
+  changed_when: false
+
+- name: Configure Second Bacula Client Service
+  template:
+    src: bacula-fd2-encrypted.service.j2
+    dest: '/etc/systemd/system/bacula-fd2-encrypted.service'
+    owner: bacula
+    group: bacula
+    mode: 0640
+    backup: yes
+
+- name: Enable and start Bacula Client
+  systemd:
+    daemon_reload: yes
+    name: bacula-fd2-encrypted
+    enabled: yes
+    state: started

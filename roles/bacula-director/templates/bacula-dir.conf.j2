@@ -27,7 +27,7 @@ JobDefs {
   Name = "DefaultJob"
   Type = Backup
   Level = Full
-  Client = bacula-fd 
+  Client = bacula-fd
   FileSet = "Full Set"
   Schedule = "WeeklyCycle"
   Storage = TapeDrive
@@ -78,9 +78,9 @@ Job {
 Job {
   Name = "RestoreFiles"
   Type = Restore
-  Client=bacula-fd                 
-  FileSet="Full Set"                  
-  Storage = File                      
+  Client=bacula-fd
+  FileSet="Full Set"
+  Storage = File
   Pool = Default
   Messages = Standard
   Where = /tmp/bacula-restores
@@ -94,7 +94,7 @@ FileSet {
     Options {
       signature = MD5
     }
-#    
+#
 #  Put your list of files here, preceded by 'File =', one per line
 #    or include an external list with:
 #
@@ -168,26 +168,26 @@ Client {
   AutoPrune = yes                     # Prune expired Jobs/Files
 }
 
-#
+
 # Second Client (File Services) to backup
 #  You should change Name, Address, and Password before using
-#
-#Client {
-#  Name = bacula2-fd                
-#  Address = localhost2
-#  FDPort = 9102
-#  Catalog = MyCatalog
-#  Password = {{ bacula_director_password }}         # password for FileDaemon 2
-#  File Retention = 30 days            # 30 days
-#  Job Retention = 6 months            # six months
-#  AutoPrune = yes                     # Prune expired Jobs/Files
-#}
+
+Client {
+  Name = bacula-fd2-encrypted
+  Address = {{ bacula_encrypted_address }}
+  FDPort = {{ bacula_encrypted_port }}
+  Catalog = MyCatalog
+  Password = {{ bacula_director_password }}         # password for FileDaemon 2
+  File Retention = 30 days            # 30 days
+  Job Retention = 6 months            # six months
+  AutoPrune = yes                     # Prune expired Jobs/Files
+}
 
 
 # Definition of file storage device
 Storage {
   Name = File
-# Do not use "localhost" here    
+# Do not use "localhost" here
   Address = {{ bacula_client_address }}                # N.B. Use a fully qualified name here
   SDPort = 9103
   Password = {{ bacula_director_password }}
@@ -198,7 +198,7 @@ Storage {
 # Definition of tape storage device
 Storage {
   Name = TapeDrive
-# Do not use "localhost" here    
+# Do not use "localhost" here
   Address = {{ bacula_client_address }}                # N.B. Use a fully qualified name here
   SDPort = 9103
   Password = {{ bacula_director_password }}
@@ -210,7 +210,7 @@ Storage {
 Catalog {
   Name = MyCatalog
 # Uncomment the following line if you want the dbi driver
-# dbdriver = "dbi:postgresql"; dbaddress = 127.0.0.1; dbport =  
+# dbdriver = "dbi:postgresql"; dbaddress = 127.0.0.1; dbport =
   dbname = "bacula"; dbuser = "bacula"; dbpassword = "{{ mariadb_bacula_password }}"
 }
 
@@ -225,14 +225,14 @@ Messages {
 #  What this does is, it sets the email address that emails would display
 #  in the FROM field, which is by default the same email as they're being
 #  sent to.  However, if you send email to more than one address, then
-#  you'll have to set the FROM address manually, to a single address. 
+#  you'll have to set the FROM address manually, to a single address.
 #  for example, a 'no-reply@mydomain.com', is better since that tends to
 #  tell (most) people that its coming from an automated source.
 
 #
   mailcommand = "/usr/sbin/bsmtp -h localhost -f \"\(Bacula\) \<%r\>\" -s \"Bacula: %t %e of %c %l\" %r"
   operatorcommand = "/usr/sbin/bsmtp -h localhost -f \"\(Bacula\) \<%r\>\" -s \"Bacula: Intervention needed for %j\" %r"
-  mail = root@localhost = all, !skipped            
+  mail = root@localhost = all, !skipped
   operator = root@localhost = mount
   console = all, !skipped, !saved
 #
@@ -250,7 +250,7 @@ Messages {
 Messages {
   Name = Daemon
   mailcommand = "/usr/sbin/bsmtp -h localhost -f \"\(Bacula\) \<%r\>\" -s \"Bacula daemon message\" %r"
-  mail = root@localhost = all, !skipped            
+  mail = root@localhost = all, !skipped
   console = all, !skipped, !saved
   append = "/var/log/bacula/bacula.log" = all, !skipped
 }

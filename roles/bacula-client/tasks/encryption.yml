@@ -1,0 +1,70 @@
+- name: Generate credentials locally
+  delegate_to: localhost
+  become: no
+  block:
+  - name: Install cryptography python module
+    pip:
+      name: cryptography
+      state: present
+
+  - name: Makes sure the local dir for ssl files exists
+    file:
+      mode: 0700
+      path: '{{ item }}'
+      state: directory
+    loop:
+    - '{{ bacula_master_keydir }}'
+    - '{{ bacula_fd_keydir }}'
+
+  # Do this manually instead of with ansible modules. Bacula requres a
+  # subject key identifier (SKI) extension in the certificate and ansible's
+  # openssl modules do not generate this.
+  - name: Generate master key and cert
+    command: |
+      openssl req -nodes
+      -subj '/CN=bacula-master' -days 3560
+      -newkey rsa:8192 -sha256 -keyout {{bacula_master_rsakey}}
+      -x509 -out {{bacula_master_rsacert}}
+    args:
+      creates: '{{ bacula_master_rsacert}}'
+
+  # Do this manually instead of with ansible modules. Bacula requres a
+  # subject key identifier (SKI) extension in the certificate and ansible's
+  # openssl modules do not generate this.
+  - name: Generate client key and cert
+    command: |
+      openssl req -nodes
+      -subj '/CN=bacula-fd' -days 3560
+      -newkey rsa:8192 -sha256 -keyout {{bacula_fd_rsakey}}
+      -x509 -out {{bacula_fd_rsacert}}
+    args:
+      creates: '{{ bacula_fd_rsacert}}'
+
+- name: Create certificate directory on target
+  become: yes
+  file:
+    mode: 'u=rwx,g=,o='
+    owner: bacula
+    group: bacula
+    path: '{{ bacula_encrypted_encrypt_certdir }}'
+    state: directory
+
+- name: Copy master certificate to target
+  become: yes
+  copy:
+    mode: 'u=rw,g=,o='
+    owner: bacula
+    group: bacula
+    src: '{{ bacula_master_rsacert }}'
+    dest: '{{ bacula_encrypted_encrypt_mastercert }}'
+
+- name: Generate bacula-fd combined PEM
+  become: yes
+  assemble:
+    mode: 'u=rw,g=,o='
+    owner: bacula
+    group: bacula
+    src: '{{ bacula_fd_keydir }}/'
+    regexp: 'bacula-fd.(cert|key)'
+    dest: '{{ bacula_encrypted_encrypt_pem }}'
+    remote_src: no

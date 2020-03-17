@@ -132,13 +132,17 @@ FileSet {
 #  and incremental backups other days
 Schedule {
   Name = "WeeklyCycle"
-  Run = Full mon-fri at 23:05
+  Run = Level=Full Pool=Monthly 1st fri at 23:05
+  Run = Level=Full Pool=Weekly 2nd-5th fri at 23:05
+  Run = Level=Full Pool=Default mon-thu at 23:05
 }
 
 # This schedule does the catalog. It starts after the WeeklyCycle
 Schedule {
   Name = "WeeklyCycleAfterBackup"
-  Run = Full mon-fri at 23:10
+  Run = Level=Full Pool=Monthly 1st fri at 23:10
+  Run = Level=Full Pool=Weekly 2nd-5th fri at 23:10
+  Run = Level=Full Pool=Default mon-thu at 23:10
 }
 
 # This is the backup of the catalog
@@ -257,20 +261,32 @@ Pool {
   Pool Type = Backup
   Recycle = yes                       # Bacula can automatically recycle Volumes
   AutoPrune = yes                     # Prune expired volumes
-  Volume Retention = 365 days         # one year
+  Volume Retention = 30 days          # 30 calendar days of Mon-Thu backups
+  #Use Volume Once = yes
+  Maximum Volume Jobs = 2
 }
 
-# # File Pool definition
-# Pool {
-#   Name = File
-#   Pool Type = Backup
-#   Recycle = yes                       # Bacula can automatically recycle Volumes
-#   AutoPrune = yes                     # Prune expired volumes
-#   Volume Retention = 365 days         # one year
-#   Maximum Volume Bytes = 50G          # Limit Volume size to something reasonable
-#   Maximum Volumes = 100               # Limit number of Volumes in Pool
-# }
+# Default pool definition
+Pool {
+  Name = Weekly
+  Pool Type = Backup
+  Recycle = yes                       # Bacula can automatically recycle Volumes
+  AutoPrune = yes                     # Prune expired volumes
+  Volume Retention = 6w               # 6 calendar weeks of Fri backups
+  #Use Volume Once = yes
+  Maximum Volume Jobs = 2
+}
 
+# Default pool definition
+Pool {
+  Name = Monthly
+  Pool Type = Backup
+  Recycle = yes                       # Bacula can automatically recycle Volumes
+  AutoPrune = yes                     # Prune expired volumes
+  Volume Retention = 6m               # 6 calendar months of 1st Fri backups
+  #Use Volume Once = yes
+  Maximum Volume Jobs = 2
+}
 
 # Scratch pool definition
 Pool {

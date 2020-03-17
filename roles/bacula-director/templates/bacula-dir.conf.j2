@@ -55,11 +55,15 @@ Job {
   Priority = 10
 }
 
-#Job {
-#  Name = "BackupClient2"
-#  Client = bacula2-fd
-#  JobDefs = "DefaultJob"
-#}
+Job {
+  Name = "BackupClient1ToFile"
+  JobDefs = "DefaultJob"
+  Schedule = "WeeklyCycleToFile"
+  Client = bacula-fd2-encrypted
+  Pool = FilePool
+  Storage = FileStorage
+  FileSet = "Full Set without Nexus"
+}
 
 # Backup the catalog database (after the nightly save)
 Job {
@@ -78,6 +82,23 @@ Job {
   Priority = 11                   # run after main backup
 }
 
+Job {
+  Name = "BackupCatalogToFile"
+  JobDefs = "DefaultJob"
+  Client = bacula-fd2-encrypted
+  FileSet="Catalog"
+  Schedule = "WeeklyCycleToFile"
+  # This creates an ASCII copy of the catalog
+  # Arguments to make_catalog_backup.pl are:
+  #  make_catalog_backup.pl <catalog-name>
+  RunBeforeJob = "/usr/libexec/bacula/make_catalog_backup.pl MyCatalog"
+  # This deletes the copy of the catalog
+  RunAfterJob  = "/usr/libexec/bacula/delete_catalog_backup"
+  Priority = 11                   # run after main backup
+  Pool = FilePool
+  Storage = FileStorage
+}
+
 #
 # Standard Restore template, to be changed by Console program
 #  Only one such job is needed for all Jobs/Clients/Storage ...
@@ -87,7 +108,7 @@ Job {
   Type = Restore
   Client=bacula-fd
   FileSet="Full Set"
-  Storage = File
+  Storage = FileStorage
   Pool = Default
   Messages = Standard
   Where = /tmp/bacula-restores
@@ -133,6 +154,20 @@ FileSet {
   }
 }
 
+# List of files to be backed up
+FileSet {
+  Name = "Full Set without Nexus"
+  Include {
+    Options {
+      signature = MD5
+    }
+    File = /tmp/docker
+  }
+  Exclude {
+    File = /tmp/docker/NEXUS3
+  }
+}
+
 #
 # When to do the backups, full backup on first sunday of the month,
 #  differential (i.e. incremental since full) every other sunday,
@@ -150,6 +185,11 @@ Schedule {
   Run = Level=Full Pool=Monthly 1st fri at 23:10
   Run = Level=Full Pool=Weekly 2nd-5th fri at 23:10
   Run = Level=Full Pool=Default mon-thu at 23:10
+}
+
+Schedule {
+  Name = "WeeklyCycleToFile"
+  Run = Level=Full Pool=FilePool mon-fri at 23:05
 }
 
 # This is the backup of the catalog
@@ -193,13 +233,13 @@ Client {
 
 # Definition of file storage device
 Storage {
-  Name = File
+  Name = FileStorage
 # Do not use "localhost" here
   Address = {{ bacula_client_address }}                # N.B. Use a fully qualified name here
   SDPort = 9103
   Password = {{ bacula_director_password }}
   Device = FileStorage
-  Media Type = File
+  Media Type = file
 }
 
 # Definition of tape storage device
@@ -301,14 +341,15 @@ Pool {
   Pool Type = Backup
 }
 
-# LTO6 Test pool definition
-# Pool {
-#   Name = LTO6test
-#   Pool Type = Backup
-#   Recycle = yes                       # Bacula can automatically recycle Volumes
-#   AutoPrune = yes                     # Prune expired volumes
-#   Volume Retention = 365 days         # one year
-# }
+Pool {
+  Name = FilePool
+  Pool Type = Backup
+  Maximum Volume Jobs = 1
+  LabelFormat="${JobName}"
+  Volume Retention = 30d
+  Recycle = no
+  Action On Purge = Truncate
+}
 
 #
 # Restricted console used by tray-monitor to get the status of the director

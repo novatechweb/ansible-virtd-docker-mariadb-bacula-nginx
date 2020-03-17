@@ -40,6 +40,20 @@ Device {
 #  AutoChanger = yes
 }
 
+Device {
+  Name = FileStorage
+  Device Type = File
+  Archive Device = /bacula
+  Media Type = file
+  Autochanger = no
+  Always Open = no
+  Removable media = no
+  Random access = yes
+  Requires Mount = no
+  LabelMedia = yes
+  AutomaticMount = yes
+}
+
 # 
 # Send all messages to the Director, 
 # mount messages also are sent to the email address

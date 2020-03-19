@@ -1,0 +1,5 @@
+set from="Bacula Backup System<bacula@novatech-llc.com>"
+set smtp=smtps://{{ exim4_hostname }}:465
+set smtp-auth=cram-md5
+set smtp-auth-user=bacula
+set smtp-auth-password={{ bacula_email_password }}

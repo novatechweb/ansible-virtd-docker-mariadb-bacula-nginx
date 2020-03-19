@@ -276,11 +276,11 @@ Messages {
 #  for example, a 'no-reply@mydomain.com', is better since that tends to
 #  tell (most) people that its coming from an automated source.
 
-#
-  mailcommand = "/usr/sbin/bsmtp -h localhost -f \"\(Bacula\) \<%r\>\" -s \"Bacula: %t %e of %c %l\" %r"
-  operatorcommand = "/usr/sbin/bsmtp -h localhost -f \"\(Bacula\) \<%r\>\" -s \"Bacula: Intervention needed for %j\" %r"
-  mail = root@localhost = all, !skipped
-  operator = root@localhost = mount
+  mailcommand = "/usr/libexec/bacula/bacula-send-email -v -s '%e: %n %l %i' %r"
+  operatorcommand = "/usr/libexec/bacula/bacula-send-email -v -s 'HELP: Intervention needed for %n %i' %r"
+
+  mail = lenexa.devops@novatechweb.com = all, !skipped
+  operator = lenexa.devops@novatechweb.com = mount
   console = all, !skipped, !saved
 #
 # WARNING! the following will create a file that you must cycle from
@@ -296,8 +296,8 @@ Messages {
 # Message delivery for daemon messages (no job).
 Messages {
   Name = Daemon
-  mailcommand = "/usr/sbin/bsmtp -h localhost -f \"\(Bacula\) \<%r\>\" -s \"Bacula daemon message\" %r"
-  mail = root@localhost = all, !skipped
+  mailcommand = "/usr/libexec/bacula/bacula-send-email -v -s 'Bacula daemon message' %r"
+  mail = lenexa.devops@novatechweb.com = all, !skipped
   console = all, !skipped, !saved
   append = "/var/log/bacula/bacula.log" = all, !skipped
 }

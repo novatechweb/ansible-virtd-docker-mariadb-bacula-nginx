@@ -69,3 +69,14 @@
   pause:
     prompt: "Verify or install the git@github.com key for the bacula user (/var/spool/bacula/.ssh/bacula@{{ ansible_facts.fqdn }}-git@github.com.pub)"
   when: st_bacula_key.stat.exists == False
+
+- name: Create mailx startup configuration file
+  template:
+    template:
+      src: mailrc.j2
+      dest: /var/spool/bacula/.mailrc
+      mode: 'u=rw,g=,o='
+      owner: bacula
+      group: bacula
+      force: no
+  

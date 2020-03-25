@@ -1,0 +1,8 @@
+---
+# defaults file for storcli
+
+storcli_exporter_binary: '/usr/local/bin/storcli_exporter'
+storcli_exporter_output: '/var/lib/node_exporter/storcli.prom'
+storcli_version: '007.1316.0000.0000'
+storcli_uri: 'https://docs.broadcom.com/docs-and-downloads/raid-controllers/raid-controllers-common-files/007.1316.0000.0000_Unified_StorCLI.zip'
+storcli_checksum: 'sha1:77cfb43709461db92b590518ca324b69be464697'

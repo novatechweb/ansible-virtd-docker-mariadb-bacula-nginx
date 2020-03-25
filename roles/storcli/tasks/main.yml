@@ -1,0 +1,77 @@
+---
+# tasks file for storcli
+- name: Ensure necessary packages are installed
+  package:
+    name:
+    - crontabs
+    - unzip
+    state: present
+
+- name: Create download cache directory
+  file:
+    path: /var/cache/ansible/
+    state: directory
+
+- name: Download storcli archive
+  get_url:
+    checksum: '{{ storcli_checksum }}'
+    dest: '/var/cache/ansible/storcli-{{ storcli_version }}.zip'
+    url: '{{ storcli_uri }}'
+
+- name: Create storcli unarchive destination
+  file:
+    path: '/var/cache/ansible/storcli-{{ storcli_version }}'
+    state: directory
+
+- name: Unzip storcli archive
+  unarchive:
+    remote_src: true
+    src: '/var/cache/ansible/storcli-{{ storcli_version }}.zip'
+    dest: '/var/cache/ansible/storcli-{{ storcli_version }}'
+    creates: '/var/cache/ansible/storcli-{{ storcli_version }}/Unified_storcli_all_os'
+
+- name: Install storcli RPM signing public key
+  rpm_key:
+    key: '/var/cache/ansible/storcli-{{ storcli_version }}/Unified_storcli_all_os/Linux/pubKey.asc'
+    state: present
+
+- name: Install storcli RPM
+  yum:
+    name: '/var/cache/ansible/storcli-{{ storcli_version }}/Unified_storcli_all_os/Linux/storcli-{{ storcli_version }}-1.noarch.rpm'
+    state: present
+
+- name: Install storcli configuration file
+  copy:
+    src: "storcliconf.ini"
+    dest: "/root/{{ item }}"
+    mode: 0644
+    owner: root
+    group: root
+  loop:
+    - storcliconf.ini
+    - storelibconf.ini
+    - storelibconfit.ini
+
+- name: Install storcli_exporter script
+  copy:
+    src: "storcli_exporter"
+    dest: "{{ storcli_exporter_binary }}"
+    mode: 0755
+    owner: root
+    group: root
+
+- name: Install storcli_hourly cron script
+  copy:
+    content: |
+      #!/bin/sh
+      {{ storcli_exporter_binary }} > {{ storcli_exporter_output }}
+    dest: "/etc/cron.hourly/0storcli_hourly.cron"
+    mode: 0755
+    owner: root
+    group: root
+
+- name: Sanity check output and return code
+  command: '{{ storcli_binary }} -v'
+  register: storcli_test
+  changed_when: false
+  failed_when: storcli_version not in storcli_test.stdout

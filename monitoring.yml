@@ -30,6 +30,11 @@
       name: cloudalchemy.node-exporter
     tags:
       - node-exporter
+  - name: Download and install StorCLI utility
+    import_role:
+      name: storcli
+    tags:
+      - storcli
 
 - name: Setup Buildbot worker system
   hosts: builder

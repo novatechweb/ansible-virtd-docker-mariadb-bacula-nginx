@@ -1,0 +1,5 @@
+---
+# vars file for storcli
+
+storcli_install_dir: /opt/MegaRAID/storcli
+storcli_binary: '{{ storcli_install_dir }}/storcli64'

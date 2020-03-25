@@ -15,6 +15,14 @@
 - name: Test Bacula client configuration
   command: /usr/sbin/bacula-fd -t -c {{ bacula_client_config_dir }}/bacula-fd.conf
   changed_when: false
+
+- name: Set selinux port definitions for Bacula File Daemon
+  seport:
+    ports: '{{ bacula_client_port }}'
+    proto: tcp
+    setype: bacula_port_t
+    state: present
+
 - name: Enable and start Bacula Client
   service: name=bacula-fd enabled=yes state=started
 
@@ -46,6 +54,13 @@
     group: bacula
     mode: 0640
     backup: yes
+
+- name: Set selinux port definitions for Second Bacula File Daemon
+  seport:
+    ports: '{{ bacula_encrypted_port }}'
+    proto: tcp
+    setype: bacula_port_t
+    state: present
 
 - name: Enable and start Bacula Client
   systemd:

@@ -32,6 +32,13 @@
   command: /usr/sbin/bacula-sd -t -c {{ bacula_storage_config_dir }}/bacula-sd.conf
   changed_when: false
 
+- name: Set selinux port definitions for Bacula Storage Daemon
+  seport:
+    ports: '{{ bacula_storage_port }}'
+    proto: tcp
+    setype: bacula_port_t
+    state: present
+
 - name: Enable and start Bacula Storage
   service:
     name: bacula-sd

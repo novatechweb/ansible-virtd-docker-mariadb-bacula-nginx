@@ -33,6 +33,14 @@
   when: databases.stdout.find('bacula') == -1
 - name: Test Bacula Director configuration
   command: /usr/sbin/bacula-dir -t -c {{ bacula_director_config_dir }}/bacula-dir.conf
+
+- name: Set selinux port definitions for Bacula Director
+  seport:
+    ports: '{{ bacula_director_port }}'
+    proto: tcp
+    setype: bacula_port_t
+    state: present
+
 - name: Enable and restart Bacula Director
   service:
     name: bacula-dir

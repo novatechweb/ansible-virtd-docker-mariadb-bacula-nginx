@@ -37,6 +37,14 @@ JobDefs {
   Write Bootstrap = "/var/spool/bacula/%c.bsr"
 }
 
+Job {
+  Name = "Sync Data"
+  JobDefs = "DefaultJob"
+  Type = Admin
+  Priority = 5
+  RunBeforeJob = "/usr/libexec/bacula/before_backup"
+  RunAfterJob  = "/usr/libexec/bacula/after_backup"
+}
 
 #
 # Define the main nightly save backup job
@@ -44,8 +52,7 @@ JobDefs {
 Job {
   Name = "BackupClient1"
   JobDefs = "DefaultJob"
-  RunBeforeJob = "/usr/libexec/bacula/before_backup"
-  RunAfterJob  = "/usr/libexec/bacula/after_backup"
+  Priority = 10
 }
 
 #Job {

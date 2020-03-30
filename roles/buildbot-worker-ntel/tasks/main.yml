@@ -104,14 +104,18 @@
 
 - name: Create buildbot worker image
   docker_image:
-    buildargs: '{{ image_args }}'
+    build:
+      args: '{{ image_args }}'
+      path: '{{ image_dir }}'
+      pull: yes
     name: '{{ image_name }}'
-    path: '{{ image_dir }}'
+    source: build
     tag: '{{ docker_image_tag }}'
-    force: '{{ deploy_source.changed }}'
+    force_source: "{{ deploy_source.changed }}"
 
 - name: Start buildbot worker container
   docker_container:
+    comparisons: {'*': strict}
     env: '{{ container_env }}'
     hostname: '{{ container_hostname }}'
     image: '{{ image_name }}:{{ docker_image_tag }}'

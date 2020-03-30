@@ -4,13 +4,17 @@
 #---------------------------------------------------------
 - name: Build docker image ----- Test Station http server
   docker_image:
+    build:
+      path: "{{ docker_projects_dir }}/{{ build_system_docker_repos.TestStation_http_server.dir_name }}"
+      pull: yes
     name: "{{ name_prefix }}teststation_http_image"
-    path: "{{ docker_projects_dir }}/{{ build_system_docker_repos.TestStation_http_server.dir_name }}"
+    source: build
     state: "{{ image_build_state_nondata }}"
-    force: "{{ docker_image_force_build }}"
+    force_source: "{{ docker_image_force_build }}"
 
 - name: Start docker container - Test Station http server
   docker_container:
+    comparisons: {'*': strict}
     detach: True
     image: "{{ name_prefix }}teststation_http_image"
     links: "{{ name_prefix }}TestStation_database_server:test_station_mysql_server"

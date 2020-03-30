@@ -21,7 +21,10 @@
 
 - name: Build docker image ----- Test Station Backup service
   docker_image:
+    build:
+      path: "{{ docker_projects_dir }}/{{ build_system_docker_repos.Backup_Restore.dir_name }}"
+      pull: yes
     name: "{{ name_prefix }}teststation_supportsite_backup_restore_image"
-    path: "{{ docker_projects_dir }}/{{ build_system_docker_repos.Backup_Restore.dir_name }}"
+    source: build
     state: "{{ image_build_state_nondata }}"
-    force: "{{ docker_image_force_build }}"
+    force_source: "{{ docker_image_force_build }}"

@@ -1,16 +1,36 @@
 ---
+bacula_director_name: "bacula-dir"
+bacula_director_password: ""
+bacula_monitor_name: "bacula-mon"
+bacula_monitor_password: ""
+
 bacula_client_config_dir: "/etc/bacula"
 bacula_client_name: "bacula-fd"
 bacula_client_port: 9102
 bacula_client_working_dir: "/var/spool/bacula"
 bacula_client_pid_dir: "/var/run"
 bacula_client_concurrent_jobs: 20
-bacula_director_name: "bacula-dir"
-bacula_director_password: ""
-bacula_monitor_name: "bacula-mon"
-bacula_monitor_password: ""
 bacula_client_address: 127.0.0.1
 
-# must pass in the following variables
-# bacula_director_password: ''
-# bacula_monitor_password: ''
+bacula_master_keydir: '{{ playbook_dir }}/credentials/bacula/master'
+bacula_master_rsakey: '{{ bacula_master_keydir }}/master.key'
+bacula_master_rsacert: '{{ bacula_master_keydir }}/master.cert'
+
+bacula_fd_keydir: '{{ playbook_dir }}/credentials/bacula/bacula-fd'
+bacula_fd_rsakey: '{{ bacula_fd_keydir }}/bacula-fd.key'
+bacula_fd_rsacert: '{{ bacula_fd_keydir }}/bacula-fd.cert'
+
+bacula_encrypted_config_dir: "/etc/bacula"
+bacula_encrypted_name: "bacula-fd2-encrypted"
+bacula_encrypted_config_file: "{{ bacula_encrypted_config_dir }}/{{ bacula_encrypted_name }}.conf"
+bacula_encrypted_port: 9202
+bacula_encrypted_working_dir: "/var/spool/bacula"
+bacula_encrypted_pid_dir: "/var/run"
+bacula_encrypted_concurrent_jobs: 20
+bacula_encrypted_address: 127.0.0.1
+
+bacula_encrypted_encrypt_signatures: yes
+bacula_encrypted_encrypt_enable: yes
+bacula_encrypted_encrypt_certdir: '{{ bacula_client_config_dir }}/encryption'
+bacula_encrypted_encrypt_mastercert: '{{ bacula_encrypted_encrypt_certdir }}/master.cert'
+bacula_encrypted_encrypt_pem: '{{ bacula_encrypted_encrypt_certdir }}/{{ bacula_client_name }}.pem'

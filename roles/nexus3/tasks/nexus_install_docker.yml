@@ -59,6 +59,7 @@
 
 - name: Start nexus container
   docker_container:
+    comparisons: {'*': strict}
     name: '{{ nexus_container_name }}'
     hostname: '{{ public_hostname }}'
     image: '{{ nexus_image_tag }}'
@@ -84,7 +85,7 @@
 - name: First-time install admin password
   set_fact:
     current_nexus_admin_password: 'admin123'
-  when: nexus_first_install
+  when: nexus_first_install | bool
 
 - name: Subsequent re-provision admin password
   set_fact:
@@ -108,7 +109,7 @@
 
 - name: Set permissions on backup volume
   command:
-    docker exec -u root nexus3 chmod 777 {{nexus_backup_dir}}
+    docker exec -u root {{nexus_container_name}} chmod 777 {{nexus_backup_dir}}
   changed_when: false
 
 - name: Declare groovy scripts in nexus

@@ -70,10 +70,13 @@
 
 - name: build image
   docker_image:
+    build:
+      path: '{{ docker_projects_dir }}/docker-mantisbt'
+      pull: yes
     name: '{{ mantisbt_image_name }}'
+    source: build
     tag: '{{ docker_image_tag }}'
-    path: '{{ docker_projects_dir }}/docker-mantisbt'
-    force: "{{ docker_image_force_build }}"
+    force_source: "{{ docker_image_force_build }}"
 
 # *****************************************************************************
 # Create the data volumes
@@ -118,6 +121,7 @@
 
 - name: start container (mysql)
   docker_container:
+    comparisons: {'*': strict}
     detach: true
     image: '{{ mantisbt_db_image_name }}'
     name: '{{ mantisbt_db_container_name }}'
@@ -152,6 +156,7 @@
 
 - name: start container (mantisbt)
   docker_container:
+    comparisons: {'*': strict}
     detach: true
     env:
       MANTISBT_HOSTNAME: '{{ mantisbt_hostname }}'

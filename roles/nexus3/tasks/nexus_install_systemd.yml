@@ -187,7 +187,7 @@
     dest: "{{ nexus_default_settings_file }}"
     regexp: "^application-host=.*"
     line: "application-host=127.0.0.1"
-  when: httpd_setup_enable
+  when: httpd_setup_enable | bool
 
 - name: Create systemd service configuration
   template:
@@ -266,7 +266,7 @@
 - name: First-time install admin password
   set_fact:
     current_nexus_admin_password: 'admin123'
-  when: nexus_first_install
+  when: nexus_first_install | bool
 
 - name: Subsequent re-provision admin password
   set_fact:

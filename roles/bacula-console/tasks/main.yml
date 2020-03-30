@@ -4,9 +4,10 @@
     that:
     - bacula_director_password is defined
 - name: Install/setup Bacula Console
-  yum: name={{ item }} state=present
-  with_items:
+  yum:
+    name:
     - bacula-console
+    state: present
 - name: Configure Bacula Console
   template: src=bconsole.conf.j2 dest={{ bacula_console_config_dir }}/bconsole.conf
           owner=bacula group=bacula mode=0640 backup=yes

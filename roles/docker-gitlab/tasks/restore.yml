@@ -82,7 +82,7 @@
   - name: restore gitlab secrets
     command: >
       docker exec -t {{ gitlab_container_name }}
-      /bin/sh -c 'tar vxzf "{{backup_file}}" -C /' 
+      /bin/sh -c 'tar vxzf "{{backup_file}}" -C /'
     when: backup_files.matched > 0
 
 - block:
@@ -120,20 +120,20 @@
 
 - name: Set root user password in restored database
   command: >
-    docker exec -t {{ gitlab_container_name }} 
-    gitlab-rails runner 
+    docker exec -t {{ gitlab_container_name }}
+    gitlab-rails runner
       'user=User.where(id: 1).first;
        user.password="{{ gitlab_root_password }}";
        user.password_confirmation="{{ gitlab_root_password }}";
        user.save!'
 
 - name: Wait for gitlab to be fully running
-  docker_health:
+  docker_container_info:
     name: '{{ gitlab_container_name }}'
-  register: health
+  register: info
   retries: 60
   delay: 5
-  until: health.Health.Status == "healthy"
+  until: info.container.State.Health.Status == "healthy"
 
 # *****************************************************************************
 # cleanup

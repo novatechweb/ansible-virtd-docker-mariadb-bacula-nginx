@@ -1,2 +1,3 @@
-credentials
-personal_credentials
+.pythonenv/
+credentials/
+personal_credentials/

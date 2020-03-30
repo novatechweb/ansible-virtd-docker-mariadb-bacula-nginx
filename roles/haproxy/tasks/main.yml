@@ -27,6 +27,7 @@
 
 - name: Start haproxy container
   docker_container:
+    comparisons: {'*': strict}
     name: '{{ container_name }}'
     env: '{{ container_env }}'
     hostname: '{{ container_hostname }}'

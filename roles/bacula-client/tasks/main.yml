@@ -5,14 +5,66 @@
     - bacula_director_password is defined
     - bacula_monitor_password is defined
 - name: Install/setup Bacula Client
-  yum: name={{ item }} state=present
-  with_items:
+  yum:
+    name:
     - bacula-client
+    state: present
 - name: Configure Bacula Client
   template: src=bacula-fd.conf.j2 dest={{ bacula_client_config_dir }}/bacula-fd.conf
           owner=bacula group=bacula mode=0640 backup=yes
 - name: Test Bacula client configuration
   command: /usr/sbin/bacula-fd -t -c {{ bacula_client_config_dir }}/bacula-fd.conf
   changed_when: false
+
+- name: Set selinux port definitions for Bacula File Daemon
+  seport:
+    ports: '{{ bacula_client_port }}'
+    proto: tcp
+    setype: bacula_port_t
+    state: present
+
 - name: Enable and start Bacula Client
   service: name=bacula-fd enabled=yes state=started
+
+#####
+
+- name: Configure client encryption
+  import_tasks: encryption.yml
+
+- name: Configure Second Bacula Client
+  template:
+    src: bacula-fd2-encrypted.conf.j2
+    dest: '{{ bacula_encrypted_config_file }}'
+    owner: bacula
+    group: bacula
+    mode: 0640
+    backup: yes
+
+- name: Test Bacula client configuration
+  command: |
+    /usr/sbin/bacula-fd -t
+    -c {{ bacula_encrypted_config_file }}
+  changed_when: false
+
+- name: Configure Second Bacula Client Service
+  template:
+    src: bacula-fd2-encrypted.service.j2
+    dest: '/etc/systemd/system/bacula-fd2-encrypted.service'
+    owner: bacula
+    group: bacula
+    mode: 0640
+    backup: yes
+
+- name: Set selinux port definitions for Second Bacula File Daemon
+  seport:
+    ports: '{{ bacula_encrypted_port }}'
+    proto: tcp
+    setype: bacula_port_t
+    state: present
+
+- name: Enable and start Bacula Client
+  systemd:
+    daemon_reload: yes
+    name: bacula-fd2-encrypted
+    enabled: yes
+    state: started

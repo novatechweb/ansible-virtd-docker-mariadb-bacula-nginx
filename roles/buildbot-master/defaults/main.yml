@@ -5,19 +5,19 @@
 backup_hostdir: '{{ docker_backup_dir }}/buildbot'
 
 # numeric ID of buildbot user
-buildbot_uid: 1000
+buildbot_uid: '1000'
 
 # numeric version of buildbot service
 buildbot_version: '2.4.0'
 
 # port number for workers to communicate with master
-buildbot_worker_port: 9989
+buildbot_worker_port: '9989'
 
 # port number for unencrypted web access
-buildbot_http_port: 8080
+buildbot_http_port: '8080'
 
 # port number for encrypted web access
-buildbot_https_port: 8443
+buildbot_https_port: '8443'
 
 # The hostname passed as an envirnment variable into the container
 buildbot_ip_addr: '127.0.0.1'

@@ -44,21 +44,21 @@
 
 - name: Check if the keyfile exists
   stat:
-    path: /var/spool/bacula/.ssh/bacula@{{ ansible_fqdn }}-git@github.com
+    path: /var/spool/bacula/.ssh/bacula@{{ ansible_facts.fqdn }}-git@github.com
     get_checksum: False
     get_md5: False
   register: st_bacula_key
 
 - name: Generate git@github.com ssh key
-  command: 'ssh-keygen -b 4098 -t rsa -P "" -f /var/spool/bacula/.ssh/bacula@{{ ansible_fqdn }}-git@github.com -C "from: bacula@{{ ansible_fqdn }} to: git@github.com"'
+  command: 'ssh-keygen -b 4098 -t rsa -P "" -f /var/spool/bacula/.ssh/bacula@{{ ansible_facts.fqdn }}-git@github.com -C "from: bacula@{{ ansible_facts.fqdn }} to: git@github.com"'
   args:
-    creates: /var/spool/bacula/.ssh/bacula@{{ ansible_fqdn }}-git@github.com
+    creates: /var/spool/bacula/.ssh/bacula@{{ ansible_facts.fqdn }}-git@github.com
   become: true
   become_user: bacula
   become_method: sudo
 
 - name: Read public key
-  command: cat /var/spool/bacula/.ssh/bacula@{{ ansible_fqdn }}-git@github.com.pub
+  command: cat /var/spool/bacula/.ssh/bacula@{{ ansible_facts.fqdn }}-git@github.com.pub
   register: bacula_key
   changed_when: false
 
@@ -67,5 +67,16 @@
 
 - name: Verify or install public key
   pause:
-    prompt: "Verify or install the git@github.com key for the bacula user (/var/spool/bacula/.ssh/bacula@{{ ansible_fqdn }}-git@github.com.pub)"
+    prompt: "Verify or install the git@github.com key for the bacula user (/var/spool/bacula/.ssh/bacula@{{ ansible_facts.fqdn }}-git@github.com.pub)"
   when: st_bacula_key.stat.exists == False
+
+- name: Create mailx startup configuration file
+  template:
+    template:
+      src: mailrc.j2
+      dest: /var/spool/bacula/.mailrc
+      mode: 'u=rw,g=,o='
+      owner: bacula
+      group: bacula
+      force: no
+  

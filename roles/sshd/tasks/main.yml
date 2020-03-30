@@ -13,5 +13,5 @@
   lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: '^[#]?ListenAddress .*$'
-    line: 'ListenAddress {{ ansible_default_ipv4["address"] }}'
+    line: 'ListenAddress {{ ansible_facts.default_ipv4.address }}'
   notify: "restart sshd service"

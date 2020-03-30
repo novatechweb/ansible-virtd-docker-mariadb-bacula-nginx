@@ -56,10 +56,13 @@
 
 - name: build image
   docker_image:
+    build:
+      path: '{{ docker_projects_dir }}/docker-openldap'
+      pull: yes
     name: '{{ openldap_image_name }}'
+    source: build
     tag: '{{ docker_image_tag }}'
-    path: '{{ docker_projects_dir }}/docker-openldap'
-    force: "{{ docker_image_force_build }}"
+    force_source: "{{ docker_image_force_build }}"
 
 # *****************************************************************************
 # Create the data volumes
@@ -96,6 +99,7 @@
 
 - name: start container (ldap)
   docker_container:
+    comparisons: {'*': strict}
     detach: true
     env:
       LDAP_HOSTNAME: '{{ openldap_hostname }}'
@@ -134,14 +138,18 @@
 
 - name: build image
   docker_image:
-    dockerfile: 'Dockerfile.phpldapadmin'
+    build:
+      dockerfile: 'Dockerfile.phpldapadmin'
+      path: '{{ docker_projects_dir }}/docker-phpldapadmin'
+      pull: yes
     name: '{{ phpldapadmin_image_name }}'
+    source: build
     tag: '{{ docker_image_tag }}'
-    path: '{{ docker_projects_dir }}/docker-phpldapadmin'
-    force: "{{ docker_image_force_build }}"
+    force_source: "{{ docker_image_force_build }}"
 
 - name: start container (phpldapadmin)
   docker_container:
+    comparisons: {'*': strict}
     detach: true
     env:
       PHPLDAPADMIN_HTTPS: 'false'

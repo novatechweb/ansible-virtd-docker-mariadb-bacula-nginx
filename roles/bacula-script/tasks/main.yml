@@ -73,7 +73,7 @@
     owner: bacula
     group: tape
     mode: 'u=rwx,g=rwx,o=rx'
-  when: assemble_scripts
+  when: assemble_scripts | bool
 
 - name: Assemble bacula after_backup script
   assemble:
@@ -83,15 +83,32 @@
     owner: bacula
     group: tape
     mode: 'u=rwx,g=rwx,o=rx'
-  when: assemble_scripts
+  when: assemble_scripts | bool
 
 - name: remove assemble dir for backup scripts
   file:
     path: /usr/libexec/bacula/backup-scripts
     state: absent
-  when: assemble_scripts
+  when: assemble_scripts | bool
 
 # *****************************************************************************
 # Install selinux policies
 
 - import_tasks: selinux-script-policy.yml
+
+# *****************************************************************************
+# Install email wrapper script
+
+- name: Install email wrapper script dependencies
+  package:
+    name: ansifilter
+    state: present
+
+- name: Install email wrapper script
+  copy:
+    src: bacula-send-email
+    dest: "/usr/libexec/bacula/bacula-send-email"
+    owner: bacula
+    group: bacula
+    mode: 0775
+

@@ -33,6 +33,6 @@
     name: httpd_can_network_connect
     persistent: yes
     state: yes
-  when: ansible_selinux.status is defined and ansible_selinux.status == "enabled"
+  when: ansible_facts.selinux.status is defined and ansible_facts.selinux.status == "enabled"
 
 - meta: flush_handlers

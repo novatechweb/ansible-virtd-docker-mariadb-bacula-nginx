@@ -7,11 +7,11 @@
 - name: install yum packages
   yum:
     state: present
-    name: 
+    name:
     - device-mapper-persistent-data
     - lvm2
     - python-pip
-  when: ansible_os_family == "RedHat"
+  when: ansible_facts.os_family == "RedHat"
 
 - name: install yum docker repository
   yum_repository:
@@ -23,7 +23,7 @@
 
 - name: remove distribution docker package
   yum:
-    name: 
+    name:
       - docker
       - docker-client
       - docker-client-latest
@@ -35,11 +35,11 @@
       # - docker-engine-selinux
       - docker-engine
     state: absent
-  when: ansible_os_family == "RedHat"
+  when: ansible_facts.os_family == "RedHat"
 
 - name: install latest stable docker
   yum:
     state: present
-    name: 
+    name:
     - docker-ce
-  when: ansible_os_family == "RedHat"
+  when: ansible_facts.os_family == "RedHat"

@@ -9,6 +9,7 @@ RUN apk --no-cache add \
         libcrypto1.0 \
         libssl1.0 \
         openssl \
+        openssh-sftp-server \
 &&  rm /etc/motd \
 &&  echo "UsePAM yes" >> /etc/ssh/sshd_config \
 &&  ssh-keygen -A \

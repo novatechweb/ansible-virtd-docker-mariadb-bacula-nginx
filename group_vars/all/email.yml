@@ -11,3 +11,6 @@ email_accounts:
   mantisbt:
     user: mantis
     password: '{{ mantisbt_email_password }}'
+  bacula:
+    user: bacula
+    password: '{{ bacula_email_password }}'

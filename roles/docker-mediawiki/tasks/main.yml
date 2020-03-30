@@ -71,10 +71,13 @@
 
 - name: build image
   docker_image:
+    build:
+      path: '{{ docker_projects_dir }}/docker-mediawiki'
+      pull: yes
     name: '{{ wiki_image_name }}'
+    source: build
     tag: '{{ docker_image_tag }}'
-    path: '{{ docker_projects_dir }}/docker-mediawiki'
-    force: "{{ docker_image_force_build }}"
+    force_source: "{{ docker_image_force_build }}"
 
 # *****************************************************************************
 # Create the data volumes
@@ -92,6 +95,7 @@
 
 - name: start container (mysql)
   docker_container:
+    comparisons: {'*': strict}
     detach: true
     env:
       MYSQL_DATABASE: '{{ wiki_database_name }}'
@@ -126,6 +130,7 @@
 
 - name: start container (mediwiki)
   docker_container:
+    comparisons: {'*': strict}
     detach: true
     env:
       WIKI_HOSTNAME: '{{ wiki_hostname }}'

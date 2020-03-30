@@ -1,0 +1,20 @@
+#!/bin/bash
+set -e
+set -x
+
+# Make temporary files
+TMPFILE="$(mktemp)"
+
+# Clean up temporary files
+cleanup() {
+    rm -f "${TMPFILE}"
+}
+trap cleanup EXIT
+
+# Run email body through ansifilter to remove shell escape sequences 
+# often produced by backup scripts
+ansifilter <&0 > "${TMPFILE}"
+
+# Send filtered email
+mailx "$@" < "${TMPFILE}"
+exit

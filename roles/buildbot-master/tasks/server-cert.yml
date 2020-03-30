@@ -39,6 +39,13 @@
       ownca_privatekey_path: '{{ buildbot_ca_key }}'
     when: server_key.changed
 
+  - name: Generate Diffie-Hellman Parameters
+    openssl_dhparam:
+      path: '{{ buildbot_master_dhparam }}'
+      size: 4096
+      state: present
+    when: server_key.changed
+
 - name: Create certificate directory on target
   file:
     path: '{{ config_hostdir }}/ssl'
@@ -50,5 +57,6 @@
     dest: '{{ config_hostdir }}/ssl/'
   loop:
   - '{{ buildbot_ca_pem }}'
+  - '{{ buildbot_master_dhparam }}'
   - '{{ buildbot_master_tlskey }}'
   - '{{ buildbot_master_tlspem }}'

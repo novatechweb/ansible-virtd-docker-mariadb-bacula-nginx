@@ -4,10 +4,14 @@
 # This is a sample buildmaster config file. It must be installed as
 # 'master.cfg' in your buildmaster's base directory.
 
+import git
+import importlib
+import novatech
 import os
-from importlib import reload
+import os.path
+import sys
 from buildbot.plugins import secrets, steps, util
-from buildbot.util import giturlparse
+from twisted.python import log
 
 os.environ['LONG_RUN_TIMEOUT'] = '14400'
 
@@ -141,41 +145,51 @@ c['db'] = {
 # Extra Options
 c['buildbotNetUsageData'] = 'basic'
 
-def codebaseGenerator(chdict):
-    """ Generate a codebase description.
+c['codebaseGenerator'] = novatech.codebaseGenerator
 
-    The codebase generator takes information about a change, like repository,
-    branch, and revision, and creates a predictable string describing the code.
-    This is used to decide upon the builder for a change and also to tie a fork
-    repository back to its parent for merge requests.
-    """
+workerConfigs = {{ buildbot_master_worker_configs | default('[]') | to_json }}
 
-    giturl = giturlparse(chdict['repository'])
-    return '/'.join((giturl.owner, giturl.repo))
+for cfg in workerConfigs:
+    # Setup local worker configuration repository
+    log.msg("[%s] Init module repository" % (cfg['module']))
+    repo = git.Repo.init(cfg['module'])
 
+    if 'origin' in repo.remotes:
+        log.msg("[%s] Update remote" % (cfg['module']))
+        remote = repo.remotes['origin']
+        remote.set_url(cfg['giturl'])
+    else:
+        log.msg("[%s] Create remote" % (cfg['module']))
+        remote = repo.create_remote('origin', cfg['giturl'])
+    log.msg("[%s] Fetch repository changes" % (cfg['module']))
+    remote.fetch()
 
-    # components = []
-    # while path != "":
-    #     path, tail = os.path.split(path)
-    #     if tail != "":
-    #         components.append(tail)
-    # components.reverse()
-    # codebase = os.path.join(*components[0:2])
-    # return codebase
+    if cfg['branch'] in repo.heads:
+        # update branch
+        log.msg("[%s] Update branch" % (cfg['module']))
+        branch = repo.heads[cfg['branch']]
+        branch.commit = remote.refs[cfg['branch']]
+    else:
+        # create branch
+        log.msg("[%s] Create branch" % (cfg['module']))
+        branch = repo.create_head(cfg['branch'], remote.refs[cfg['branch']])
 
+    # Update working directory
+    log.msg("[%s] Checkout branch" % (cfg['module']))
+    branch.checkout(force=True)
 
-c['codebaseGenerator'] = codebaseGenerator
+    # Load worker configuration
+    log.msg("[%s] Import module" % (cfg['module']))
+    module_name = ".".join((cfg['module'], 'buildbot_ci'))
+    if module name in sys.modules:
+        importlib.reload(sys.modules[module_name])
+    else:
+        importlib.import_module(module_name)
+    module = sys.modules[module_name]
 
-import openembedded
-reload(openembedded)
-c['workers'].extend(openembedded.WorkerConfig['workers'])
-c['schedulers'].extend(openembedded.WorkerConfig['schedulers'])
-c['builders'].extend(openembedded.WorkerConfig['builders'])
-c['change_source'].extend(openembedded.WorkerConfig['change_source'])
-
-import ptxdist
-reload(ptxdist)
-c['workers'].extend(ptxdist.WorkerConfig['workers'])
-c['schedulers'].extend(ptxdist.WorkerConfig['schedulers'])
-c['builders'].extend(ptxdist.WorkerConfig['builders'])
-c['change_source'].extend(ptxdist.WorkerConfig['change_source'])
+    # Copy worker configuration
+    worker_config = module.WorkerConfig
+    c['workers'].extend(worker_config['workers'])
+    c['schedulers'].extend(worker_config['schedulers'])
+    c['builders'].extend(worker_config['builders'])
+    c['change_source'].extend(worker_config['change_source'])

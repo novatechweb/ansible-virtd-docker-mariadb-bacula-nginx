@@ -47,3 +47,11 @@ buildbot_worker_ptxdist_tlskey: '{{ buildbot_creds + "/worker_ptxdist/client.key
 buildbot_worker_ptxdist_tlspem: '{{ buildbot_creds + "/worker_ptxdist/client.pem" }}'
 
 buildbot_webhook_secret: '{{ lookup("password", buildbot_creds + "/webhook length=20") }}'
+
+buildbot_master_worker_configs:
+  - module: 'worker_ntel_morty'
+    giturl: 'git@{{ gitlab_hostname }}:andrew.cooper/setup-scripts'
+    branch: 'morty'
+  - module: 'worker_ptxdist_master'
+    giturl: 'git@{{ gitlab_hostname }}:andrew.cooper/workspace-ptxdist2'
+    branch: 'master'

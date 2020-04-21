@@ -55,16 +55,17 @@ RUN wget https://bootstrap.pypa.io/get-pip.py \
 
 # Install software for image signing
 ARG PTK_HSM_HOST="127.0.0.1"
-ARG PTK_URI="http://127.0.0.1/610-009981-015_SW_PTK_5.3_Client_RevA.tar"
+ARG PTK_URI="http://127.0.0.1/610-009981-023_SW_PTK_5.9_Client_RevA.tar"
 RUN curl ${PTK_URI} \
 |   tar -v -x -C /tmp \
-&&  alien --to-deb --install --scripts /tmp/610-009981-015_SW_PTK_5.3_Client_RevA/SDKs/Linux64/ptkc_sdk/PTKcpsdk-5.3.0-16.x86_64.rpm \
-&&  alien --to-deb --install --scripts /tmp/610-009981-015_SW_PTK_5.3_Client_RevA/SDKs/Linux64/ptkc_runtime/PTKcprt-5.3.0-15.x86_64.rpm \
-&&  alien --to-deb --install --scripts /tmp/610-009981-015_SW_PTK_5.3_Client_RevA/SDKs/Linux64/network_hsm_access_provider/PTKnethsm-5.3.0-15.x86_64.rpm \
+&&  alien --to-deb --install --scripts /tmp/610-009981-023_SW_PTK_5.9_Client_RevA/SDKs/Linux64/ptkc_sdk/PTKcpsdk-5.9.0-RC5.x86_64.rpm \
+&&  alien --to-deb --install --scripts /tmp/610-009981-023_SW_PTK_5.9_Client_RevA/SDKs/Linux64/ptkc_runtime/PTKcprt-5.9.0-RC5.x86_64.rpm \
+&&  alien --to-deb --install --scripts /tmp/610-009981-023_SW_PTK_5.9_Client_RevA/SDKs/Linux64/network_hsm_access_provider/PTKnethsm-5.9.0-RC5.x86_64.rpm \
 &&  echo "ET_HSM_NETCLIENT_SERVERLIST=${PTK_HSM_HOST}" > /etc/default/et_hsm \
 &&  echo "/opt/safenet/protecttoolkit5/ptk/lib" > /etc/ld.so.conf.d/safenet_ptk.conf \
+&&  ln -sf "/opt/safenet/protecttoolkit5/cprt/lib/linux-x86_64/libcthsm.so" "/opt/safenet/protecttoolkit5/ptk/lib/libcryptoki.so" \
 &&  ldconfig -v \
-&&  rm -rf /tmp/610-009981-015_SW_PTK_5.3_Client_RevA/
+&&  rm -rf /tmp/610-009981-023_SW_PTK_5.9_Client_RevA/
 
 # Create buildbot user
 ARG BUILDBOT_UID=1000

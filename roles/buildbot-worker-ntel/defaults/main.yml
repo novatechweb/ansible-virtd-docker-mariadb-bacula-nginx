@@ -73,7 +73,7 @@ hsm_host: '{{ansible_facts.default_ipv4.address}}'
 image_args:
   BUILDBOT_UID: '{{buildbot_uid}}'
   BUILDBOT_VERSION: 'v{{buildbot_version}}'
-  PTK_URI: '{{asset_downloads}}/610-009981-015_SW_PTK_5.3_Client_RevA.tar'
+  PTK_URI: '{{asset_downloads}}/610-009981-023_SW_PTK_5.9_Client_RevA.tar'
   PTK_HSM_HOST: '{{hsm_host}}'
 
 # directory of the image source

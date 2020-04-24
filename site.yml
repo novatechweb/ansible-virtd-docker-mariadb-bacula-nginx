@@ -33,10 +33,6 @@
   become_user: root
   become_method: sudo
   roles:
-  - name: Setup SSH Daemon
-    role: sshd
-    tags:
-    - sshd
   - name: Run common Docker tasks
     role: docker-common
     tags:
@@ -49,6 +45,10 @@
   become_user: root
   become_method: sudo
   roles:
+  - name: Setup SSH Daemon
+    role: sshd
+    tags:
+    - sshd
   - name: Configure Docker networking
     role: docker-networking
     network_connection: '{{ daedalus_net_connection }}'

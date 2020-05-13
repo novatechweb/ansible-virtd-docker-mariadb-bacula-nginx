@@ -1,4 +1,4 @@
-buildbot-worker-ntel
+Ansible Role: buildbot-worker-ntel
 =========
 
 Create and run a container for a Buildbot worker to build NTEL Orion images.
@@ -15,10 +15,14 @@ Role Variables
 ### Image Configuration
 | `buildbot_worker_image_args`        | arguments for building the Docker image                              |
 | `buildbot_worker_image_dir`         | directory from which to build the Docker image                       |
+| `buildbot_worker_image_dockerfile`  | Dockerfile with which to build the Docker image                      |
 | `buildbot_worker_image_name`        | name:tag for the built image                                         |
 | `buildbot_worker_image_repo`        | sources for the image; installed in `buildbot_worker_image_dir`      |
 
 ### Container Configuration
+| Name                                | Description                                                          |
+| ----------------------------------- | -------------------------------------------------------------------- |
+| `buildbot_ca_pem`                   | certificate authority used to issue the worker's client certificate  |
 | `buildbot_worker_container`         | defines the container's name                                         |
 | `buildbot_worker_env`               | defines the container's environment                                  |
 | `buildbot_worker_hostname`          | defines the container's hostname                                     |
@@ -31,9 +35,14 @@ Role Variables
 | `buildbot_worker_volumes`           | defines a list of volumes to mount in the container                  |
 
 ### Buildbot Worker Configuration
-| `asset_downloads`                   | url from which the worker should download assets for builds          |
+| Name                                | Description                                                          |
+| ----------------------------------- | -------------------------------------------------------------------- |
+| `asset_host`                        | url from which the worker should download assets for builds          |
+| `asset_user`                        | user with which to download assets                                   |
+| `asset_pass`                        | password for `asset_user`                                            |
 | `buildbot_worker_connection_string` | Twisted library connection string for worker to contact master       |
 | `hsm_host`                          | hostname of cryptographic signing server                             |
+| `known_hosts`                       | list of ssh hosts the container should trust                         |
 
 Example Playbook
 ----------------
@@ -41,16 +50,19 @@ Example Playbook
 Including an example of how to use your role (for instance, with variables
 passed in as parameters) is always nice for users too:
 
-    - hosts: servers
-      tasks:
-        - name: start the buildbot worker
-          import_role:
-            name: buildbot-worker-ntel
-          vars:
-            variant: '-suffix'
-            variant_var_prefix: 'buildbot_worker_prefix'
-          tags:
-            - buildbot-worker-suffix
+```yaml
+- hosts: servers
+  tasks:
+    - name: start the buildbot worker
+      import_role:
+        name: buildbot-worker-ntel
+      vars:
+        buildbot_worker_name: 'buildbot-worker-ntel-sumo'
+        buildbot_worker_passwd: 'pass'
+        buildbot_worker_image_dockerfile: 'Dockerfile-sumo'
+      tags:
+        - buildbot-worker-suffix
+```
 
 License
 -------

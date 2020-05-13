@@ -12,45 +12,9 @@
   docker_volume:
     name: '{{ buildbot_worker_volume_cache }}'
 
-- name: Populate buildbot cache volume
-  loop:
-  - /cache
-  - /cache/ccache
-  - /cache/downloads
-  - /cache/images
-  - /cache/ipkg-repository
-  - /cache/releases
-  docker_container:
-    name: '{{ buildbot_worker_container }}-bootstrap'
-    image: 'alpine:latest'
-    volumes:
-    - '{{ buildbot_worker_cache_volume }}:{{ buildbot_worker_cache_path }}:z'
-    detach: no
-    cleanup: yes
-    command: /bin/ash -c
-      "mkdir -p {{item}} &&
-      chown -c -R {{buildbot_worker_uid}}:{{buildbot_worker_gid}} {{item}} &&
-      chmod -v 777 {{item}}"
-
 - name: Create buildbot data volume
   docker_volume:
     name: '{{ buildbot_worker_volume_data }}'
-
-- name: Populate buildbot data volume
-  loop:
-  - /buildbot
-  docker_container:
-    name: '{{ buildbot_worker_container }}-bootstrap'
-    image: 'alpine:latest'
-    volumes:
-    - '{{ buildbot_worker_data_volume }}:{{ buildbot_worker_data_path }}:z'
-    detach: no
-    cleanup: yes
-    command: /bin/ash -c
-      "mkdir -p {{item}} &&
-      if [ $(stat --printf='%u' '{{item}}') -ne {{buildbot_worker_uid}} ]; then
-        chown -c -R {{buildbot_worker_uid}}:{{buildbot_worker_gid}} {{item}};
-      fi"
 
 - name: Create config directory
   file:

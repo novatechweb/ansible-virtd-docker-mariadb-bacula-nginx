@@ -1,0 +1,35 @@
+---
+
+- name: Generate credentials
+  hosts: localhost
+  become: no
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: "Generate Buildbot TLS certificates"
+      include_role:
+        name: buildbot-tls-certificates
+
+- name: Prepare
+  hosts: all
+  become: true
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: "Update Apt Cache"
+      apt:
+        update_cache: yes
+      when: ansible_os_family == 'Debian'
+
+    - name: "Install Docker engine"
+      include_role:
+        name: "geerlingguy.docker"
+
+    - name: "Install python pip"
+      include_role:
+        name: "geerlingguy.pip"
+      vars:
+        pip_package: python3-pip
+        pip_executable: pip3
+        pip_install_packages:
+          - docker

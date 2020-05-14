@@ -1,0 +1,10 @@
+---
+- name: Converge
+  hosts: all
+  become: yes
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: "Include buildbot-master"
+      include_role:
+        name: "buildbot-master"

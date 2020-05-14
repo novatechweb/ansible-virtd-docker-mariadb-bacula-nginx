@@ -85,6 +85,12 @@
     source: build
     force_source: "{{ deploy_source.changed }}"
 
+- name: Create buildbot network
+  docker_network:
+    name: '{{ item.name }}'
+    state: present
+  loop: '{{ buildbot_networks }}'
+
 - name: Start buildbot container
   docker_container:
     comparisons: {'*': strict}
@@ -93,6 +99,7 @@
     image: '{{ buildbot_image_name }}'
     name: '{{ buildbot_name }}'
     networks: '{{ buildbot_networks }}'
+    networks_cli_compatible: yes
     ports: '{{ buildbot_port_args }}'
     restart: '{{
       configs.changed

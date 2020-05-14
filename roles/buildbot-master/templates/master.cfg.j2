@@ -10,7 +10,7 @@ import novatech
 import os
 import os.path
 import sys
-from buildbot.plugins import secrets, steps, util
+from buildbot.plugins import schedulers, secrets, steps, util, worker
 from twisted.python import log
 
 os.environ['LONG_RUN_TIMEOUT'] = '14400'
@@ -46,40 +46,43 @@ irc = reporters.IRC(host="172.16.64.3",
                     channels=["#orion"])
 c['services'].append(irc)
 
-mn = reporters.MailNotifier(
-    fromaddr="buildbot@novatechweb.com",
-    sendToInterestedUsers=True,
-    extraRecipients=["andrew.cooper@novatechweb.com"],
-    useTls=True,
-    relayhost=os.getenv('BUILDBOT_SMTP_HOST'),
-    smtpPort=int(os.getenv('BUILDBOT_SMTP_PORT')),
-    smtpUser=os.getenv('BUILDBOT_SMTP_USER'),
-    smtpPassword=os.getenv('BUILDBOT_SMTP_PASS')
-)
-c['services'].append(mn)
+if os.getenv('BUILDBOT_SMTP_HOST'):
+    mn = reporters.MailNotifier(
+        fromaddr="buildbot@novatechweb.com",
+        sendToInterestedUsers=True,
+        extraRecipients=["andrew.cooper@novatechweb.com"],
+        useTls=True,
+        relayhost=os.getenv('BUILDBOT_SMTP_HOST'),
+        smtpPort=int(os.getenv('BUILDBOT_SMTP_PORT')),
+        smtpUser=os.getenv('BUILDBOT_SMTP_USER'),
+        smtpPassword=os.getenv('BUILDBOT_SMTP_PASS')
+    )
+    c['services'].append(mn)
 
-gl = reporters.GitLabStatusPush(
-    os.getenv('GITLAB_TOKEN'),
-    context=util.Interpolate("%(prop:buildername)s"),
-    baseURL=os.getenv("GITLAB_URI"),
-    verbose=True,
-    debug=True
-)
-c['services'].append(gl)
+if os.getenv('GITLAB_TOKEN'):
+    gl = reporters.GitLabStatusPush(
+        os.getenv('GITLAB_TOKEN'),
+        context=util.Interpolate("%(prop:buildername)s"),
+        baseURL=os.getenv("GITLAB_URI"),
+        verbose=True,
+        debug=True
+    )
+    c['services'].append(gl)
 
-userInfoProvider = util.LdapUserInfo(
-    uri=os.getenv('LDAP_URI'),
-    bindUser=os.getenv('LDAP_BIND_USER'),
-    bindPw=os.getenv('LDAP_BIND_PW'),
-    accountBase='ou=user,dc=novatech',
-    groupBase='ou=group,dc=novatech',
-    accountPattern='(&(objectClass=inetOrgPerson)(uid=%(username)s))',
-    accountFullName='displayName',
-    accountEmail='mail',
-    groupMemberPattern='(&(objectClass=groupOfNames)(member=%(dn)s))',
-    groupName='cn',
-    accountExtraFields=['employeeType'],
-)
+if os.getenv('LDAP_URI'):
+    userInfoProvider = util.LdapUserInfo(
+        uri=os.getenv('LDAP_URI'),
+        bindUser=os.getenv('LDAP_BIND_USER'),
+        bindPw=os.getenv('LDAP_BIND_PW'),
+        accountBase='ou=user,dc=novatech',
+        groupBase='ou=group,dc=novatech',
+        accountPattern='(&(objectClass=inetOrgPerson)(uid=%(username)s))',
+        accountFullName='displayName',
+        accountEmail='mail',
+        groupMemberPattern='(&(objectClass=groupOfNames)(member=%(dn)s))',
+        groupName='cn',
+        accountExtraFields=['employeeType'],
+    )
 
 # WEB SERVER
 c['www'] = {
@@ -89,12 +92,17 @@ c['www'] = {
         'console_view': True,
         'grid_view': True,
     },
-    'auth': util.GitLabAuth(
+}
+
+if os.getenv('GITLAB_URI'):
+    c['www']['auth'] = util.GitLabAuth(
         os.getenv('GITLAB_URI'),
         os.getenv('GITLAB_OAUTH_ID'),
         os.getenv('GITLAB_OAUTH_SECRET'),
-        userInfoProvider=userInfoProvider),
-    'authz': util.Authz(
+        userInfoProvider=userInfoProvider
+    )
+
+    c['www']['authz'] = util.Authz(
         allowRules=[
             # admins can do anything,
             # defaultDeny=False: if user does not have the admin role, we continue parsing rules
@@ -109,13 +117,14 @@ c['www'] = {
                     "andrew.cooper",
                 ]),
         ],
-    ),
-    'change_hook_dialects': {
+    )
+
+if os.getenv('GITLAB_WEBHOOK_SECRET'):
+    c['www']['change_hook_dialects'] = {
         'gitlab': {
             'secret': os.getenv('GITLAB_WEBHOOK_SECRET')
         }
     }
-}
 
 # PROJECT IDENTITY
 
@@ -147,41 +156,43 @@ c['buildbotNetUsageData'] = 'basic'
 
 c['codebaseGenerator'] = novatech.codebaseGenerator
 
-workerConfigs = {{ buildbot_master_worker_configs | default('[]') | to_json }}
+workerConfigs = {{ buildbot_worker_configs | default([]) | to_json }}
 
 for cfg in workerConfigs:
     # Setup local worker configuration repository
-    log.msg("[%s] Init module repository" % (cfg['module']))
-    repo = git.Repo.init(cfg['module'])
 
-    if 'origin' in repo.remotes:
-        log.msg("[%s] Update remote" % (cfg['module']))
-        remote = repo.remotes['origin']
-        remote.set_url(cfg['giturl'])
-    else:
-        log.msg("[%s] Create remote" % (cfg['module']))
-        remote = repo.create_remote('origin', cfg['giturl'])
-    log.msg("[%s] Fetch repository changes" % (cfg['module']))
-    remote.fetch()
+    if 'giturl' in cfg:
+        log.msg("[%s] Init module repository" % (cfg['module']))
+        repo = git.Repo.init(cfg['module'])
 
-    if cfg['branch'] in repo.heads:
-        # update branch
-        log.msg("[%s] Update branch" % (cfg['module']))
-        branch = repo.heads[cfg['branch']]
-        branch.commit = remote.refs[cfg['branch']]
-    else:
-        # create branch
-        log.msg("[%s] Create branch" % (cfg['module']))
-        branch = repo.create_head(cfg['branch'], remote.refs[cfg['branch']])
+        if 'origin' in repo.remotes:
+            log.msg("[%s] Update remote" % (cfg['module']))
+            remote = repo.remotes['origin']
+            remote.set_url(cfg['giturl'])
+        else:
+            log.msg("[%s] Create remote" % (cfg['module']))
+            remote = repo.create_remote('origin', cfg['giturl'])
+        log.msg("[%s] Fetch repository changes" % (cfg['module']))
+        remote.fetch()
 
-    # Update working directory
-    log.msg("[%s] Checkout branch" % (cfg['module']))
-    branch.checkout(force=True)
+        if cfg['branch'] in repo.heads:
+            # update branch
+            log.msg("[%s] Update branch" % (cfg['module']))
+            branch = repo.heads[cfg['branch']]
+            branch.commit = remote.refs[cfg['branch']]
+        else:
+            # create branch
+            log.msg("[%s] Create branch" % (cfg['module']))
+            branch = repo.create_head(cfg['branch'], remote.refs[cfg['branch']])
+
+        # Update working directory
+        log.msg("[%s] Checkout branch" % (cfg['module']))
+        branch.checkout(force=True)
 
     # Load worker configuration
     log.msg("[%s] Import module" % (cfg['module']))
     module_name = ".".join((cfg['module'], 'buildbot_ci'))
-    if module name in sys.modules:
+    if module_name in sys.modules:
         importlib.reload(sys.modules[module_name])
     else:
         importlib.import_module(module_name)
@@ -193,3 +204,18 @@ for cfg in workerConfigs:
     c['schedulers'].extend(worker_config['schedulers'])
     c['builders'].extend(worker_config['builders'])
     c['change_source'].extend(worker_config['change_source'])
+
+c['workers'].append(worker.LocalWorker('master-worker'))
+
+c['builders'].append(
+    util.BuilderConfig(
+        name='master-reconfigure',
+        workernames=['master-worker'],
+        factory=util.BuildFactory([steps.ShellCommand(name="Reconfigure",command=["buildbot reconfigure"],)])
+    ))
+
+c['schedulers'].append(
+    schedulers.ForceScheduler(
+        name='master-reconfigure',
+        builderNames=['master-reconfigure']
+    ))

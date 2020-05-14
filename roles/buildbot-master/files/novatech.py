@@ -1,5 +1,6 @@
 from buildbot.util import giturlparse
 
+
 def codebaseGenerator(chdict):
     """ Generate a codebase description.
 

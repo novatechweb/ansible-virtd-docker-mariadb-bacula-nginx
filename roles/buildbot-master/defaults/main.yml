@@ -47,6 +47,9 @@ buildbot_image_dir: '/tmp/buildbot-master'
 # name of the image being built
 buildbot_image_name: 'buildbot:latest'
 
+# list of ssh hosts known to the container
+known_hosts: ''
+
 # the name of the container being started
 buildbot_name: 'buildbot'
 

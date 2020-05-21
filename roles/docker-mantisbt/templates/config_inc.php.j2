@@ -1,0 +1,12 @@
+<?php
+/**
+ * Configuration Variable Overrides
+ *
+ * This file contains overrides of config_defaults_inc.php
+ *
+ * {{ ansible_managed }}
+ */
+
+{% for k,v in mantisbt_config_vars.items() %}
+${{ k }} = {{ v }};
+{% endfor %}

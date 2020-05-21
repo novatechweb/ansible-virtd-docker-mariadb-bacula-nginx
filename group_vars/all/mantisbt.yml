@@ -1,3 +1,89 @@
 ---
 
+mantisbt_config_dir: '{{ docker_restore_config_base_dir }}/{{ mantisbt_container_name }}'
+mantisbt_config_vars:
+  # https://mantisbt.org/docs/master/en-US/Admin_Guide/html-desktop/#admin.config
+  # ⁠Chapter 5. Configuration
+
+  # 5.2. Database #
+  g_db_type: "'mysqli'"
+  g_hostname: "'{{ mantisbt_db_container_name }}'"
+  g_db_username: "'{{ mantisbt_db_username }}'"
+  g_db_password: "'{{ mantisbt_db_password }}'"
+  g_database_name: "'{{ mantisbt_database_name }}'"
+
+  # 5.6. Security and Cryptography #
+  g_crypto_master_salt: "'{{ mantisbt_crypto_salt }}'"
+
+  # 5.7. Signup and Lost Password #
+  g_allow_signup: 'OFF'
+  g_send_reset_password: 'OFF'
+
+  # 5.8. Email #
+  g_webmaster_email: "'andrew.cooper@novatechweb.com'"
+  g_from_email: "'mantis@novatech-llc.com'"
+  g_from_name: "'Mantis Bug Tracker'"
+  g_return_path_email: "'bounce@novatech-llc.com'"
+  g_enable_email_notification: 'ON'
+  g_validate_email: 'OFF'
+  g_phpMailer_method: 'PHPMAILER_METHOD_SMTP'
+  g_smtp_host: "'{{ exim4_hostname }}'"
+  g_smtp_username: "'mantis'"
+  g_smtp_password: "'{{ mantisbt_email_password }}'"
+  g_smtp_connection_mode: "'tls'"
+  g_smtp_port: 587
+
+  # 5.11. Display #
+  g_window_title: "'MantisBT'"
+  g_logo_image: "'images/ntlogosmall.png'"
+  g_logo_url: "'http://wiki.novatech-llc.com/index.php/Mantis_Workflow'"
+  g_show_realname: 'ON'
+  g_show_avatar: 'ON'
+
+  # MantisBT TimeZone Settings #
+  g_default_timezone: "'America/Chicago'"
+
+  # MantisBT Authentication and LDAP Settings #
+  g_login_method: 'LDAP'
+  g_reauthentication: 'ON'
+  g_reauthentication_expiry: TOKEN_EXPIRY_AUTHENTICATED
+  g_ldap_server: "'ldap://{{ openldap_hostname }}'"
+  g_ldap_root_dn: "'ou=user,dc=novatech'"
+  g_ldap_organization: "''"
+  g_ldap_protocol_version: 3
+  g_ldap_bind_dn: "'cn=proxyagent,dc=novatech'"
+  g_ldap_bind_passwd: "'{{ openldap_proxyagent_password }}'"
+  g_ldap_uid_field: "'uid'"
+  g_ldap_realname_field: "'cn'"
+  g_use_ldap_realname: 'ON'
+  g_use_ldap_email: 'ON'
+
+  # Debugging / Developer Settings #
+  g_log_level: 'LOG_EMAIL | LOG_EMAIL_RECIPIENT | LOG_WEBSERVICE'
+  g_log_destination: "''"
+
+# database usernames and passwords
+mantisbt_db_username: novatech
+
+# the name of the image being duilt and used for the container
+mantisbt_image_dir: '{{ docker_projects_dir }}/docker-mantisbt'
+mantisbt_image_name: '{{ docker_registry_username }}/mantisbt'
+
+# the name of the container being started
+mantisbt_container_name: '{{ docker_name_prefix }}mantisbt'
+
+# the name of the container being started
+mantisbt_db_container_name: '{{ docker_name_prefix }}mantisbt_db'
+
+# path to MantisBT Database configuration directory
+mantisbt_db_config_dir: '{{ docker_restore_config_base_dir }}/{{ mantisbt_db_container_name }}'
+
+# the name of the mysql data-volume used by the mantisbt container
+mantisbt_db_dv_name: '{{ docker_name_prefix }}mantisbt_db_DV'
+
+# restore directories to temporarly store data being restored into docker containers
+mantisbt_docker_backup_dir: '{{ docker_backup_dir }}/MANTISBT'
+mantisbt_docker_restore_dir: '{{ bacula_dest }}{{ mantisbt_docker_backup_dir }}'
+
+# Monitoring package for MantisBT
 mantisbt_monitor_container_name: '{{ docker_name_prefix }}mantisbt_monitor'

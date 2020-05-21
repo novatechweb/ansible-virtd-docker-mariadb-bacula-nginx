@@ -10,7 +10,7 @@
 - name: docker_container.conf dir
   file:
     state: directory
-    path: '{{ docker_restore_config_base_dir }}/{{ mantisbt_container_name }}'
+    path: '{{ mantisbt_config_dir }}'
     owner: root
     group: root
     mode: 'u=rwx,g=rx,o=rx'
@@ -37,18 +37,31 @@
 # *****************************************************************************
 # update the Docker restore config
 
-- name: make config.sh
+- name: make mantisbt.sh
   template:
-    src: config.sh.j2
-    dest: '{{ docker_restore_config_base_dir }}/{{ mantisbt_container_name }}/config.sh'
-    backup: yes
+    src: mantisbt.sh.j2
+    dest: '{{ mantisbt_config_dir }}/mantisbt.sh'
+    backup: no
     owner: root
     group: tape
+    mode: 'u=rwx,g=rx,o='
+    unsafe_writes: yes
+  register: config_sh
+
+- name: Create config_inc.php
+  template:
+    src: config_inc.php.j2
+    dest: '{{ mantisbt_config_dir }}/config_inc.php'
+    backup: no
+    owner: root
+    group: root
     mode: 'u=rw,g=r,o='
+    unsafe_writes: yes
+  register: config_inc
 
 - name: exists - state file
   stat:
-    path: '{{ docker_restore_config_base_dir }}/{{ mantisbt_container_name }}/restore.date.txt'
+    path: '{{ mantisbt_config_dir }}/restore.date.txt'
     get_checksum: False
     get_md5: False
   register: st_mantisbt_restore
@@ -70,13 +83,6 @@
     dest: '{{ mantisbt_image_dir }}/'
   register: deploy_source
 
-- name: copy script
-  copy:
-    remote_src: true
-    src: '{{ mantisbt_image_dir }} }}/mantisbt.sh'
-    dest: '{{ docker_restore_config_base_dir }}/{{ mantisbt_container_name }}/'
-    mode: 'u=rwx,g=rx,o=rx'
-
 - name: build image
   docker_image:
     build:
@@ -85,14 +91,10 @@
     name: '{{ mantisbt_image_name }}'
     source: build
     tag: '{{ docker_image_tag }}'
-    force_source: "{{ docker_image_force_build }}"
+    force_source: "{{ deploy_source.changed }}"
 
 # *****************************************************************************
 # Create the data volumes
-
-- name: config-volume container (mysql)
-  docker_volume:
-    name: '{{ mantisbt_db_cv_name }}'
 
 - name: data-volume container (mysql)
   docker_volume:
@@ -101,25 +103,23 @@
 # *****************************************************************************
 # Configure the database
 
-- name: make temporary directory for config
-  tempfile:
+- name: docker_container.conf dir
+  file:
     state: directory
-  register: config_tempdir
+    path: '{{ mantisbt_db_config_dir }}'
+    owner: root
+    group: root
+    mode: 'u=rwx,g=rx,o=rx'
+    recurse: no
 
 - name: upload mysql config
   copy:
     src: '{{ item }}'
-    dest: '{{ config_tempdir.path }}/{{ item }}'
+    dest: '{{ mantisbt_db_config_dir }}/{{ item }}'
   with_items:
   - largefile.cnf
   - character-set.cnf
-
-- name: copy mysql config to volume
-  command: >
-    docker run --rm
-    -v '{{ config_tempdir.path }}:/from'
-    -v '{{ mantisbt_db_cv_name }}:/to'
-    alpine /bin/ash -c 'cp -v /from/* /to'
+  register: mysql_config
 
 # *****************************************************************************
 # Start the database
@@ -132,24 +132,26 @@
     name: '{{ mantisbt_db_container_name }}'
     restart_policy: '{{ docker_restart_policy }}'
     volumes:
-      - '{{ mantisbt_db_cv_name }}:/etc/mysql/conf.d:z'
+      - '{{ mantisbt_db_config_dir }}:/etc/mysql/conf.d:z'
       - '{{ mantisbt_db_dv_name }}:/var/lib/mysql:z'
     env:
       MYSQL_DATABASE: '{{ mantisbt_database_name }}'
       MYSQL_ROOT_PASSWORD: '{{ mantisbt_db_root_password }}'
-      MYSQL_USER: '{{ mantisbt_db_user }}'
+      MYSQL_USER: '{{ mantisbt_db_username }}'
       MYSQL_PASSWORD: '{{ mantisbt_db_password }}'
     networks:
       - name: '{{ docker_network_frontend }}'
     purge_networks: true
+    restart: '{{ mysql_config.changed }}'
+    state: started
 
 - name: wait for initialization to complete
   shell: >
       printf 'SHOW GLOBAL STATUS\n' | docker exec -i
       '{{ mantisbt_db_container_name }}'
       mysql --host=localhost
-      --user={{ mantisbt_db_user | quote }}
-      --password={{ mantisbt_db_password | quote }}
+      --user='root'
+      --password={{ mantisbt_db_root_password | quote }}
       '{{ mantisbt_database_name }}'
   register: db_status
   retries: 20
@@ -165,9 +167,6 @@
     detach: true
     env:
       MANTISBT_HOSTNAME: '{{ mantisbt_hostname }}'
-      MANTISBT_MAIL_USER: 'mantis'
-      MANTISBT_MAIL_PASSWORD: '{{ mantisbt_email_password | quote }}'
-      MANTISBT_LDAP_PASSWORD: '{{ openldap_proxyagent_password | quote }}'
     hostname: '{{ mantisbt_container_name }}'
     image: '{{ mantisbt_image_name }}:{{ docker_image_tag }}'
     name: '{{ mantisbt_container_name }}'
@@ -180,9 +179,12 @@
           - '{{ mantisbt_db_container_name }}:mantisbt_db'
     ports: '{{ mantisbt_port_args }}'
     purge_networks: true
+    restart: '{{ config_sh.changed or config_inc.changed }}'
     restart_policy: '{{ docker_restart_policy }}'
+    state: started
     volumes:
       - '{{ openssl_dv_name }}:/etc/ssl/private:z'
+      - '{{ mantisbt_config_dir }}:/var/www/html/config/'
 
 # *****************************************************************************
 # Start the monitoring container running
@@ -201,17 +203,8 @@
       - name: '{{ docker_network_frontend }}'
     purge_networks: true
     restart_policy: '{{ docker_restart_policy }}'
+    state: started
 
-# *****************************************************************************
-# remove the MySQL config in the restore directory
-
-- name: cleanup - import mysql config
-  file:
-    path: '{{ mantisbt_docker_restore_dir }}/{{ item }}'
-    state: absent
-  with_items:
-  - largefile.cnf
-  - character-set.cnf
 
 # *****************************************************************************
 # restore?

@@ -7,38 +7,47 @@ mantisbt_port_args:
   - '80'
   - '443'
 
-# database usernames and passwords
-mantisbt_db_user: novatech
+mantisbt_config_dir: '/etc/{{ mantisbt_container_name }}'
+mantisbt_config_vars:
+  # ⁠Chapter 5. Configuration
+  # https://mantisbt.org/docs/master/en-US/Admin_Guide/html-desktop/#admin.config
 
-# must pass in the following variables
-# mantisbt_db_root_password: ''
-# mantisbt_db_password: ''
+  # 5.2. Database #
+  g_hostname: '"{{ mantisbt_db_container_name }}"'
+  g_db_username: '"{{ mantisbt_db_username }}"'
+  g_db_password: '"{{ mantisbt_db_password }}"'
+  g_database_name: '"{{ mantisbt_database_name }}"'
+
+# database usernames and passwords
+mantisbt_database_name: 'bugtracker'
+mantisbt_db_username: 'mantis'
+mantisbt_db_password: 'pass'
 
 # the name of the image being duilt and used for the container
-mantisbt_image_dir: '{{ docker_projects_dir }}/docker-mantisbt'
-mantisbt_image_name: '{{ docker_registry_username }}/mantisbt'
+mantisbt_image_dir: '/usr/src/docker-mantisbt'
+mantisbt_image_name: 'mantisbt'
 
 mantisbt_db_image_name: 'mysql:5'
 
 # the name of the container being started
-mantisbt_container_name: '{{ docker_name_prefix }}mantisbt'
+mantisbt_container_name: 'mantisbt'
 
 # the name of the container being started
-mantisbt_db_container_name: '{{ docker_name_prefix }}mantisbt_db'
+mantisbt_db_container_name: 'mantisbt_db'
 
-# the name of the mysql config volume used by the mantisbt container
-mantisbt_db_cv_name: '{{ docker_name_prefix }}mantisbt_db_CV'
+# path to MantisBT Database configuration directory
+mantisbt_db_config_dir: '/etc/{{ mantisbt_db_container_name }}'
 
 # the name of the mysql data-volume used by the mantisbt container
-mantisbt_db_dv_name: '{{ docker_name_prefix }}mantisbt_db_DV'
+mantisbt_db_dv_name: 'mantisbt_db_DV'
 
 # restore directories to temporarly store data being restored into docker containers
-mantisbt_docker_backup_dir: '{{ docker_backup_dir }}/MANTISBT'
-mantisbt_docker_restore_dir: '{{ bacula_dest }}{{ mantisbt_docker_backup_dir }}'
+mantisbt_docker_backup_dir: '/tmp/MANTISBT'
+mantisbt_docker_restore_dir: '{{ mantisbt_docker_backup_dir }}'
 
 # Monitoring package for MantisBT
 mantisbt_monitor_image_name: 'lusotycoon/apache-exporter:v0.8.0'
-mantisbt_monitor_container_name: '{{ docker_name_prefix }}mantisbt_monitor'
+mantisbt_monitor_container_name: 'mantisbt_monitor'
 mantisbt_monitor_scrape_uri: "http://{{ mantisbt_container_name }}/server-status?auto" #URI to apache stub status page. (default "http://localhost/server-status/?auto")
 mantisbt_monitor_telemetry_address: ":9117" #Address on which to expose metrics. (default ":9117")
 mantisbt_monitor_telemetry_endpoint: "/metrics" #Path under which to expose metrics. (default "/metrics")
@@ -46,9 +55,3 @@ mantisbt_monitor_telemetry_endpoint: "/metrics" #Path under which to expose metr
 # files restored from tape
 mantisbt_database_backup_file: '/mantisbtdb.sql'
 mantisbt_database_files_table_backup_file: '/mantisbtdb-files_table.sql'
-
-# Network names
-docker_network_frontend: 'frontend'
-
-# the name of the sql database used by mantisbt
-mantisbt_database_name: 'bugtracker'

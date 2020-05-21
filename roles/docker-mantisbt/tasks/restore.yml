@@ -74,10 +74,10 @@
 # restore the mantisbt
 
 - name: restore script
-  command: '{{ docker_projects_dir }}/docker-mantisbt/mantisbt.sh restore -u {{ mantisbt_db_user }} -p {{ mantisbt_db_password | quote }}'
+  command: '{{ mantisbt_config_dir }}/mantisbt.sh restore'
   args:
-    chdir: '{{ docker_restore_config_base_dir }}/{{ mantisbt_container_name }}/'
-  when: st_mantisbt_static_archive.stat.exists == True and st_mantisbt_SQL_file.stat.exists == True and st_mantisbt_files_table_SQL_file.stat.exists == True
+    chdir: '{{ mantisbt_config_dir }}/'
+  when: st_mantisbt_SQL_file.stat.exists == True and st_mantisbt_files_table_SQL_file.stat.exists == True
 
 # *****************************************************************************
 # cleanup
@@ -88,5 +88,5 @@
     state: absent
 
 - name: State file
-  shell: 'date --rfc-3339=seconds > {{ docker_restore_config_base_dir }}/{{ mantisbt_container_name }}/restore.date.txt'
+  shell: 'date --rfc-3339=seconds > {{ mantisbt_config_dir }}/restore.date.txt'
   when: st_mantisbt_restore.stat.exists == False

@@ -15,7 +15,7 @@ mantisbt_db_user: novatech
 # mantisbt_db_password: ''
 
 # the name of the image being duilt and used for the container
-mantisbt_image_repo: https://github.com/novatechweb/docker-mantisbt.git
+mantisbt_image_dir: '{{ docker_projects_dir }}/docker-mantisbt'
 mantisbt_image_name: '{{ docker_registry_username }}/mantisbt'
 
 mantisbt_db_image_name: 'mysql:5'

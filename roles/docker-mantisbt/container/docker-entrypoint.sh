@@ -48,14 +48,6 @@ unlock_mantisbt() {
     echo >&2 "MantisBT unlocked to read-write mode"
 }
 
-if [[ $(ls -A1 ${MANTISBT_BASE_DIR} | wc -l) == '0' ]]; then
-    # initial setup of mantisbt
-    if [[ ! -e ${MANTISBT_BASE_DIR}/index.php ]] || [[ ! -e ${MANTISBT_BASE_DIR}/config_inc.php ]]; then
-        echo >&2 "Installing Mantis Bug Tracker into ${MANTISBT_BASE_DIR} - copying now..."
-        tar cf - --one-file-system -C /usr/src/mantisbt . | tar xf -
-    fi
-fi
-
 # Set the server name
 if [[ ! -z "${MANTISBT_HOSTNAME}" ]]; then
     # change any value of MANTISBT_HOSTNAME to the value

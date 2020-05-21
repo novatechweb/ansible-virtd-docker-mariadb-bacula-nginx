@@ -56,7 +56,6 @@ done
 # make certian the containers exist
 docker inspect ${MANTISBT_CONTAINER_NAME} > /dev/null
 docker inspect ${MANTISBT_DB_CONTAINER_NAME} > /dev/null
-docker volume inspect ${MANTISBT_DV_NAME} > /dev/null
 docker volume inspect ${MANTISBT_DB_DV_NAME} > /dev/null
 
 get_db_user_and_password() {

@@ -26,9 +26,6 @@ mantisbt_container_name: '{{ docker_name_prefix }}mantisbt'
 # the name of the container being started
 mantisbt_db_container_name: '{{ docker_name_prefix }}mantisbt_db'
 
-# the name of the data-volume used by the container
-mantisbt_dv_name: '{{ docker_name_prefix }}mantisbt_DV'
-
 # the name of the mysql config volume used by the mantisbt container
 mantisbt_db_cv_name: '{{ docker_name_prefix }}mantisbt_db_CV'
 
@@ -47,7 +44,6 @@ mantisbt_monitor_telemetry_address: ":9117" #Address on which to expose metrics.
 mantisbt_monitor_telemetry_endpoint: "/metrics" #Path under which to expose metrics. (default "/metrics")
 
 # files restored from tape
-mantisbt_static_backup_file: '/mantisbt.tar'
 mantisbt_database_backup_file: '/mantisbtdb.sql'
 mantisbt_database_files_table_backup_file: '/mantisbtdb-files_table.sql'
 

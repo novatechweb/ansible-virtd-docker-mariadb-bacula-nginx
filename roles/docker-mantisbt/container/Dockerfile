@@ -75,9 +75,6 @@ RUN ["/bin/bash", "/configure.sh"]
 # specify which network ports will be used
 EXPOSE 80 443
 
-# specify the volumes directly related to this image
-VOLUME ["/var/www/html"]
-
 # start the entrypoint script
 WORKDIR /var/www/html
 ENTRYPOINT ["/docker-entrypoint.sh"]

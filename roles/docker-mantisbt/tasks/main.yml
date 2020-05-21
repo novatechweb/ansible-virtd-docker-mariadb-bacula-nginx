@@ -10,7 +10,7 @@
 - name: docker_container.conf dir
   file:
     state: directory
-    path: '{{ docker_restore_config_base_dir }}/{{ mantisbt_dv_name }}'
+    path: '{{ docker_restore_config_base_dir }}/{{ mantisbt_container_name }}'
     owner: root
     group: root
     mode: 'u=rwx,g=rx,o=rx'
@@ -40,7 +40,7 @@
 - name: make config.sh
   template:
     src: config.sh.j2
-    dest: '{{ docker_restore_config_base_dir }}/{{ mantisbt_dv_name }}/config.sh'
+    dest: '{{ docker_restore_config_base_dir }}/{{ mantisbt_container_name }}/config.sh'
     backup: yes
     owner: root
     group: tape
@@ -48,7 +48,7 @@
 
 - name: exists - state file
   stat:
-    path: '{{ docker_restore_config_base_dir }}/{{ mantisbt_dv_name }}/restore.date.txt'
+    path: '{{ docker_restore_config_base_dir }}/{{ mantisbt_container_name }}/restore.date.txt'
     get_checksum: False
     get_md5: False
   register: st_mantisbt_restore
@@ -74,7 +74,7 @@
   copy:
     remote_src: true
     src: '{{ mantisbt_image_dir }} }}/mantisbt.sh'
-    dest: '{{ docker_restore_config_base_dir }}/{{ mantisbt_dv_name }}/'
+    dest: '{{ docker_restore_config_base_dir }}/{{ mantisbt_container_name }}/'
     mode: 'u=rwx,g=rx,o=rx'
 
 - name: build image
@@ -89,10 +89,6 @@
 
 # *****************************************************************************
 # Create the data volumes
-
-- name: data-volume container (mantisbt)
-  docker_volume:
-    name: '{{ mantisbt_dv_name }}'
 
 - name: config-volume container (mysql)
   docker_volume:
@@ -187,7 +183,6 @@
     restart_policy: '{{ docker_restart_policy }}'
     volumes:
       - '{{ openssl_dv_name }}:/etc/ssl/private:z'
-      - '{{ mantisbt_dv_name }}:/var/www/html:z'
 
 # *****************************************************************************
 # Start the monitoring container running

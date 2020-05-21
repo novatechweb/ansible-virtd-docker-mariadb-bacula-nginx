@@ -59,6 +59,7 @@ RUN mkdir -p /usr/src/mantisbt \
 &&  rm -rf "${MANTISBT_BASE_DIR}/doc/"
 
 # copy over files
+COPY ntlogosmall.png images/
 COPY \
     config/000-default-ssl.conf \
     config/000-default.conf \

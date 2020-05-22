@@ -157,6 +157,7 @@
   retries: 20
   delay: 3
   until: "db_status.rc == 0"
+  changed_when: False
 
 # *****************************************************************************
 # Start the data container running

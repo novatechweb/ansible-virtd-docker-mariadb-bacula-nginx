@@ -1,0 +1,29 @@
+---
+# This is an example playbook to execute Ansible tests.
+
+- name: Verify
+  hosts: all
+  become: true
+  pre_tasks:
+    - name: Include module default variables
+      include_vars:
+        file: "{{ playbook_dir }}/../../defaults/main.yml"
+    - name: Include module standard variables
+      include_vars:
+        file: "{{ playbook_dir }}/../../vars/main.yml"
+
+  tasks:
+    - name: Get promtail container information
+      docker_container_info:
+        name: '{{ promtail_container }}'
+      register: promtail_info
+
+    - name: Get promtail ready status
+      uri:
+        url: 'http://localhost:{{ promtail_port_listen }}/ready'
+        return_content: yes
+      register: promtail_info
+
+    - name: Assert promtail ready status
+      assert:
+        that: promtail_info.content == "Ready"

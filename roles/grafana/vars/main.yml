@@ -1,0 +1,15 @@
+---
+# vars file for grafana
+
+grafana_instance: "{{ grafana_hostname }}"
+
+# paths within grafana container
+grafana_etc_dir: "/etc/grafana"
+grafana_logs_dir: "/var/log/grafana"
+grafana_data_dir: "/var/lib/grafana"
+
+grafana_address: "0.0.0.0"
+grafana_port: '3000'
+
+grafana_uid: '472'
+grafana_gid: '472'

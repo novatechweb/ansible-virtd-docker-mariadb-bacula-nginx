@@ -1,0 +1,12 @@
+---
+# vars file for loki
+
+loki_etc_dir: "/etc/loki"
+loki_config_file: "loki.yaml"
+
+loki_port_listen: 3100
+
+loki_uid: '10001'
+loki_gid: '10001'
+
+loki_storage_dir: "/loki"

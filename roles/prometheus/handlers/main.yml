@@ -1,0 +1,14 @@
+---
+# handlers file for prometheus
+
+- name: restart prometheus
+  become: true
+  docker_container:
+    name: '{{ prometheus_container }}'
+    restart: yes
+    state: started
+
+- name: reload prometheus
+  become: true
+  command:
+    docker kill --signal=HUP '{{ prometheus_container }}'

@@ -1,0 +1,73 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+{{ ansible_managed | comment }}
+
+# The module to run Loki with. Supported values
+# all, querier, table-manager, ingester, distributor
+target: {{ loki_target_config | default("all") }}
+
+# Enables authentication through the X-Scope-OrgID header, which must be present
+# if true. If false, the OrgID will always be set to "fake".
+auth_enabled: {{ loki_auth_enabled_config | default(false) }}
+
+{% if loki_server_config != {} %}
+# Configures the server of the launched module(s).
+server:
+  {{ loki_server_config | to_nice_yaml(indent=2) | indent(2, False) }}
+{% endif %}
+
+{% if loki_distributor_config != {} %}
+# Configures the distributor.
+distributor:
+  {{ loki_distributor_config | to_nice_yaml(indent=2) | indent(2, False) }}
+{% endif %}
+
+{% if loki_querier_config != {} %}
+# Configures the querier. Only appropriate when running all modules or
+# just the querier.
+querier:
+  {{ loki_querier_config | to_nice_yaml(indent=2) | indent(2, False) }}
+{% endif %}
+
+{% if loki_ingester_client_config != {} %}
+# Configures how the distributor will connect to ingesters. Only appropriate
+# when running all modules, the distributor, or the querier.
+ingester_client:
+  {{ loki_ingester_client_config | to_nice_yaml(indent=2) | indent(2, False) }}
+{% endif %}
+
+{% if loki_ingester_config != {} %}
+# Configures the ingester and how the ingester will register itself to a
+# key value store.
+ingester:
+  {{ loki_ingester_config | to_nice_yaml(indent=2) | indent(2, False) }}
+{% endif %}
+
+{% if loki_storage_config != {} %}
+# Configures where Loki will store data.
+storage_config:
+  {{ loki_storage_config | to_nice_yaml(indent=2) | indent(2, False) }}
+{% endif %}
+
+{% if loki_chunk_store_config != {} %}
+# Configures how Loki will store data in the specific store.
+chunk_store_config:
+  {{ loki_chunk_store_config | to_nice_yaml(indent=2) | indent(2, False) }}
+{% endif %}
+
+{% if loki_schema_config != {} %}
+# Configures the chunk index schema and where it is stored.
+schema_config:
+  {{ loki_schema_config | to_nice_yaml(indent=2) | indent(2, False) }}
+{% endif %}
+
+{% if loki_limits_config != {} %}
+# Configures limits per-tenant or globally
+limits_config:
+  {{ loki_limits_config | to_nice_yaml(indent=2) | indent(2, False) }}
+{% endif %}
+
+{% if loki_table_manager != {} %}
+# Configures the table manager for retention
+table_manager:
+  {{ loki_table_manager | to_nice_yaml(indent=2) | indent(2, False) }}
+{% endif %}

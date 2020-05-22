@@ -1,0 +1,36 @@
+---
+# This is an example playbook to execute Ansible tests.
+
+- name: Verify
+  hosts: all
+  become: true
+  pre_tasks:
+    - name: Include module default variables
+      include_vars:
+        file: "{{ playbook_dir }}/../../defaults/main.yml"
+    - name: Include module standard variables
+      include_vars:
+        file: "{{ playbook_dir }}/../../vars/main.yml"
+
+  tasks:
+  - name: Get prometheus container information
+    docker_container_info:
+      name: '{{ prometheus_container }}'
+    register: prometheus_info
+
+  - name: Assert prometheus container is running and healthy
+    assert:
+      that:
+        - prometheus_info['container']['State']['Health']['Status'] == 'healthy'
+
+  - name: Grab actual prometheus port
+    set_fact:
+      prometheus_host_port: "{{ prometheus_info['container']['NetworkSettings']['Ports'][prometheus_port+'/tcp'][0]['HostPort'] }}"
+
+  - name: Assert prometheus is responding
+    uri:
+      method: GET
+      return_content: yes
+      status_code: 200
+      url: "http://localhost:{{ prometheus_host_port }}/api/v1/status/flags"
+    register: health

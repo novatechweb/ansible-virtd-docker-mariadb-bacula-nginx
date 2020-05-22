@@ -5,6 +5,8 @@ nexus_networks:
       - '{{ public_hostname }}'
 nexus_host_docker: true
 nexus_default_port: 8081
+nexus_monitor_container_name: '{{ docker_name_prefix }}nexus_monitor'
+nexus_monitor_port: "9184"
 
 # Nexus Backup
 nexus_docker_backup_dir: "{{ docker_backup_dir }}/NEXUS3"

@@ -1,0 +1,539 @@
+Usage of /usr/bin/loki:
+  -applicationautoscaling.url value
+    	ApplicationAutoscaling endpoint URL with escaped Key and Secret encoded.
+  -auth.enabled
+    	Set to false to disable auth. (default true)
+  -bigtable.backoff-max-period duration
+    	Maximum delay when backing off. (default 10s)
+  -bigtable.backoff-min-period duration
+    	Minimum delay when backing off. (default 100ms)
+  -bigtable.backoff-on-ratelimits
+    	Enable backoff and retry when we hit ratelimits.
+  -bigtable.backoff-retries int
+    	Number of times to backoff and retry before failing. (default 10)
+  -bigtable.column-key-from value
+    	The date (in the format YYYY-MM-DD) after which we use bigtable column keys.
+  -bigtable.grpc-client-rate-limit float
+    	Rate limit for gRPC client; 0 means disabled.
+  -bigtable.grpc-client-rate-limit-burst int
+    	Rate limit burst for gRPC client.
+  -bigtable.grpc-max-recv-msg-size int
+    	gRPC client max receive message size (bytes). (default 104857600)
+  -bigtable.grpc-max-send-msg-size int
+    	gRPC client max send message size (bytes). (default 16777216)
+  -bigtable.grpc-use-gzip-compression
+    	Use compression when sending messages.
+  -bigtable.instance string
+    	Bigtable instance ID.
+  -bigtable.project string
+    	Bigtable project ID.
+  -boltdb.dir string
+    	Location of BoltDB index files.
+  -cache.enable-fifocache
+    	Cache config for chunks. Enable in-memory cache.
+  -cassandra.addresses string
+    	Comma-separated hostnames or IPs of Cassandra instances.
+  -cassandra.auth
+    	Enable password authentication when connecting to cassandra.
+  -cassandra.ca-path string
+    	Path to certificate file to verify the peer.
+  -cassandra.connect-timeout duration
+    	Initial connection timeout, used during initial dial to server. (default 600ms)
+  -cassandra.consistency string
+    	Consistency level for Cassandra. (default "QUORUM")
+  -cassandra.disable-initial-host-lookup
+    	Instruct the cassandra driver to not attempt to get host info from the system.peers table.
+  -cassandra.host-verification
+    	Require SSL certificate validation. (default true)
+  -cassandra.keyspace string
+    	Keyspace to use in Cassandra.
+  -cassandra.password string
+    	Password to use when connecting to cassandra.
+  -cassandra.port int
+    	Port that Cassandra is running on (default 9042)
+  -cassandra.replication-factor int
+    	Replication factor to use in Cassandra. (default 1)
+  -cassandra.ssl
+    	Use SSL when connecting to cassandra instances.
+  -cassandra.timeout duration
+    	Timeout when connecting to cassandra. (default 600ms)
+  -cassandra.username string
+    	Username to use when connecting to cassandra.
+  -chunk.storage-client string
+    	Which storage client to use (aws, gcp, cassandra, inmemory). (default "aws")
+  -config-yaml string
+    	Schema config yaml
+  -config.file string
+    	Configuration file to load.
+  -consul.acltoken string
+    	ACL Token used to interact with Consul.
+  -consul.client-timeout duration
+    	HTTP timeout when talking to consul (default 20s)
+  -consul.consistent-reads
+    	Enable consistent reads to consul. (default true)
+  -consul.hostname string
+    	Hostname and port of Consul. (default "localhost:8500")
+  -consul.prefix string
+    	Prefix for keys in Consul. Should end with a /. (default "collectors/")
+  -default-validity duration
+    	Cache config for chunks. The default validity of entries for caches unless overridden.
+  -distributor.accept-ha-samples
+    	Per-user flag to enable handling of samples with external labels for identifying replicas in an HA Prometheus setup.
+  -distributor.client-cleanup-period duration
+    	How frequently to clean up clients for ingesters that have gone away. (default 15s)
+  -distributor.health-check-ingesters
+    	Run a health check on each ingester client during periodic cleanup.
+  -distributor.ingestion-burst-size int
+    	Per-user allowed ingestion burst size (in number of samples). Warning, very high limits will be reset every -distributor.limiter-reload-period. (default 50000)
+  -distributor.ingestion-rate-limit float
+    	Per-user ingestion rate limit in samples per second. (default 25000)
+  -distributor.replication-factor int
+    	The number of ingesters to write to and read from. (default 3)
+  -dynamodb.api-limit float
+    	DynamoDB table management requests per second limit. (default 2)
+  -dynamodb.base64-buckets-from value
+    	The date (in the format YYYY-MM-DD) after which we will stop querying to non-base64 encoded values.
+  -dynamodb.chunk-table.enable-ondemand-throughput-mode
+    	Enables on demand througput provisioning for the storage provider (if supported). Applies only to tables which are not autoscaled
+  -dynamodb.chunk-table.from value
+    	Date after which to write chunks to DynamoDB.
+  -dynamodb.chunk-table.inactive-enable-ondemand-throughput-mode
+    	Enables on demand througput provisioning for the storage provider (if supported). Applies only to tables which are not autoscaled
+  -dynamodb.chunk-table.inactive-read-throughput int
+    	DynamoDB table read throughput for inactive tables. (default 300)
+  -dynamodb.chunk-table.inactive-read-throughput.scale-last-n int
+    	Number of last inactive tables to enable read autoscale. (default 4)
+  -dynamodb.chunk-table.inactive-read-throughput.scale.enabled
+    	Should we enable autoscale for the table.
+  -dynamodb.chunk-table.inactive-read-throughput.scale.in-cooldown int
+    	DynamoDB minimum seconds between each autoscale down. (default 1800)
+  -dynamodb.chunk-table.inactive-read-throughput.scale.max-capacity int
+    	DynamoDB maximum provision capacity. (default 6000)
+  -dynamodb.chunk-table.inactive-read-throughput.scale.min-capacity int
+    	DynamoDB minimum provision capacity. (default 3000)
+  -dynamodb.chunk-table.inactive-read-throughput.scale.out-cooldown int
+    	DynamoDB minimum seconds between each autoscale up. (default 1800)
+  -dynamodb.chunk-table.inactive-read-throughput.scale.role-arn string
+    	AWS AutoScaling role ARN
+  -dynamodb.chunk-table.inactive-read-throughput.scale.target-value float
+    	DynamoDB target ratio of consumed capacity to provisioned capacity. (default 80)
+  -dynamodb.chunk-table.inactive-write-throughput int
+    	DynamoDB table write throughput for inactive tables. (default 1)
+  -dynamodb.chunk-table.inactive-write-throughput.scale-last-n int
+    	Number of last inactive tables to enable write autoscale. (default 4)
+  -dynamodb.chunk-table.inactive-write-throughput.scale.enabled
+    	Should we enable autoscale for the table.
+  -dynamodb.chunk-table.inactive-write-throughput.scale.in-cooldown int
+    	DynamoDB minimum seconds between each autoscale down. (default 1800)
+  -dynamodb.chunk-table.inactive-write-throughput.scale.max-capacity int
+    	DynamoDB maximum provision capacity. (default 6000)
+  -dynamodb.chunk-table.inactive-write-throughput.scale.min-capacity int
+    	DynamoDB minimum provision capacity. (default 3000)
+  -dynamodb.chunk-table.inactive-write-throughput.scale.out-cooldown int
+    	DynamoDB minimum seconds between each autoscale up. (default 1800)
+  -dynamodb.chunk-table.inactive-write-throughput.scale.role-arn string
+    	AWS AutoScaling role ARN
+  -dynamodb.chunk-table.inactive-write-throughput.scale.target-value float
+    	DynamoDB target ratio of consumed capacity to provisioned capacity. (default 80)
+  -dynamodb.chunk-table.period duration
+    	DynamoDB table period. (default 168h0m0s)
+  -dynamodb.chunk-table.prefix string
+    	DynamoDB table prefix for period tables. (default "cortex_chunks_")
+  -dynamodb.chunk-table.read-throughput int
+    	DynamoDB table default read throughput. (default 300)
+  -dynamodb.chunk-table.read-throughput.scale.enabled
+    	Should we enable autoscale for the table.
+  -dynamodb.chunk-table.read-throughput.scale.in-cooldown int
+    	DynamoDB minimum seconds between each autoscale down. (default 1800)
+  -dynamodb.chunk-table.read-throughput.scale.max-capacity int
+    	DynamoDB maximum provision capacity. (default 6000)
+  -dynamodb.chunk-table.read-throughput.scale.min-capacity int
+    	DynamoDB minimum provision capacity. (default 3000)
+  -dynamodb.chunk-table.read-throughput.scale.out-cooldown int
+    	DynamoDB minimum seconds between each autoscale up. (default 1800)
+  -dynamodb.chunk-table.read-throughput.scale.role-arn string
+    	AWS AutoScaling role ARN
+  -dynamodb.chunk-table.read-throughput.scale.target-value float
+    	DynamoDB target ratio of consumed capacity to provisioned capacity. (default 80)
+  -dynamodb.chunk-table.tag value
+    	Tag (of the form key=value) to be added to all tables under management.
+  -dynamodb.chunk-table.write-throughput int
+    	DynamoDB table default write throughput. (default 3000)
+  -dynamodb.chunk-table.write-throughput.scale.enabled
+    	Should we enable autoscale for the table.
+  -dynamodb.chunk-table.write-throughput.scale.in-cooldown int
+    	DynamoDB minimum seconds between each autoscale down. (default 1800)
+  -dynamodb.chunk-table.write-throughput.scale.max-capacity int
+    	DynamoDB maximum provision capacity. (default 6000)
+  -dynamodb.chunk-table.write-throughput.scale.min-capacity int
+    	DynamoDB minimum provision capacity. (default 3000)
+  -dynamodb.chunk-table.write-throughput.scale.out-cooldown int
+    	DynamoDB minimum seconds between each autoscale up. (default 1800)
+  -dynamodb.chunk-table.write-throughput.scale.role-arn string
+    	AWS AutoScaling role ARN
+  -dynamodb.chunk-table.write-throughput.scale.target-value float
+    	DynamoDB target ratio of consumed capacity to provisioned capacity. (default 80)
+  -dynamodb.chunk.gang.size int
+    	Number of chunks to group together to parallelise fetches (zero to disable) (default 10)
+  -dynamodb.chunk.get.max.parallelism int
+    	Max number of chunk-get operations to start in parallel (default 32)
+  -dynamodb.daily-buckets-from value
+    	The date (in the format YYYY-MM-DD) of the first day for which DynamoDB index buckets should be day-sized vs. hour-sized.
+  -dynamodb.max-backoff duration
+    	Maximum backoff time (default 50s)
+  -dynamodb.max-retries int
+    	Maximum number of times to retry an operation (default 20)
+  -dynamodb.min-backoff duration
+    	Minimum backoff time (default 100ms)
+  -dynamodb.original-table-name string
+    	The name of the DynamoDB table used before versioned schemas were introduced. (default "cortex")
+  -dynamodb.periodic-table.enable-ondemand-throughput-mode
+    	Enables on demand througput provisioning for the storage provider (if supported). Applies only to tables which are not autoscaled
+  -dynamodb.periodic-table.from value
+    	Date after which to use periodic tables.
+  -dynamodb.periodic-table.grace-period duration
+    	DynamoDB periodic tables grace period (duration which table will be created/deleted before/after it's needed). (default 10m0s)
+  -dynamodb.periodic-table.inactive-enable-ondemand-throughput-mode
+    	Enables on demand througput provisioning for the storage provider (if supported). Applies only to tables which are not autoscaled
+  -dynamodb.periodic-table.inactive-read-throughput int
+    	DynamoDB table read throughput for inactive tables. (default 300)
+  -dynamodb.periodic-table.inactive-read-throughput.scale-last-n int
+    	Number of last inactive tables to enable read autoscale. (default 4)
+  -dynamodb.periodic-table.inactive-read-throughput.scale.enabled
+    	Should we enable autoscale for the table.
+  -dynamodb.periodic-table.inactive-read-throughput.scale.in-cooldown int
+    	DynamoDB minimum seconds between each autoscale down. (default 1800)
+  -dynamodb.periodic-table.inactive-read-throughput.scale.max-capacity int
+    	DynamoDB maximum provision capacity. (default 6000)
+  -dynamodb.periodic-table.inactive-read-throughput.scale.min-capacity int
+    	DynamoDB minimum provision capacity. (default 3000)
+  -dynamodb.periodic-table.inactive-read-throughput.scale.out-cooldown int
+    	DynamoDB minimum seconds between each autoscale up. (default 1800)
+  -dynamodb.periodic-table.inactive-read-throughput.scale.role-arn string
+    	AWS AutoScaling role ARN
+  -dynamodb.periodic-table.inactive-read-throughput.scale.target-value float
+    	DynamoDB target ratio of consumed capacity to provisioned capacity. (default 80)
+  -dynamodb.periodic-table.inactive-write-throughput int
+    	DynamoDB table write throughput for inactive tables. (default 1)
+  -dynamodb.periodic-table.inactive-write-throughput.scale-last-n int
+    	Number of last inactive tables to enable write autoscale. (default 4)
+  -dynamodb.periodic-table.inactive-write-throughput.scale.enabled
+    	Should we enable autoscale for the table.
+  -dynamodb.periodic-table.inactive-write-throughput.scale.in-cooldown int
+    	DynamoDB minimum seconds between each autoscale down. (default 1800)
+  -dynamodb.periodic-table.inactive-write-throughput.scale.max-capacity int
+    	DynamoDB maximum provision capacity. (default 6000)
+  -dynamodb.periodic-table.inactive-write-throughput.scale.min-capacity int
+    	DynamoDB minimum provision capacity. (default 3000)
+  -dynamodb.periodic-table.inactive-write-throughput.scale.out-cooldown int
+    	DynamoDB minimum seconds between each autoscale up. (default 1800)
+  -dynamodb.periodic-table.inactive-write-throughput.scale.role-arn string
+    	AWS AutoScaling role ARN
+  -dynamodb.periodic-table.inactive-write-throughput.scale.target-value float
+    	DynamoDB target ratio of consumed capacity to provisioned capacity. (default 80)
+  -dynamodb.periodic-table.period duration
+    	DynamoDB table period. (default 168h0m0s)
+  -dynamodb.periodic-table.prefix string
+    	DynamoDB table prefix for period tables. (default "cortex_")
+  -dynamodb.periodic-table.read-throughput int
+    	DynamoDB table default read throughput. (default 300)
+  -dynamodb.periodic-table.read-throughput.scale.enabled
+    	Should we enable autoscale for the table.
+  -dynamodb.periodic-table.read-throughput.scale.in-cooldown int
+    	DynamoDB minimum seconds between each autoscale down. (default 1800)
+  -dynamodb.periodic-table.read-throughput.scale.max-capacity int
+    	DynamoDB maximum provision capacity. (default 6000)
+  -dynamodb.periodic-table.read-throughput.scale.min-capacity int
+    	DynamoDB minimum provision capacity. (default 3000)
+  -dynamodb.periodic-table.read-throughput.scale.out-cooldown int
+    	DynamoDB minimum seconds between each autoscale up. (default 1800)
+  -dynamodb.periodic-table.read-throughput.scale.role-arn string
+    	AWS AutoScaling role ARN
+  -dynamodb.periodic-table.read-throughput.scale.target-value float
+    	DynamoDB target ratio of consumed capacity to provisioned capacity. (default 80)
+  -dynamodb.periodic-table.tag value
+    	Tag (of the form key=value) to be added to all tables under management.
+  -dynamodb.periodic-table.write-throughput int
+    	DynamoDB table default write throughput. (default 3000)
+  -dynamodb.periodic-table.write-throughput.scale.enabled
+    	Should we enable autoscale for the table.
+  -dynamodb.periodic-table.write-throughput.scale.in-cooldown int
+    	DynamoDB minimum seconds between each autoscale down. (default 1800)
+  -dynamodb.periodic-table.write-throughput.scale.max-capacity int
+    	DynamoDB maximum provision capacity. (default 6000)
+  -dynamodb.periodic-table.write-throughput.scale.min-capacity int
+    	DynamoDB minimum provision capacity. (default 3000)
+  -dynamodb.periodic-table.write-throughput.scale.out-cooldown int
+    	DynamoDB minimum seconds between each autoscale up. (default 1800)
+  -dynamodb.periodic-table.write-throughput.scale.role-arn string
+    	AWS AutoScaling role ARN
+  -dynamodb.periodic-table.write-throughput.scale.target-value float
+    	DynamoDB target ratio of consumed capacity to provisioned capacity. (default 80)
+  -dynamodb.poll-interval duration
+    	How frequently to poll DynamoDB to learn our capacity. (default 2m0s)
+  -dynamodb.throttle-limit float
+    	DynamoDB rate cap to back off when throttled. (default 10)
+  -dynamodb.url value
+    	DynamoDB endpoint URL with escaped Key and Secret encoded. If only region is specified as a host, proper endpoint will be deduced. Use inmemory:///<table-name> to use a mock in-memory implementation.
+  -dynamodb.use-periodic-tables
+    	Should we use periodic tables.
+  -dynamodb.v4-schema-from value
+    	The date (in the format YYYY-MM-DD) after which we enable v4 schema.
+  -dynamodb.v5-schema-from value
+    	The date (in the format YYYY-MM-DD) after which we enable v5 schema.
+  -dynamodb.v6-schema-from value
+    	The date (in the format YYYY-MM-DD) after which we enable v6 schema.
+  -dynamodb.v9-schema-from value
+    	The date (in the format YYYY-MM-DD) after which we enable v9 schema (Series indexing).
+  -fifocache.duration duration
+    	Cache config for chunks. The expiry duration for the cache.
+  -fifocache.size int
+    	Cache config for chunks. The number of entries to cache.
+  -gcs.bucketname string
+    	Name of GCS bucket to put chunks in.
+  -gcs.chunk-buffer-size int
+    	The size of the buffer that GCS client for each PUT request. 0 to disable buffering.
+  -gcs.request-timeout duration
+    	The duration after which the requests to GCS should be timed out.
+  -ha-tracker.cluster string
+    	Prometheus label to look for in samples to identify a Poemtheus HA cluster. (default "cluster")
+  -ha-tracker.replica string
+    	Prometheus label to look for in samples to identify a Proemtheus HA replica. (default "__replica__")
+  -httptest.serve string
+    	if non-empty, httptest.NewServer serves on this address and blocks
+  -ingester.chunks-block-size int
+    	 (default 262144)
+  -ingester.chunks-idle-period duration
+    	 (default 30m0s)
+  -ingester.chunks-retain-period duration
+    	 (default 15m0s)
+  -ingester.claim-on-rollout
+    	Send chunks to PENDING ingesters on exit.
+  -ingester.client.healthcheck-timeout duration
+    	Timeout for healthcheck rpcs. (default 1s)
+  -ingester.client.max-recv-message-size int
+    	Maximum message size, in bytes, this client will receive. (default 67108864)
+  -ingester.client.timeout duration
+    	Timeout for ingester client RPCs. (default 5s)
+  -ingester.concurrent-flushed int
+    	 (default 16)
+  -ingester.final-sleep duration
+    	Duration to sleep for before exiting, to ensure metrics are scraped. (default 30s)
+  -ingester.flush-check-period duration
+    	 (default 30s)
+  -ingester.flush-op-timeout duration
+    	 (default 10s)
+  -ingester.heartbeat-period duration
+    	Period at which to heartbeat to consul. (default 5s)
+  -ingester.join-after duration
+    	Period to wait for a claim from another member; will join automatically after this.
+  -ingester.lifecycler.ID string
+    	ID to register into consul. (default "e499097725f1")
+  -ingester.lifecycler.addr string
+    	IP address to advertise in consul.
+  -ingester.lifecycler.interface value
+    	Name of network interface to read address from. (default [eth0 en0])
+  -ingester.lifecycler.port int
+    	port to advertise in consul (defaults to server.grpc-listen-port).
+  -ingester.max-samples-per-query int
+    	The maximum number of samples that a query can return. (default 1000000)
+  -ingester.max-series-per-metric int
+    	Maximum number of active series per metric name. (default 50000)
+  -ingester.max-series-per-query int
+    	The maximum number of series that a query can return. (default 100000)
+  -ingester.max-series-per-user int
+    	Maximum number of active series per user. (default 5000000)
+  -ingester.max-transfer-retries int
+    	Number of times to try and transfer chunks before falling back to flushing. (default 10)
+  -ingester.min-ready-duration duration
+    	Minimum duration to wait before becoming ready. This is to work around race conditions with ingesters exiting and updating the ring. (default 1m0s)
+  -ingester.normalise-tokens
+    	Store tokens in a normalised fashion to reduce allocations.
+  -ingester.num-tokens int
+    	Number of tokens for each ingester. (default 128)
+  -limits.per-user-override-config string
+    	File name of per-user overrides.
+  -limits.per-user-override-period duration
+    	Period with this to reload the overrides. (default 10s)
+  -local.chunk-directory string
+    	Directory to store chunks in.
+  -log.level value
+    	Only log messages with the given severity or above. Valid levels: [debug, info, warn, error] (default info)
+  -max-chunk-batch-size int
+    	The maximun of chunks to fetch per batch. (default 50)
+  -memcache.write-back-buffer int
+    	Cache config for chunks. How many chunks to buffer for background write back. (default 10000)
+  -memcache.write-back-goroutines int
+    	Cache config for chunks. How many goroutines to use to write back to memcache. (default 10)
+  -memcached.batchsize int
+    	Cache config for chunks. How many keys to fetch in each batch.
+  -memcached.expiration duration
+    	Cache config for chunks. How long keys stay in the memcache.
+  -memcached.hostname string
+    	Cache config for chunks. Hostname for memcached service to use when caching chunks. If empty, no memcached will be used.
+  -memcached.max-idle-conns int
+    	Cache config for chunks. Maximum number of idle connections in pool. (default 16)
+  -memcached.parallelism int
+    	Cache config for chunks. Maximum active requests to memcache. (default 100)
+  -memcached.service string
+    	Cache config for chunks. SRV service used to discover memcache servers. (default "memcached")
+  -memcached.timeout duration
+    	Cache config for chunks. Maximum time to wait before giving up on memcached requests. (default 100ms)
+  -memcached.update-interval duration
+    	Cache config for chunks. Period with which to poll DNS for memcache servers. (default 1m0s)
+  -metrics.error-rate-query string
+    	DEPRECATED: use -metrics.write-throttle-query instead
+  -metrics.queue-length-query string
+    	query to fetch ingester queue length (default "sum(avg_over_time(cortex_ingester_flush_queue_length{job=\"cortex/ingester\"}[2m]))")
+  -metrics.read-error-query string
+    	query to fetch read errors per table (default "sum(increase(cortex_dynamo_failures_total{operation=\"DynamoDB.QueryPages\",error=\"ProvisionedThroughputExceededException\"}[1m])) by (table) > 0")
+  -metrics.read-usage-query string
+    	query to fetch read capacity usage per table (default "sum(rate(cortex_dynamo_consumed_capacity_total{operation=\"DynamoDB.QueryPages\"}[1h])) by (table) > 0")
+  -metrics.scale-up-factor float
+    	Scale up capacity by this multiple (default 1.3)
+  -metrics.target-queue-length int
+    	Queue length above which we will scale up capacity (default 100000)
+  -metrics.url string
+    	Use metrics-based autoscaling, via this query URL
+  -metrics.usage-query string
+    	query to fetch write capacity usage per table (default "sum(rate(cortex_dynamo_consumed_capacity_total{operation=\"DynamoDB.BatchWriteItem\"}[15m])) by (table) > 0")
+  -metrics.write-throttle-query string
+    	query to fetch throttle rates per table (default "sum(rate(cortex_dynamo_throttled_total{operation=\"DynamoDB.BatchWriteItem\"}[1m])) by (table) > 0")
+  -querier.max-query-parallelism int
+    	Maximum number of queries will be scheduled in parallel by the frontend. (default 14)
+  -querier.query_timeout duration
+    	Timeout when querying backends (ingesters or storage) during the execution of a query request (default 1m0s)
+  -querier.tail-max-duration duration
+    	Limit the duration for which live tailing request would be served (default 1h0m0s)
+  -ring.heartbeat-timeout duration
+    	The heartbeat timeout after which ingesters are skipped for reads/writes. (default 1m0s)
+  -ring.store string
+    	Backend storage to use for the ring (consul, inmemory). (default "consul")
+  -s3.force-path-style true
+    	Set this to true to force the request to use path-style addressing.
+  -s3.url value
+    	S3 endpoint URL with escaped Key and Secret encoded. If only region is specified as a host, proper endpoint will be deduced. Use inmemory:///<bucket-name> to use a mock in-memory implementation.
+  -server.graceful-shutdown-timeout duration
+    	Timeout for graceful shutdowns (default 30s)
+  -server.grpc-listen-host string
+    	gRPC server listen host.
+  -server.grpc-listen-port int
+    	gRPC server listen port. (default 9095)
+  -server.grpc-max-concurrent-streams uint
+    	Limit on the number of concurrent streams for gRPC calls (0 = unlimited) (default 100)
+  -server.grpc-max-recv-msg-size-bytes int
+    	Limit on the size of a gRPC message this server can receive (bytes). (default 4194304)
+  -server.grpc-max-send-msg-size-bytes int
+    	Limit on the size of a gRPC message this server can send (bytes). (default 4194304)
+  -server.http-idle-timeout duration
+    	Idle timeout for HTTP server (default 2m0s)
+  -server.http-listen-host string
+    	HTTP server listen host.
+  -server.http-listen-port int
+    	HTTP server listen port. (default 80)
+  -server.http-read-timeout duration
+    	Read timeout for HTTP server (default 30s)
+  -server.http-write-timeout duration
+    	Write timeout for HTTP server (default 30s)
+  -server.path-prefix string
+    	Base path to serve all API routes from (e.g. /v1/)
+  -server.register-instrumentation
+    	Register the intrumentation handlers (/metrics etc). (default true)
+  -store.cache-lookups-older-than duration
+    	Cache index entries older than this period. 0 to disable.
+  -store.cardinality-cache-size value
+    	DEPRECATED. Use store.index-cache-read.enable-fifocache and store.index-cache-read.fifocache.size instead.
+  -store.cardinality-cache-validity value
+    	DEPRECATED. Use store.index-cache-read.enable-fifocache and store.index-cache-read.fifocache.duration instead.
+  -store.cardinality-limit int
+    	Cardinality limit for index queries. (default 100000)
+  -store.chunk-cache-stubs
+    	If true, don't write the full chunk to cache, just a stub entry.
+  -store.index-cache-read.cache.enable-fifocache
+    	Cache config for index entry reading. Enable in-memory cache.
+  -store.index-cache-read.default-validity duration
+    	Cache config for index entry reading. The default validity of entries for caches unless overridden.
+  -store.index-cache-read.fifocache.duration duration
+    	Cache config for index entry reading. The expiry duration for the cache.
+  -store.index-cache-read.fifocache.size int
+    	Cache config for index entry reading. The number of entries to cache.
+  -store.index-cache-read.memcache.write-back-buffer int
+    	Cache config for index entry reading. How many chunks to buffer for background write back. (default 10000)
+  -store.index-cache-read.memcache.write-back-goroutines int
+    	Cache config for index entry reading. How many goroutines to use to write back to memcache. (default 10)
+  -store.index-cache-read.memcached.batchsize int
+    	Cache config for index entry reading. How many keys to fetch in each batch.
+  -store.index-cache-read.memcached.expiration duration
+    	Cache config for index entry reading. How long keys stay in the memcache.
+  -store.index-cache-read.memcached.hostname string
+    	Cache config for index entry reading. Hostname for memcached service to use when caching chunks. If empty, no memcached will be used.
+  -store.index-cache-read.memcached.max-idle-conns int
+    	Cache config for index entry reading. Maximum number of idle connections in pool. (default 16)
+  -store.index-cache-read.memcached.parallelism int
+    	Cache config for index entry reading. Maximum active requests to memcache. (default 100)
+  -store.index-cache-read.memcached.service string
+    	Cache config for index entry reading. SRV service used to discover memcache servers. (default "memcached")
+  -store.index-cache-read.memcached.timeout duration
+    	Cache config for index entry reading. Maximum time to wait before giving up on memcached requests. (default 100ms)
+  -store.index-cache-read.memcached.update-interval duration
+    	Cache config for index entry reading. Period with which to poll DNS for memcache servers. (default 1m0s)
+  -store.index-cache-validity duration
+    	Cache validity for active index entries. Should be no higher than -ingester.max-chunk-idle. (default 5m0s)
+  -store.index-cache-write.cache.enable-fifocache
+    	Cache config for index entry writing. Enable in-memory cache.
+  -store.index-cache-write.default-validity duration
+    	Cache config for index entry writing. The default validity of entries for caches unless overridden.
+  -store.index-cache-write.fifocache.duration duration
+    	Cache config for index entry writing. The expiry duration for the cache.
+  -store.index-cache-write.fifocache.size int
+    	Cache config for index entry writing. The number of entries to cache.
+  -store.index-cache-write.memcache.write-back-buffer int
+    	Cache config for index entry writing. How many chunks to buffer for background write back. (default 10000)
+  -store.index-cache-write.memcache.write-back-goroutines int
+    	Cache config for index entry writing. How many goroutines to use to write back to memcache. (default 10)
+  -store.index-cache-write.memcached.batchsize int
+    	Cache config for index entry writing. How many keys to fetch in each batch.
+  -store.index-cache-write.memcached.expiration duration
+    	Cache config for index entry writing. How long keys stay in the memcache.
+  -store.index-cache-write.memcached.hostname string
+    	Cache config for index entry writing. Hostname for memcached service to use when caching chunks. If empty, no memcached will be used.
+  -store.index-cache-write.memcached.max-idle-conns int
+    	Cache config for index entry writing. Maximum number of idle connections in pool. (default 16)
+  -store.index-cache-write.memcached.parallelism int
+    	Cache config for index entry writing. Maximum active requests to memcache. (default 100)
+  -store.index-cache-write.memcached.service string
+    	Cache config for index entry writing. SRV service used to discover memcache servers. (default "memcached")
+  -store.index-cache-write.memcached.timeout duration
+    	Cache config for index entry writing. Maximum time to wait before giving up on memcached requests. (default 100ms)
+  -store.index-cache-write.memcached.update-interval duration
+    	Cache config for index entry writing. Period with which to poll DNS for memcache servers. (default 1m0s)
+  -store.max-look-back-period duration
+    	Limit how long back data can be queried
+  -store.max-query-length duration
+    	Limit to length of chunk store queries, 0 to disable.
+  -store.min-chunk-age duration
+    	Minimum time between chunk update and being saved to the store.
+  -store.query-chunk-limit int
+    	Maximum number of chunks that can be fetched in a single query. (default 2000000)
+  -table-manager.retention-deletes-enabled
+    	If true, enables retention deletes of DB tables
+  -table-manager.retention-period duration
+    	Tables older than this retention period are deleted. Note: This setting is destructive to data!(default: 0, which disables deletion)
+  -table-manager.throughput-updates-disabled
+    	If true, disable all changes to DB capacity
+  -target value
+    	target module (default All) (default all)
+  -validation.create-grace-period duration
+    	Duration which table will be created/deleted before/after it's needed; we won't accept sample from before this time. (default 10m0s)
+  -validation.enforce-metric-name
+    	Enforce every sample has a metric name. (default true)
+  -validation.max-label-names-per-series int
+    	Maximum number of label names per series. (default 30)
+  -validation.max-length-label-name int
+    	Maximum length accepted for label names (default 1024)
+  -validation.max-length-label-value int
+    	Maximum length accepted for label value. This setting also applies to the metric name (default 2048)
+  -validation.reject-old-samples
+    	Reject old samples.
+  -validation.reject-old-samples.max-age duration
+    	Maximum accepted sample age before rejecting. (default 336h0m0s)

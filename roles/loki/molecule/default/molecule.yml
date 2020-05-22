@@ -1,0 +1,24 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: vagrant
+  provider:
+    name: virtualbox
+lint: |
+  set -e
+  yamllint .
+  ansible-lint
+  flake8
+platforms:
+  - name: ubuntu1804
+    box: geerlingguy/ubuntu1804
+# - name: centos7
+#   box: geerlingguy/centos7
+# - name: centos8
+#   box: geerlingguy/centos8
+provisioner:
+  name: ansible
+  log: true
+verifier:
+  name: ansible

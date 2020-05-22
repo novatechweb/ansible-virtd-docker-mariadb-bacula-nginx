@@ -1,0 +1,52 @@
+---
+# tasks file for promtail
+
+- name: Ensure promtail configuration directories exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+  with_items:
+    - "{{ promtail_etc_volume }}"
+
+- name: Create promtail main configuration file
+  template:
+    src: "{{ promtail_config_template }}"
+    dest: "{{ promtail_etc_volume }}/{{ promtail_config_file }}"
+    owner: root
+    group: root
+    mode: 0640
+  # no_log: true
+  notify: restart promtail
+
+- name: Start promtail container
+  docker_container:
+    command: '{{ promtail_command }}'
+    comparisons: {'*': strict}
+    detach: true
+    env: '{{ promtail_env }}'
+    healthcheck:
+      test: ['CMD', 'wget', '--spider', 'http://localhost:{{ promtail_port_listen }}/ready']
+    hostname: '{{ promtail_hostname }}'
+    image: '{{ promtail_image }}'
+    name: '{{ promtail_container }}'
+    networks: '{{ promtail_networks }}'
+    networks_cli_compatible: yes
+    ports: '{{ promtail_port_args }}'
+    pull: yes
+    purge_networks: yes
+    restart_policy: '{{ promtail_restart_policy }}'
+    state: started
+    volumes: '{{ promtail_volumes }}'
+
+- meta: flush_handlers
+
+- name: Wait for promtail to start
+  uri:
+    url: 'http://localhost:{{ promtail_port_listen }}/ready'
+    return_content: yes
+  register: promtail_info
+  until: promtail_info.content == 'Ready'
+  retries: 10
+  delay: 10

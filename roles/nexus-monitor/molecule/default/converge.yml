@@ -1,0 +1,8 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  tasks:
+    - name: "Include nexus-monitor"
+      include_role:
+        name: "nexus-monitor"

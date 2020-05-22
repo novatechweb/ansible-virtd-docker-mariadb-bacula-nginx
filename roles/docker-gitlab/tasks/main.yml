@@ -67,6 +67,10 @@
   docker_volume:
     name: '{{ gitlab_dv_name }}'
 
+- name: log-volume container (gitlab)
+  docker_volume:
+    name: '{{ gitlab_lv_name }}'
+
 # *****************************************************************************
 # Create the gitlab container
 
@@ -88,6 +92,7 @@
     volumes:
       - '{{ openssl_dv_name }}:/etc/ssl/private:z'
       - '{{ gitlab_cv_name }}:/etc/gitlab:z'
+      - '{{ gitlab_lv_name }}:/var/log/gitlab:z'
       - '{{ gitlab_dv_name }}:/var/opt/gitlab:z'
       - '{{ gitlab_bv_name }}:{{ gitlab_bv_mountpoint }}:z'
 

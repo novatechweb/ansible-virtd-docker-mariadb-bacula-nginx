@@ -1,0 +1,4 @@
+#jinja2: lstrip_blocks: True
+{{ ansible_managed | comment }}
+
+{{ item.value | to_nice_yaml(indent=2) }}

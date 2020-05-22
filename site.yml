@@ -66,6 +66,8 @@
     - nexus
     - ddio
     - easyrsa
+    - grafana
+    - prometheus
     tags:
     - docker_networking
   - name: Build the openssl Docker volume
@@ -145,6 +147,9 @@
     vars:
       svn_username: ansible
       svn_password: '{{ openldap_ansible_password }}'
+
+- name: Setup system monitoring
+  import_playbook: monitoring.yml
 
 - name: Assemble Bacula backup scripts
   hosts: bacula

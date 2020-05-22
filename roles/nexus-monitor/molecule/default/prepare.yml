@@ -1,0 +1,56 @@
+---
+- name: Prepare
+  hosts: all
+  become: true
+  vars:
+    pip_package: python3-pip
+    pip_executable: pip3
+    pip_install_packages:
+      - docker
+  tasks:
+    - name: "Install Docker engine"
+      include_role:
+        name: "geerlingguy.docker"
+
+    - name: "Install python pip"
+      include_role:
+        name: "geerlingguy.pip"
+
+    - name: "Create HTTP server document root and static file locations"
+      file:
+        path: "{{ item }}"
+        state: directory
+      loop:
+        - "/srv/nexus/service/metrics"
+        - "/srv/nexus/service/rest/atlas"
+
+    - name: "Copy static files to server"
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+      loop:
+        - src: mock_metrics.json
+          dest: "/srv/nexus/service/metrics/data"
+        - src: mock_sysinfo.json
+          dest: "/srv/nexus/service/rest/atlas/system-information"
+
+    - name: "Create network for mock-nexus and nexus-monitor"
+      docker_network:
+        name: 'nexus-monitor'
+
+    - name: "Run a mock HTTP server providing metrics and sysinfo files"
+      docker_container:
+        name: nexus
+        image: httpd:2.4
+        detach: true
+        networks:
+          - name: 'nexus-monitor'
+        networks_cli_compatible: yes
+        pull: yes
+        hostname: nexus
+        published_ports:
+          - "80:80"
+        purge_networks: yes
+        state: started
+        volumes:
+          - "/srv/nexus:/usr/local/apache2/htdocs/"

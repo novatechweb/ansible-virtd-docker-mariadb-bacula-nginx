@@ -1,0 +1,3 @@
+---
+
+mantisbt_monitor_container_name: '{{ docker_name_prefix }}mantisbt_monitor'

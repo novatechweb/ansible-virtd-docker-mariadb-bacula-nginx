@@ -1,0 +1,24 @@
+---
+# This is an example playbook to execute Ansible tests.
+
+- name: Verify
+  hosts: all
+  become: true
+  pre_tasks:
+    - name: Include module default variables
+      include_vars:
+        file: "{{ playbook_dir }}/../../defaults/main.yml"
+    - name: Include module standard variables
+      include_vars:
+        file: "{{ playbook_dir }}/../../vars/main.yml"
+
+  tasks:
+  - name: Verify StorCLI binary
+    stat:
+      get_checksum: no
+      path: '{{ storcli_binary }}'
+    register: storcli_stat
+
+  - name: Test existence of StorCLI binary
+    assert:
+      that: storcli_stat.stat.exists

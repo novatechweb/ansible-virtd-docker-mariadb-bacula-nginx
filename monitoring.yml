@@ -1,0 +1,49 @@
+- name: Install/Setup Docker images and containers on daedalus
+  hosts: daedalus
+  remote_user: ansibleremote
+  become: true
+  become_user: root
+  become_method: sudo
+  tasks:
+  - name: Build and start the Grafana Docker container
+    import_role:
+      name: grafana
+    tags:
+      - grafana_container
+  - name: Build and start the Prometheus Docker container
+    import_role:
+      name: prometheus
+    tags:
+      - prometheus_container
+  - name: Build and start the Loki Docker container
+    import_role:
+      name: loki
+    tags:
+      - loki_container
+  - name: Build and start the promtail Docker containers
+    import_role:
+      name: promtail
+    tags:
+      - promtail_container
+  - name: Start node-exporter service
+    import_role:
+      name: cloudalchemy.node-exporter
+    tags:
+      - node-exporter
+  - name: Download and install StorCLI utility
+    import_role:
+      name: storcli
+    tags:
+      - storcli
+
+- name: Setup Buildbot worker system
+  hosts: builder
+  become: true
+  become_user: root
+  become_method: sudo
+  tasks:
+  - name: Start node-exporter service
+    import_role:
+      name: cloudalchemy.node-exporter
+    tags:
+      - node-exporter

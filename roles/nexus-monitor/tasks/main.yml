@@ -1,0 +1,18 @@
+---
+# tasks file for nexus-monitor
+
+# *****************************************************************************
+# Start the monitoring container running
+
+- name: start container (nexus_monitor)
+  docker_container:
+    command: '{{ nexus_monitor_command }}'
+    comparisons: {'*': strict}
+    detach: true
+    image: '{{ nexus_monitor_image_name }}'
+    name: '{{ nexus_monitor_container_name }}'
+    networks: '{{ nexus_monitor_networks }}'
+    networks_cli_compatible: yes
+    published_ports: '{{ nexus_monitor_port_args }}'
+    purge_networks: true
+    restart_policy: '{{ nexus_monitor_restart_policy }}'

@@ -193,7 +193,7 @@
 - name: start container (mantisbt_monitor)
   docker_container:
     command:
-      - "--scrape-uri={{ mantisbt_monitor_scrape_uri }}"
+      - "--scrape_uri={{ mantisbt_monitor_scrape_uri }}"
       - "--telemetry.address={{ mantisbt_monitor_telemetry_address }}"
       - "--telemetry.endpoint={{ mantisbt_monitor_telemetry_endpoint }}"
     comparisons: {'*': strict}

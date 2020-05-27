@@ -1,2 +1,21 @@
 ---
 # vars file for buildbot-worker-ntel
+
+# numeric ID of buildbot group
+buildbot_worker_gid: '1000'
+
+# numeric ID of buildbot user
+buildbot_worker_uid: '1000'
+
+# mount path of the cache volume
+buildbot_worker_cache_path: '/cache'
+
+# mount path of the data volume
+buildbot_worker_data_path: '/buildbot'
+
+worker_sshkey: 'id_rsa'
+
+worker_ssl_dir: /etc/ssl/private
+worker_tlsca: 'ca.pem'
+worker_tlskey: 'worker.key'
+worker_tlspem: 'worker.pem'

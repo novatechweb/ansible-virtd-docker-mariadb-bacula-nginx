@@ -21,22 +21,15 @@
     - buildbot
     - buildbot-master
   vars:
-    known_hosts: "{{gitlab_keys.stdout}}"
-    ntel_release_uri:    "https://{{nexus_hostname}}/repository/ntel-release"
-    ntel_beta_uri:       "https://{{nexus_hostname}}/repository/ntel-unofficial"
-    ntel_sstate_uri:     "https://{{nexus_hostname}}/repository/ntel-sstate"
-    ptxdist_release_uri: "https://{{nexus_hostname}}/repository/ptxdist-release"
-    ptxdist_beta_uri:    "https://{{nexus_hostname}}/repository/ptxdist-unofficial"
+    known_hosts: "{{ gitlab_keys.stdout_lines | sort | join('\n') }}"
   tasks:
-    - add_host:
-        name: nexus
-        groups: services
-        ip_addr: "{{ nexus_ip_addr }}"
-        uri: "repository"
     - name: Scan Gitlab ssh keys
       command: ssh-keyscan {{gitlab_hostname}}
       register: gitlab_keys
       changed_when: false
+      tags:
+        - always
+
     - name: Build and start the Buildbot master container
       import_role:
         name: buildbot-master
@@ -61,8 +54,8 @@
     asset_xorg:        "{{ asset_host }}/xorg"
     asset_kernel:      "{{ asset_host }}/kernel/linux"
     asset_pypi:        "{{ asset_host }}/pypi"
-    buildbot_master: "{{ buildbot_hostname }}"
-    known_hosts: "{{ gitlab_keys.stdout }}"
+    known_hosts:       "{{ gitlab_keys.stdout_lines | sort | join('\n') }}"
+    ptk_archive_uri:   "{{ asset_downloads }}/610-009981-023_SW_PTK_5.9_Client_RevA.tar"
   tasks:
     - name: Scan Gitlab ssh keys
       command: ssh-keyscan {{gitlab_hostname}}
@@ -70,13 +63,30 @@
       changed_when: false
       tags:
         - always
-    - name: Build and start the Buildbot worker container
+
+    - name: Build and start the NTEL container
       import_role:
         name: buildbot-worker-ntel
+      vars:
+        buildbot_worker_hostdir_config: '{{ buildbot_worker_ntel_hostdir_config }}'
+        buildbot_worker_name: '{{ buildbot_worker_ntel }}'
+        buildbot_worker_passwd: '{{ buildbot_worker_ntel_passwd }}'
+        buildbot_worker_tlsca: '{{ buildbot_ca_pem }}'
+        buildbot_worker_tlskey: '{{ buildbot_worker_ntel_tlskey }}'
+        buildbot_worker_tlspem: '{{ buildbot_worker_ntel_tlspem }}'
+
       tags:
         - buildbot-worker-ntel
-    - name: Build and start the Buildbot worker container
+
+    - name: Build and start the PTXdist container
       import_role:
         name: buildbot-worker-ptxdist
+      vars:
+        buildbot_worker_hostdir_config: '{{ buildbot_worker_ptxdist_hostdir_config }}'
+        buildbot_worker_name: '{{ buildbot_worker_ptxdist }}'
+        buildbot_worker_passwd: '{{ buildbot_worker_ptxdist_passwd }}'
+        buildbot_worker_tlsca: '{{ buildbot_ca_pem }}'
+        buildbot_worker_tlskey: '{{ buildbot_worker_ptxdist_tlskey }}'
+        buildbot_worker_tlspem: '{{ buildbot_worker_ptxdist_tlspem }}'
       tags:
         - buildbot-worker-ptxdist

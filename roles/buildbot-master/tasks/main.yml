@@ -1,39 +1,32 @@
 ---
 # tasks file for buildbot-master
 
-# This will generate passwords for these accounts.
-- name: Check conditions
-  assert:
-    that:
-    - buildbot_master_sshkey is defined
-
 - name: Create buildbot data volume
   docker_volume:
-    name: '{{ data_volume }}'
+    name: '{{ buildbot_volume_data }}'
 
 - name: Create config directory
   file:
-    path: "{{ config_hostdir }}"
+    path: "{{ buildbot_hostdir_config }}"
     state: directory
 
 - name: Populate config files
   copy:
     src: "{{ item }}"
-    dest: "{{ config_hostdir }}/{{ item | basename }}"
-    group: '{{ buildbot_uid }}'
+    dest: "{{ buildbot_hostdir_config }}/{{ item | basename }}"
+    group: '{{ buildbot_gid }}'
     owner: '{{ buildbot_uid }}'
     mode: "u=rw,g=,o="
     unsafe_writes: yes
   register: configs
   loop:
     - novatech.py
-    - '{{ buildbot_master_sshkey }}'
 
 - name: Populate config templates
   template:
     src: "{{ item }}.j2"
-    dest: "{{ config_hostdir }}/{{ item }}"
-    group: '{{ buildbot_uid }}'
+    dest: "{{ buildbot_hostdir_config }}/{{ item }}"
+    group: '{{ buildbot_gid }}'
     owner: '{{ buildbot_uid }}'
     mode: "u=rw,g=,o="
     unsafe_writes: yes
@@ -45,7 +38,7 @@
 
 - name: Create credential directory
   file:
-    path: '{{ config_hostdir }}/ssl'
+    path: '{{ buildbot_hostdir_ssl }}'
     state: directory
 
 - name: Populate credential files
@@ -59,17 +52,17 @@
   register: credentials
   loop:
     - src: '{{ buildbot_sshkey }}'
-      dest: '{{ config_hostdir }}/{{ buildbot_sshkey | basename }}'
+      dest: '{{ buildbot_hostdir_config }}/{{ master_sshkey }}'
     - src: '{{ buildbot_tlsca }}'
-      dest: '{{ config_hostdir }}/ssl/ca.pem'
+      dest: '{{ buildbot_hostdir_ssl }}/{{ master_tlsca }}'
     - src: '{{ buildbot_tlskey }}'
-      dest: '{{ config_hostdir }}/ssl/server.key'
+      dest: '{{ buildbot_hostdir_ssl }}/{{ master_tlskey }}'
     - src: '{{ buildbot_tlspem }}'
-      dest: '{{ config_hostdir }}/ssl/server.pem'
+      dest: '{{ buildbot_hostdir_ssl }}/{{ master_tlspem }}'
 
 - name: Create image source directory
   file:
-    path: "{{ image_dir }}"
+    path: "{{ buildbot_image_dir }}"
     state: directory
 
 - name: Deploy image source
@@ -79,34 +72,33 @@
     compress: yes
     delete: yes
     src: docker/
-    dest: '{{ image_dir }}/'
+    dest: '{{ buildbot_image_dir }}/'
   register: deploy_source
 
 - name: Create buildbot master image
   docker_image:
     build:
-      args: '{{ image_args }}'
-      path: '{{ image_dir }}'
+      args: '{{ buildbot_image_args }}'
+      path: '{{ buildbot_image_dir }}'
       pull: yes
-    name: '{{ image_name }}'
+    name: '{{ buildbot_image_name }}'
     source: build
-    tag: '{{ docker_image_tag }}'
     force_source: "{{ deploy_source.changed }}"
 
 - name: Start buildbot container
   docker_container:
     comparisons: {'*': strict}
-    env: '{{ container_env }}'
-    hostname: '{{ container_hostname }}'
-    image: '{{ image_name }}:{{ docker_image_tag }}'
-    name: '{{ container_name }}'
-    networks: '{{ container_networks }}'
-    ports: '{{ container_port_args }}'
+    env: '{{ buildbot_env }}'
+    hostname: '{{ buildbot_hostname }}'
+    image: '{{ buildbot_image_name }}'
+    name: '{{ buildbot_name }}'
+    networks: '{{ buildbot_networks }}'
+    ports: '{{ buildbot_port_args }}'
     restart: '{{
       configs.changed
       or templates.changed
       or deploy_source.changed }}'
-    restart_policy: '{{ docker_restart_policy }}'
+    restart_policy: '{{ buildbot_restart_policy }}'
     state: started
-    volumes: '{{ container_volumes }}'
-    working_dir: '{{ container_workdir }}'
+    volumes: '{{ buildbot_volumes }}'
+    working_dir: '{{ buildbot_data_path }}'

@@ -1,24 +1,10 @@
 ---
+
 buildbot_version: '2.4.0'
+
+buildbot_hostname: buildbot.novatech-llc.com
+
 buildbot_worker_port: '9989'
-buildbot_worker_ntel: worker-ntel
-buildbot_worker_ptxdist: worker-ptxdist
-
-buildbot_master_connection_string: "\
-  ssl\
-  :port={{ buildbot_worker_port }}\
-  :sslmethod=TLSv1_2_METHOD\
-  :certKey=/etc/ssl/private/server.pem\
-  :privateKey=/etc/ssl/private/server.key\
-  :extraCertChain=/etc/ssl/private/ca.pem"
-
-buildbot_worker_connection_string: "\
-  tls\
-  :host={{ buildbot_hostname }}\
-  :port={{ buildbot_worker_port }}\
-  :certificate=/etc/ssl/private/client.pem\
-  :privateKey=/etc/ssl/private/client.key\
-  :trustRoots=/etc/ssl/private"
 
 buildbot_ca_creds: '{{ playbook_dir + "/credentials/buildbot-ca" }}'
 buildbot_ca_dir: '{{ buildbot_ca_creds }}'
@@ -39,7 +25,7 @@ buildbot_client_certificates:
     key: '{{ buildbot_tlskey }}'
     pem: '{{ buildbot_tlspem }}'
     fields:
-      CN: buildbot.novatech-llc.com
+      CN: '{{ buildbot_hostname }}'
       O: NovaTech
       OU: Orion
       C: US
@@ -100,32 +86,82 @@ buildbot_tlspem: '{{ buildbot_creds }}/server.pem'
 
 buildbot_email_password: '{{ lookup("password", buildbot_creds + "/buildbot@novatech-llc.com length=20 chars=ascii_letters,digits") }}'
 
+# environment passed to the container
+buildbot_env:
+  BUILDBOT_DATABASE: 'sqlite:///{{ buildbot_data_path }}/state.sqlite'
+  BUILDBOT_SMTP_HOST: '{{ exim4_hostname }}'
+  BUILDBOT_SMTP_PORT: '587'
+  BUILDBOT_SMTP_USER: 'buildbot'
+  BUILDBOT_SMTP_PASS: '{{ buildbot_email_password }}'
+  BUILDBOT_WEB_PORT: '{{ buildbot_http_port }}'
+  BUILDBOT_WEB_URL: 'https://{{ buildbot_hostname }}/'
+  BUILDBOT_WORKER_PORT: '{{ buildbot_connection_string }}'
+  BUILDBOT_WORKER_NTEL_BETA_URI: '{{ ntel_beta_uri }}'
+  BUILDBOT_WORKER_NTEL_NAME: '{{ buildbot_worker_ntel }}'
+  BUILDBOT_WORKER_NTEL_PASS: '{{ buildbot_worker_ntel_passwd }}'
+  BUILDBOT_WORKER_NTEL_RELEASE_URI: '{{ ntel_release_uri }}'
+  BUILDBOT_WORKER_NTEL_SSTATE_URI: '{{ ntel_sstate_uri }}'
+  BUILDBOT_WORKER_PTXDIST_BETA_URI: '{{ ptxdist_beta_uri }}'
+  BUILDBOT_WORKER_PTXDIST_NAME: '{{ buildbot_worker_ptxdist }}'
+  BUILDBOT_WORKER_PTXDIST_PASS: '{{ buildbot_worker_ptxdist_passwd }}'
+  BUILDBOT_WORKER_PTXDIST_RELEASE_URI: '{{ ptxdist_release_uri }}'
+  GITLAB_URI: 'https://{{ gitlab_hostname }}/'
+  GITLAB_OAUTH_ID: '{{ gitlab_oauth_buildbot_id }}'
+  GITLAB_OAUTH_SECRET: '{{ gitlab_oauth_buildbot_secret }}'
+  GITLAB_TOKEN: '{{ gitlab_user_buildbot_token }}'
+  GITLAB_WEBHOOK_SECRET: '{{ buildbot_webhook_secret }}'
+  LDAP_URI: 'ldap://{{ openldap_hostname }}:389/'
+  LDAP_BIND_USER: 'cn=proxyagent,dc=novatech'
+  LDAP_BIND_PW: '{{ openldap_proxyagent_password }}'
+
+buildbot_image_dir: '{{ docker_projects_dir }}/buildbot-master'
+buildbot_image_name: '{{ docker_registry_username }}/buildbot:{{ docker_image_tag }}'
+
+buildbot_name: '{{ docker_name_prefix }}buildbot'
+buildbot_hostdir_config: '{{ docker_restore_config_base_dir }}/buildbot'
+buildbot_hostdir_config_ssl: '{{ buildbot_hostdir_config }}/ssl'
+
+buildbot_worker_configs:
+  - module: 'worker_ntel_morty'
+    giturl: 'git@{{ gitlab_hostname }}:ntel/setup-scripts'
+    branch: 'morty'
+  - module: 'worker_ptxdist_master'
+    giturl: 'git@{{ gitlab_hostname }}:Orion-ptxdist/workspace-ptxdist2'
+    branch: 'master'
+
 buildbot_worker_network: '{{ docker_name_prefix }}workers'
 buildbot_worker_networks:
   - name: '{{ buildbot_worker_network }}'
     aliases:
       - '{{ buildbot_worker_hostname }}'
 
-buildbot_worker_ntel_creds: '{{ playbook_dir + "/credentials/buildbot-worker-ntel" }}'
+buildbot_worker_image_dir: '{{ docker_projects_dir }}/{{ buildbot_worker_container }}'
+buildbot_worker_image_name: '{{ docker_registry_username }}/{{ buildbot_worker_container }}:{{ docker_image_tag }}'
+
+buildbot_worker_ntel: '{{ docker_name_prefix }}buildbot-worker-ntel'
+buildbot_worker_ntel_hostdir_config: '{{ docker_restore_config_base_dir }}/buildbot-worker-ntel'
+buildbot_worker_ntel_hostdir_ssl: '{{ buildbot_worker_ntel_hostdir_config }}/ssl'
+buildbot_worker_ntel_creds: '{{ playbook_dir }}/credentials/buildbot-worker-ntel'
 buildbot_worker_ntel_passwd: '{{ lookup("password", buildbot_worker_ntel_creds + "/passwd length=20") }}'
 buildbot_worker_ntel_sshkey: '{{ buildbot_worker_ntel_creds }}/id_rsa'
-buildbot_worker_ntel_tlscsr: '{{ buildbot_worker_ntel_creds }}/client.csr'
-buildbot_worker_ntel_tlskey: '{{ buildbot_worker_ntel_creds }}/client.key'
-buildbot_worker_ntel_tlspem: '{{ buildbot_worker_ntel_creds }}/client.pem'
+buildbot_worker_ntel_tlscsr: '{{ buildbot_worker_ntel_creds }}/worker.csr'
+buildbot_worker_ntel_tlskey: '{{ buildbot_worker_ntel_creds }}/worker.key'
+buildbot_worker_ntel_tlspem: '{{ buildbot_worker_ntel_creds }}/worker.pem'
 
-buildbot_worker_ptxdist_creds: '{{ playbook_dir + "/credentials/buildbot-worker-ptxdist" }}'
+buildbot_worker_ptxdist: '{{ docker_name_prefix }}buildbot-worker-ptxdist'
+buildbot_worker_ptxdist_hostdir_config: '{{ docker_restore_config_base_dir }}/buildbot-worker-ptxdist'
+buildbot_worker_ptxdist_hostdir_ssl: '{{ buildbot_worker_ptxdist_hostdir_config }}/ssl'
+buildbot_worker_ptxdist_creds: '{{ playbook_dir }}/credentials/buildbot-worker-ptxdist'
 buildbot_worker_ptxdist_passwd: '{{ lookup("password", buildbot_worker_ptxdist_creds + "/passwd length=20") }}'
 buildbot_worker_ptxdist_sshkey: '{{ buildbot_worker_ptxdist_creds }}/id_rsa'
-buildbot_worker_ptxdist_tlscsr: '{{ buildbot_worker_ptxdist_creds }}/client.csr'
-buildbot_worker_ptxdist_tlskey: '{{ buildbot_worker_ptxdist_creds }}/client.key'
-buildbot_worker_ptxdist_tlspem: '{{ buildbot_worker_ptxdist_creds }}/client.pem'
+buildbot_worker_ptxdist_tlscsr: '{{ buildbot_worker_ptxdist_creds }}/worker.csr'
+buildbot_worker_ptxdist_tlskey: '{{ buildbot_worker_ptxdist_creds }}/worker.key'
+buildbot_worker_ptxdist_tlspem: '{{ buildbot_worker_ptxdist_creds }}/worker.pem'
 
 buildbot_webhook_secret: '{{ lookup("password", buildbot_creds + "/webhook length=20") }}'
 
-buildbot_master_worker_configs:
-  - module: 'worker_ntel_morty'
-    giturl: 'git@{{ gitlab_hostname }}:andrew.cooper/setup-scripts'
-    branch: 'morty'
-  - module: 'worker_ptxdist_master'
-    giturl: 'git@{{ gitlab_hostname }}:andrew.cooper/workspace-ptxdist2'
-    branch: 'master'
+ntel_beta_uri:       "https://{{ nexus_hostname }}/repository/ntel-unofficial"
+ntel_release_uri:    "https://{{ nexus_hostname }}/repository/ntel-release"
+ntel_sstate_uri:     "https://{{ nexus_hostname }}/repository/ntel-sstate"
+ptxdist_beta_uri:    "https://{{ nexus_hostname }}/repository/ptxdist-unofficial"
+ptxdist_release_uri: "https://{{ nexus_hostname }}/repository/ptxdist-release"

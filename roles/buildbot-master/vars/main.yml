@@ -1,2 +1,25 @@
 ---
 # vars file for buildbot-master
+
+# mount path of the data volume
+buildbot_data_path: '/buildbot'
+
+# numeric ID of buildbot user
+buildbot_uid: '1000'
+
+# numeric ID of buildbot group
+buildbot_gid: '1000'
+
+# full paths to buildbot config files
+buildbot_tac_file: '{{ buildbot_data_path }}/buildbot.tac'
+buildbot_cfg_file: '{{ buildbot_data_path }}/master.cfg'
+buildbot_ssh_id_file: /home/buildbot/.ssh/{{ buildbot_sshkey }}
+buildbot_known_hosts: /home/buildbot/.ssh/known_hosts
+buildbot_ssl_dir: /etc/ssl/private
+
+# Names of TLS certificate files
+master_sshkey: 'id_rsa'
+master_dhparam: 'master.dhparam'
+master_tlsca: 'ca.pem'
+master_tlskey: 'master.key'
+master_tlspem: 'master.pem'

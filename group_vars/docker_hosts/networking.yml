@@ -46,7 +46,6 @@ phpldapadmin_port_args: []
 
 phpmyadmin_hostname: phpmyadmin.novatech-llc.com
 
-buildbot_hostname: buildbot.novatech-llc.com
 buildbot_port_args:
 - "{{ buildbot_ip_addr }}:9989:9989"
 

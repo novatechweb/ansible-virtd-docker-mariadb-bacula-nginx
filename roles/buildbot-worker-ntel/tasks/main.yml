@@ -1,15 +1,16 @@
 ---
 # tasks file for buildbot-worker-ntel
 
-# This will generate passwords for these accounts.
-- assert:
+- name: "Assert a password is defined"
+  assert:
     that:
-    - buildbot_worker_ntel_passwd is defined
-    - buildbot_worker_ntel_sshkey is defined
+    - buildbot_worker_passwd is defined
+    - buildbot_worker_passwd is not none
+    fail_msg: "A password must be defined. A default is not provided."
 
 - name: Create buildbot cache volume
   docker_volume:
-    name: '{{ cache_volume }}'
+    name: '{{ buildbot_worker_volume_cache }}'
 
 - name: Populate buildbot cache volume
   loop:
@@ -20,48 +21,48 @@
   - /cache/releases
   - /cache/sstate
   docker_container:
-    name: '{{ container_name }}-bootstrap'
+    name: '{{ buildbot_worker_container }}-bootstrap'
     image: 'alpine:latest'
     volumes:
-    - '{{ cache_volume }}:{{ cache_path }}:z'
+    - '{{ buildbot_worker_cache_volume }}:{{ buildbot_worker_cache_path }}:z'
     detach: no
     cleanup: yes
     command: /bin/ash -c
       "mkdir -p {{item}} &&
-      chown -c -R {{buildbot_uid}}:{{buildbot_uid}} {{item}} &&
+      chown -c -R {{buildbot_worker_uid}}:{{buildbot_worker_gid}} {{item}} &&
       chmod -v 777 {{item}}"
 
 - name: Create buildbot data volume
   docker_volume:
-    name: '{{ data_volume }}'
+    name: '{{ buildbot_worker_volume_data }}'
 
 - name: Populate buildbot data volume
   loop:
   - /buildbot
   docker_container:
-    name: '{{ container_name }}-bootstrap'
+    name: '{{ buildbot_worker_container }}-bootstrap'
     image: 'alpine:latest'
     volumes:
-    - '{{ data_volume }}:{{ data_path }}:z'
+    - '{{ buildbot_worker_data_volume }}:{{ buildbot_worker_data_path }}:z'
     detach: no
     cleanup: yes
     command: /bin/ash -c
       "mkdir -p {{item}} &&
-      if [ $(stat --printf='%u' '{{item}}') -ne {{buildbot_uid}} ]; then
-        chown -c -R {{buildbot_uid}}:{{buildbot_uid}} {{item}};
+      if [ $(stat --printf='%u' '{{item}}') -ne {{buildbot_worker_uid}} ]; then
+        chown -c -R {{buildbot_worker_uid}}:{{buildbot_worker_gid}} {{item}};
       fi"
 
 - name: Create config directory
   file:
-    path: "{{ config_hostdir }}"
+    path: "{{ buildbot_worker_hostdir_config }}"
     state: directory
 
 - name: Populate config templates
   template:
     src: "{{ item }}.j2"
-    dest: "{{ config_hostdir }}/{{ item }}"
-    group: '{{ buildbot_uid }}'
-    owner: '{{ buildbot_uid }}'
+    dest: "{{ buildbot_worker_hostdir_config }}/{{ item }}"
+    group: '{{ buildbot_worker_gid }}'
+    owner: '{{ buildbot_worker_uid }}'
     mode: "u=rw,g=,o="
     unsafe_writes: yes
   register: templates
@@ -71,42 +72,33 @@
     - netrc
     - pydistutils.cfg
 
-- name: Populate archival script
-  copy:
-    src: ci-archive.sh
-    dest: '{{ config_hostdir }}/ci-archive.sh'
-    group: '{{ buildbot_uid }}'
-    owner: '{{ buildbot_uid }}'
-    mode: 'u=rwx,g=rx,o=rx'
-    unsafe_writes: yes
-
 - name: Create credential directory
   file:
-    path: '{{ config_hostdir }}/ssl'
+    path: '{{ buildbot_worker_hostdir_ssl }}'
     state: directory
 
 - name: Populate credential files
   copy:
     src: '{{ item.src }}'
     dest: "{{ item.dest }}"
-    group: '{{ buildbot_uid }}'
-    owner: '{{ buildbot_uid }}'
+    group: '{{ buildbot_worker_gid }}'
+    owner: '{{ buildbot_worker_uid }}'
     mode: "u=rw,g=,o="
     unsafe_writes: yes
   register: credentials
   loop:
     - src: '{{ buildbot_worker_ntel_sshkey }}'
-      dest: '{{ config_hostdir }}/{{ buildbot_worker_ntel_sshkey | basename }}'
+      dest: '{{ buildbot_worker_hostdir_config }}/{{ worker_sshkey }}'
     - src: '{{ buildbot_tlsca }}'
-      dest: '{{ config_hostdir }}/ssl/ca.pem'
+      dest: '{{ buildbot_worker_hostdir_ssl }}/{{ worker_tlsca }}'
     - src: '{{ buildbot_worker_ntel_tlskey }}'
-      dest: '{{ config_hostdir }}/ssl/client.key'
+      dest: '{{ buildbot_worker_hostdir_ssl }}/{{ worker_tlskey }}'
     - src: '{{ buildbot_worker_ntel_tlspem }}'
-      dest: '{{ config_hostdir }}/ssl/client.pem'
+      dest: '{{ buildbot_worker_hostdir_ssl }}/{{ worker_tlspem }}'
 
 - name: Create image source directory
   file:
-    path: "{{ image_dir }}"
+    path: "{{ buildbot_worker_image_dir }}"
     state: directory
 
 - name: Deploy Image Source
@@ -114,21 +106,22 @@
     archive: yes
     checksum: yes
     compress: yes
-    src: '{{ image_repo }}/'
-    dest: '{{ image_dir }}/'
+    delete: yes
+    src: '{{ buildbot_worker_image_repo }}/'
+    dest: '{{ buildbot_worker_image_dir }}/'
   register: deploy_source
 
 - name: Create buildbot worker image
   docker_image:
     build:
-      args: '{{ image_args }}'
+      args: '{{ buildbot_worker_image_args }}'
+      dockerfile: '{{ buildbot_worker_image_dockerfile }}'
       network: 'host'
-      path: '{{ image_dir }}'
+      path: '{{ buildbot_worker_image_dir }}'
       pull: yes
-    name: '{{ image_name }}'
+    name: '{{ buildbot_worker_image_name }}'
     source: build
-    tag: '{{ docker_image_tag }}'
-    force_source: "{{ deploy_source.changed }}"
+    force_source: '{{ deploy_source.changed }}'
 
 - name: Create buildbot worker network
   docker_network:
@@ -139,18 +132,18 @@
 - name: Start buildbot worker container
   docker_container:
     comparisons: {'*': strict}
-    env: '{{ container_env }}'
-    hostname: '{{ container_hostname }}'
-    image: '{{ image_name }}:{{ docker_image_tag }}'
-    name: '{{ container_name }}'
+    env: '{{ buildbot_worker_env }}'
+    hostname: '{{ buildbot_worker_hostname }}'
+    image: '{{ buildbot_worker_image_name }}'
+    name: '{{ buildbot_worker_container }}'
     networks: '{{ buildbot_worker_networks }}'
     networks_cli_compatible: yes
-    ports: '{{ container_port_args }}'
+    ports: '{{ buildbot_worker_port_args }}'
     purge_networks: yes
     restart: '{{
       credentials.changed
       or templates.changed
       or deploy_source.changed }}'
-    restart_policy: '{{ docker_restart_policy }}'
+    restart_policy: '{{ buildbot_worker_restart_policy }}'
     state: started
-    volumes: '{{ container_volumes }}'
+    volumes: '{{ buildbot_worker_volumes }}'

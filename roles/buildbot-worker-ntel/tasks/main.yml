@@ -92,7 +92,27 @@
     mode: 'u=rwx,g=rx,o=rx'
     unsafe_writes: yes
 
-- import_tasks: worker-cert.yml
+- name: Create credential directory
+  file:
+    path: '{{ config_hostdir }}/ssl'
+    state: directory
+
+- name: Populate credential files
+  copy:
+    src: '{{ item.src }}'
+    dest: "{{ item.dest }}"
+    group: '{{ buildbot_uid }}'
+    owner: '{{ buildbot_uid }}'
+    mode: "u=rw,g=,o="
+    unsafe_writes: yes
+  register: credentials
+  loop:
+    - src: '{{ buildbot_tlsca }}'
+      dest: '{{ config_hostdir }}/ssl/ca.pem'
+    - src: '{{ buildbot_worker_ntel_tlskey }}'
+      dest: '{{ config_hostdir }}/ssl/client.key'
+    - src: '{{ buildbot_worker_ntel_tlspem }}'
+      dest: '{{ config_hostdir }}/ssl/client.pem'
 
 - name: Create image source directory
   file:
@@ -138,7 +158,7 @@
     ports: '{{ container_port_args }}'
     purge_networks: yes
     restart: '{{
-      configs.changed
+      credentials.changed
       or templates.changed
       or deploy_source.changed }}'
     restart_policy: '{{ docker_restart_policy }}'

@@ -1,0 +1,38 @@
+---
+# Generate a certificate authority for signing client certificates
+
+- name: Make sure the local dir {{ buildbot_ca_dir }} for ssl files exists
+  file:
+    mode: 0700
+    path: '{{ buildbot_ca_dir }}'
+    state: directory
+
+- name: Generate ca key {{ buildbot_ca_key }}.
+  openssl_privatekey:
+    path: '{{ buildbot_ca_key }}'
+    size: 8192
+    type: RSA
+    state: present
+
+- name: Generate ca.csr {{ buildbot_ca_csr }}.
+  openssl_csr:
+    path: '{{ buildbot_ca_csr }}'
+    privatekey_path: '{{ buildbot_ca_key }}'
+    basic_constraints:
+    - "CA:TRUE"
+    CN: '{{ buildbot_ca_fields.common_name | default(omit) }}'
+    C: '{{ buildbot_ca_fields.country_name | default(omit) }}'
+    E: '{{ buildbot_ca_fields.email_address | default(omit) }}'
+    L: '{{ buildbot_ca_fields.locality_name | default(omit) }}'
+    O: '{{ buildbot_ca_fields.organization_name | default(omit) }}'
+    OU: '{{ buildbot_ca_fields.organizational_unit_name | default(omit) }}'
+    ST: '{{ buildbot_ca_fields.state_or_province_name | default(omit) }}'
+    state: present
+
+- name: Generate ca.pem {{ buildbot_ca_pem }}.
+  openssl_certificate:
+    csr_path: '{{ buildbot_ca_csr }}'
+    path: '{{ buildbot_ca_pem }}'
+    privatekey_path: '{{ buildbot_ca_key }}'
+    provider: selfsigned
+    selfsigned_not_after: '+3650d'

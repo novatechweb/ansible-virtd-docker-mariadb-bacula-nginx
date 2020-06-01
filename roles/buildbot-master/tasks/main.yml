@@ -43,9 +43,27 @@
     - buildbot.tac
     - known_hosts
 
-- import_tasks: ca-cert.yml
+- name: Create credential directory
+  file:
+    path: '{{ config_hostdir }}/ssl'
+    state: directory
 
-- import_tasks: server-cert.yml
+- name: Populate credential files
+  copy:
+    src: '{{ item.src }}'
+    dest: "{{ item.dest }}"
+    group: '{{ buildbot_uid }}'
+    owner: '{{ buildbot_uid }}'
+    mode: "u=rw,g=,o="
+    unsafe_writes: yes
+  register: credentials
+  loop:
+    - src: '{{ buildbot_tlsca }}'
+      dest: '{{ config_hostdir }}/ssl/ca.pem'
+    - src: '{{ buildbot_tlskey }}'
+      dest: '{{ config_hostdir }}/ssl/server.key'
+    - src: '{{ buildbot_tlspem }}'
+      dest: '{{ config_hostdir }}/ssl/server.pem'
 
 - name: Create image source directory
   file:

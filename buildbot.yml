@@ -1,5 +1,17 @@
 ---
 
+- name: Generate Buildbot master and worker credentials
+  hosts: localhost
+  become: no
+  tags:
+    - buildbot
+  tasks:
+    - name: Generate Buildbot TLS certificates
+      import_role:
+        name: buildbot-tls-certificates
+      tags:
+        - buildbot-tls
+
 - name: Install/Setup Docker images and containers on Daedalus
   hosts: daedalus
   become: true

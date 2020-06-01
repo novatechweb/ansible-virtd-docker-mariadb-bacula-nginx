@@ -1,0 +1,9 @@
+---
+- name: Converge
+  hosts: all
+  become: yes
+  vars_files: vars.yml
+  tasks:
+    - name: "Include buildbot-tls-certificates"
+      include_role:
+        name: "buildbot-tls-certificates"

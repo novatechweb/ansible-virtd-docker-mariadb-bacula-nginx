@@ -10,8 +10,7 @@ buildbot_master_connection_string: "\
   :sslmethod=TLSv1_2_METHOD\
   :certKey=/etc/ssl/private/server.pem\
   :privateKey=/etc/ssl/private/server.key\
-  :extraCertChain=/etc/ssl/private/ca.pem\
-  :dhParameters=/etc/ssl/private/dhparam.pem"
+  :extraCertChain=/etc/ssl/private/ca.pem"
 
 buildbot_worker_connection_string: "\
   tls\
@@ -21,18 +20,62 @@ buildbot_worker_connection_string: "\
   :privateKey=/etc/ssl/private/client.key\
   :trustRoots=/etc/ssl/private"
 
+buildbot_ca_creds: '{{ playbook_dir + "/credentials/buildbot-ca" }}'
+buildbot_ca_dir: '{{ buildbot_ca_creds }}'
+buildbot_ca_csr: '{{ buildbot_ca_creds + "/ca.csr" }}'
+buildbot_ca_key: '{{ buildbot_ca_creds + "/ca.key" }}'
+buildbot_ca_pem: '{{ buildbot_ca_creds + "/ca.pem" }}'
+buildbot_ca_fields:
+  common_name: cert_auth_ts.novatech-llc.com
+  organization_name: NovaTech
+  organizational_unit_name: Orion
+  country_name: US
+  state_or_province_name: Kansas
+  locality_name: Lenexa
+
+buildbot_client_certificates:
+  - dir: '{{ buildbot_creds }}'
+    csr: '{{ buildbot_tlscsr }}'
+    key: '{{ buildbot_tlskey }}'
+    pem: '{{ buildbot_tlspem }}'
+    fields:
+      CN: buildbot.novatech-llc.com
+      O: NovaTech
+      OU: Orion
+      C: US
+      ST: Kansas
+      L: Lenexa
+  - dir: '{{ buildbot_worker_ntel_creds }}'
+    csr: '{{ buildbot_worker_ntel_tlscsr }}'
+    key: '{{ buildbot_worker_ntel_tlskey }}'
+    pem: '{{ buildbot_worker_ntel_tlspem }}'
+    fields:
+      CN: '{{ buildbot_worker_ntel }}'
+      O: NovaTech
+      OU: Orion
+      C: US
+      ST: Kansas
+      L: Lenexa
+  - dir: '{{ buildbot_worker_ptxdist_creds }}'
+    csr: '{{ buildbot_worker_ptxdist_tlscsr }}'
+    key: '{{ buildbot_worker_ptxdist_tlskey }}'
+    pem: '{{ buildbot_worker_ptxdist_tlspem }}'
+    fields:
+      CN: buildbot-worker-ptxdist
+      O: NovaTech
+      OU: Orion
+      C: US
+      ST: Kansas
+      L: Lenexa
+
 buildbot_creds: '{{ playbook_dir + "/credentials/buildbot" }}'
-buildbot_ca_csr: '{{ buildbot_creds + "/ssl/ca.csr" }}'
-buildbot_ca_key: '{{ buildbot_creds + "/ssl/ca.key" }}'
-buildbot_ca_pem: '{{ buildbot_creds + "/ssl/ca.pem" }}'
+buildbot_sshkey: '{{ buildbot_creds }}/id_rsa'
+buildbot_tlsca:  '{{ buildbot_ca_pem }}'
+buildbot_tlscsr: '{{ buildbot_creds }}/server.csr'
+buildbot_tlskey: '{{ buildbot_creds }}/server.key'
+buildbot_tlspem: '{{ buildbot_creds }}/server.pem'
 
 buildbot_email_password: '{{ lookup("password", buildbot_creds + "/buildbot@novatech-llc.com length=20 chars=ascii_letters,digits") }}'
-
-buildbot_master_dhparam: '{{ buildbot_creds + "/master/dhparam.pem" }}'
-buildbot_master_sshkey: '{{ buildbot_creds + "/master/id_rsa" }}'
-buildbot_master_tlscsr: '{{ buildbot_creds + "/master/server.csr" }}'
-buildbot_master_tlskey: '{{ buildbot_creds + "/master/server.key" }}'
-buildbot_master_tlspem: '{{ buildbot_creds + "/master/server.pem" }}'
 
 buildbot_worker_network: '{{ docker_name_prefix }}workers'
 buildbot_worker_networks:
@@ -40,17 +83,19 @@ buildbot_worker_networks:
     aliases:
       - '{{ buildbot_worker_hostname }}'
 
-buildbot_worker_ntel_passwd: '{{ lookup("password", buildbot_creds + "/worker_ntel/passwd length=20") }}'
-buildbot_worker_ntel_sshkey: '{{ buildbot_creds + "/worker_ntel/id_rsa" }}'
-buildbot_worker_ntel_tlscsr: '{{ buildbot_creds + "/worker_ntel/client.csr" }}'
-buildbot_worker_ntel_tlskey: '{{ buildbot_creds + "/worker_ntel/client.key" }}'
-buildbot_worker_ntel_tlspem: '{{ buildbot_creds + "/worker_ntel/client.pem" }}'
+buildbot_worker_ntel_creds: '{{ playbook_dir + "/credentials/buildbot-worker-ntel" }}'
+buildbot_worker_ntel_passwd: '{{ lookup("password", buildbot_worker_ntel_creds + "/passwd length=20") }}'
+buildbot_worker_ntel_sshkey: '{{ buildbot_worker_ntel_creds }}/id_rsa'
+buildbot_worker_ntel_tlscsr: '{{ buildbot_worker_ntel_creds }}/client.csr'
+buildbot_worker_ntel_tlskey: '{{ buildbot_worker_ntel_creds }}/client.key'
+buildbot_worker_ntel_tlspem: '{{ buildbot_worker_ntel_creds }}/client.pem'
 
-buildbot_worker_ptxdist_passwd: '{{ lookup("password", buildbot_creds + "/worker_ptxdist/passwd length=20") }}'
-buildbot_worker_ptxdist_sshkey: '{{ buildbot_creds + "/worker_ptxdist/id_rsa" }}'
-buildbot_worker_ptxdist_tlscsr: '{{ buildbot_creds + "/worker_ptxdist/client.csr" }}'
-buildbot_worker_ptxdist_tlskey: '{{ buildbot_creds + "/worker_ptxdist/client.key" }}'
-buildbot_worker_ptxdist_tlspem: '{{ buildbot_creds + "/worker_ptxdist/client.pem" }}'
+buildbot_worker_ptxdist_creds: '{{ playbook_dir + "/credentials/buildbot-worker-ptxdist" }}'
+buildbot_worker_ptxdist_passwd: '{{ lookup("password", buildbot_worker_ptxdist_creds + "/passwd length=20") }}'
+buildbot_worker_ptxdist_sshkey: '{{ buildbot_worker_ptxdist_creds }}/id_rsa'
+buildbot_worker_ptxdist_tlscsr: '{{ buildbot_worker_ptxdist_creds }}/client.csr'
+buildbot_worker_ptxdist_tlskey: '{{ buildbot_worker_ptxdist_creds }}/client.key'
+buildbot_worker_ptxdist_tlspem: '{{ buildbot_worker_ptxdist_creds }}/client.pem'
 
 buildbot_webhook_secret: '{{ lookup("password", buildbot_creds + "/webhook length=20") }}'
 

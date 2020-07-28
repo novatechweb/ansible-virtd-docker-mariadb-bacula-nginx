@@ -1,0 +1,38 @@
+---
+# Generage a client certificate
+
+- name: Make sure the local dir '{{ client_certificate_dir }}' for ssl files exists.
+  file:
+    mode: 0700
+    path: '{{ client_certificate_dir }}'
+    state: directory
+
+- name: Generate server key {{ client_certificate_key }}.
+  openssl_privatekey:
+    path: '{{ client_certificate_key }}'
+    size: 8192
+    type: RSA
+    state: present
+
+- name: Generate server req {{ client_certificate_csr }}.
+  openssl_csr:
+    path: '{{ client_certificate_csr }}'
+    privatekey_path: '{{ client_certificate_key }}'
+    CN: '{{ client_certificate_fields.common_name | default(omit) }}'
+    C: '{{ client_certificate_fields.country_name | default(omit) }}'
+    E: '{{ client_certificate_fields.email_address | default(omit) }}'
+    L: '{{ client_certificate_fields.locality_name | default(omit) }}'
+    O: '{{ client_certificate_fields.organization_name | default(omit) }}'
+    OU: '{{ client_certificate_fields.organizational_unit_name | default(omit) }}'
+    ST: '{{ client_certificate_fields.state_or_province_name | default(omit) }}'
+    state: present
+
+- name: Generate server cert {{ client_certificate_pem }}.
+  openssl_certificate:
+    csr_path: '{{ client_certificate_csr }}'
+    path: '{{ client_certificate_pem }}'
+    privatekey_path: '{{ client_certificate_key }}'
+    provider: ownca
+    ownca_not_after: "+3650d"
+    ownca_path: '{{ buildbot_ca_pem }}'
+    ownca_privatekey_path: '{{ buildbot_ca_key }}'

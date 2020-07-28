@@ -2,83 +2,98 @@
 # defaults file for buildbot-worker-ptxdist
 
 # host containing build assets
-asset_host: 'http://{{ansible_facts.default_ipv4.address}}/'
+asset_host: 'http://localhost/'
+asset_pypi: 'http://localhost/'
+asset_user: 'buildbot'
+asset_password: 'buildbot'
 
 # address of buildbot master service
-buildbot_master: '{{ansible_facts.default_ipv4.address}}'
-
-# numeric ID of buildbot user
-buildbot_uid: '1000'
+buildbot_master_hostname: 'buildbot'
+buildbot_master_worker_port: '9989'
 
 # numeric version of buildbot service
-buildbot_version: '1.2.0'
+buildbot_worker_version: '2.4.0'
 
 # port number for workers to communicate with master
-buildbot_worker_port: '9989'
-buildbot_worker_connection_string: 'tcp:{{ buildbot_master }}:{{ buildbot_worker_port }}'
+buildbot_worker_connection_string: "\
+  tls\
+  :host={{ buildbot_master_hostname }}\
+  :port={{ buildbot_master_worker_port }}\
+  :certificate={{ worker_ssl_dir }}/{{ worker_tlspem }}\
+  :privateKey={{ worker_ssl_dir }}/{{ worker_tlskey }}\
+  :trustRoots={{ worker_ssl_dir }}"
 
 # host path containing configuration files
-config_hostdir: '{{ docker_restore_config_base_dir }}/{{ container_name }}'
+buildbot_worker_hostdir_config: '/etc/{{ buildbot_worker_container }}'
 
-# mount path of the cache volume
-cache_path: '/cache'
-
-# name of the cache volume
-cache_volume: '{{ docker_name_prefix }}{{ container_hostname }}-cache'
-
-# environment passed to the container
-container_env:
-  BUILDBOT_MASTER: '{{ buildbot_master }}'
-  BUILDBOT_WORKER_PORT: '{{ buildbot_worker_connection_string }}'
-  BUILDBOT_WORKER_NAME: '{{ buildbot_worker_ptxdist }}'
-  BUILDBOT_WORKER_PASS: '{{ buildbot_worker_ptxdist_passwd }}'
-
-# container_hostname
-container_hostname: '{{ role_name }}'
+# host directory for ssl certificates and keys
+buildbot_worker_hostdir_ssl: '{{ buildbot_worker_hostdir_config }}/ssl'
 
 # the name of the container being started
-container_name: '{{ docker_name_prefix }}{{ container_hostname }}'
+buildbot_worker_container: '{{ buildbot_worker_name }}'
+
+# environment passed to the container
+buildbot_worker_env:
+  BUILDBOT_WORKER_PORT: '{{ buildbot_worker_connection_string }}'
+  BUILDBOT_WORKER_NAME: '{{ buildbot_worker_name }}'
+  BUILDBOT_WORKER_PASS: '{{ buildbot_worker_passwd }}'
+
+# buildbot_worker_hostname
+buildbot_worker_hostname: 'buildbot-worker-ntel'
+
+# worker identifier
+buildbot_worker_name: 'buildbot-worker-ntel'
+
+# worker password
+buildbot_worker_passwd:
 
 # network configuration for the confainer
-container_networks:
-  - name: '{{ docker_network_frontend }}'
+buildbot_worker_networks:
+  - name: 'workers'
     aliases:
-      - '{{ container_hostname }}'
-
-# port configuration of the container
-container_port_args: []
-
-# volumes mounted within the container
-container_volumes:
-- '{{ data_volume }}:{{ data_path }}:z'
-- '{{ cache_volume }}:{{ cache_path }}:z'
-- '{{ config_hostdir }}/buildbot.tac:{{ data_path }}/buildbot.tac'
-- '{{ config_hostdir }}/pydistutils.cfg:/home/buildbot/.pydistutils.cfg'
-- '{{ config_hostdir }}/ptxdistrc:/home/buildbot/.ptxdist/ptxdistrc-2012.09'
-- '{{ config_hostdir }}/netrc:/home/buildbot/.netrc'
-- '{{ config_hostdir }}/{{ buildbot_worker_ptxdist_sshkey | basename }}:/home/buildbot/.ssh/id_rsa'
-- '{{ config_hostdir }}/known_hosts:/home/buildbot/.ssh/known_hosts'
-- '{{ config_hostdir }}/ssl:/etc/ssl/private'
-
-# mount path of the data volume
-data_path: '/buildbot'
-
-# name of the data volume
-data_volume: '{{ docker_name_prefix }}{{ container_hostname }}-data'
-
-# address of hsm cryptographic service
-hsm_host: '{{ansible_facts.default_ipv4.address}}'
+      - '{{ buildbot_worker_hostname }}'
 
 # build arguments of the image
-image_args:
-  BUILDBOT_UID: '{{buildbot_uid}}'
-  BUILDBOT_VERSION: 'v{{buildbot_version}}'
+buildbot_worker_image_args:
+  BUILDBOT_GID: '{{ buildbot_worker_gid }}'
+  BUILDBOT_UID: '{{ buildbot_worker_uid }}'
+  BUILDBOT_VERSION: 'v{{ buildbot_worker_version }}'
 
 # directory of the image source
-image_dir: '{{ docker_projects_dir }}/{{ container_hostname }}'
+buildbot_worker_image_dir: '/tmp/{{ buildbot_worker_container }}'
+
+# name of the Dockerfile to build the container's image
+buildbot_worker_image_dockerfile: 'Dockerfile'
 
 # name of the image being built
-image_name: '{{ docker_registry_username }}/{{ container_hostname }}'
+buildbot_worker_image_name: '{{ buildbot_worker_container }}:latest'
 
 # repository URI of the image source
-image_repo: '{{ buildbot_worker_ptxdist_image_repo | default("https://github.com/novatechweb/docker-buildbot-worker-ptxdist.git") }}'
+buildbot_worker_image_repo: '{{ role_path }}/container/'
+
+# port configuration of the container
+buildbot_worker_port_args: []
+
+# policy for restarting container on failure
+buildbot_worker_restart_policy: 'no'
+
+# name of the cache volume
+buildbot_worker_volume_cache: '{{ buildbot_worker_container }}-cache'
+
+# name of the data volume
+buildbot_worker_volume_data: '{{ buildbot_worker_container }}-data'
+
+# volumes mounted within the container
+buildbot_worker_volumes:
+- '{{ buildbot_worker_volume_data }}:{{ buildbot_worker_data_path }}:z'
+- '{{ buildbot_worker_volume_cache }}:{{ buildbot_worker_cache_path }}:z'
+- '{{ buildbot_worker_hostdir_config }}/buildbot.tac:/home/buildbot/buildbot.tac'
+- '{{ buildbot_worker_hostdir_config }}/{{ buildbot_worker_sshkey | basename }}:/home/buildbot/.ssh/id_rsa'
+- '{{ buildbot_worker_hostdir_config }}/known_hosts:/home/buildbot/.ssh/known_hosts'
+- '{{ buildbot_worker_hostdir_config }}/ptxdistrc:/home/buildbot/.ptxdist/ptxdistrc-2012.09'
+- '{{ buildbot_worker_hostdir_config }}/pydistutils.cfg:/home/buildbot/.pydistutils.cfg'
+- '{{ buildbot_worker_hostdir_config }}/netrc:/home/buildbot/.netrc'
+- '{{ buildbot_worker_hostdir_ssl }}:{{ worker_ssl_dir }}'
+
+# known ssh hosts
+known_hosts: ''

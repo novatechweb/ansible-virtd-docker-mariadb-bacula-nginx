@@ -1,0 +1,30 @@
+---
+- name: Converge
+  hosts: all
+  become: yes
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: "Include buildbot-worker-ntel"
+      include_role:
+        name: "buildbot-worker-ntel"
+      vars:
+        buildbot_worker_name: 'buildbot-worker-ntel-morty'
+        buildbot_worker_passwd: 'pass'
+        buildbot_worker_image_dockerfile: 'Dockerfile-morty'
+
+    - name: "Include buildbot-worker-ntel"
+      include_role:
+        name: "buildbot-worker-ntel"
+      vars:
+        buildbot_worker_name: 'buildbot-worker-ntel-sumo'
+        buildbot_worker_passwd: 'pass'
+        buildbot_worker_image_dockerfile: 'Dockerfile-sumo'
+
+    - name: "Include buildbot-worker-ntel"
+      include_role:
+        name: "buildbot-worker-ntel"
+      vars:
+        buildbot_worker_name: 'buildbot-worker-ntel-warrior'
+        buildbot_worker_passwd: 'pass'
+        buildbot_worker_image_dockerfile: 'Dockerfile-warrior'

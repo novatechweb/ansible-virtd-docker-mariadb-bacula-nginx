@@ -1,0 +1,40 @@
+"""
+    Buildbot configuration for NovaTech Open-Embedded builds
+"""
+
+from buildbot.plugins import *
+
+#####################################################################
+# GLOBAL VARIABLES
+#####################################################################
+
+c = WorkerConfig = {
+    'builders' : [],
+    'change_source' : [],
+    'schedulers' : [],
+    'workers' : [],
+}
+
+c['workers'].append(
+    worker.Worker(
+        '{{ buildbot_worker_name }}',
+        '{{ buildbot_worker_passwd }}'
+    ))
+
+c['builders'].append(
+    util.BuilderConfig(
+        name='{{ buildbot_worker_name }}',
+        workernames=['{{ buildbot_worker_name }}'],
+        factory=util.BuildFactory([
+            steps.ShellCommand(
+                name="Date",
+                command=["date"],
+            )
+        ])
+    ))
+
+c['schedulers'].append(
+    schedulers.ForceScheduler(
+        name='{{ buildbot_worker_name }}',
+        builderNames=['{{ buildbot_worker_name }}']
+    ))

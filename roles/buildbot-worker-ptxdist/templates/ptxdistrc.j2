@@ -29,7 +29,7 @@ PTXCONF_SETUP_PROJECTPATH="${PTXDIST_TOPDIR}/projects"
 #
 # Source Directories
 #
-PTXCONF_SETUP_SRCDIR="{{cache_path}}/downloads"
+PTXCONF_SETUP_SRCDIR="{{ buildbot_worker_cache_path }}/downloads"
 
 #
 # Source Download
@@ -51,7 +51,7 @@ PTXCONF_SETUP_CHECK="notempty"
 #
 # IPKG Repository
 #
-PTXCONF_SETUP_IPKG_REPOSITORY="{{cache_path}}/ipkg-repository"
+PTXCONF_SETUP_IPKG_REPOSITORY="{{ buildbot_worker_cache_path }}/ipkg-repository"
 
 #
 # Java SDK

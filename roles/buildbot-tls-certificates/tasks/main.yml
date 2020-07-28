@@ -1,0 +1,22 @@
+---
+# tasks file for buildbot-tls-certificates
+
+- name: Generate Certificate Authority
+  include_tasks: certificate-authority.yml
+
+- name: Generate Client Certificates
+  include_tasks: client-certificate.yml
+  vars:
+    client_certificate_dir: '{{ item.dir }}'
+    client_certificate_csr: '{{ item.csr }}'
+    client_certificate_key: '{{ item.key }}'
+    client_certificate_pem: '{{ item.pem }}'
+    client_certificate_fields: '{{ item.fields }}'
+  loop: '{{ buildbot_client_certificates }}'
+
+- name: Generate Client SSH keypairs
+  include_tasks: ssh-key.yml
+  vars:
+    client_sshkey_dir: '{{ item.dir }}'
+    client_sshkey: '{{ item.sshkey }}'
+  loop: '{{ buildbot_ssh_clients }}'

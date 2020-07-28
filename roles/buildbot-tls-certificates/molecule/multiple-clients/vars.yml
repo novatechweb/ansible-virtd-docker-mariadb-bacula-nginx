@@ -1,0 +1,55 @@
+---
+# vars file for multiple-clients scenario
+
+buildbot_ca_dir: "/etc/buildbot-ca"
+buildbot_ca_key: "{{ buildbot_ca_dir }}/ca.key"
+buildbot_ca_csr: "{{ buildbot_ca_dir }}/ca.csr"
+buildbot_ca_pem: "{{ buildbot_ca_dir }}/ca.pem"
+buildbot_ca_fields:
+  common_name: ca.example.com
+  country_name: US
+  email_address: ca@example.com
+  locality_name: Example Locality
+  organization_name: Example Org
+  organizational_unit_name: Example Dept.
+  state_or_province_name: Example State
+
+buildbot_client_certificates:
+  - dir: "/etc/buildbot-master"
+    key: "/etc/buildbot-master/master.key"
+    csr: "/etc/buildbot-master/master.csr"
+    pem: "/etc/buildbot-master/master.pem"
+    fields:
+      common_name: buildbot.example.com
+      country_name: US
+      email_address: buildbot@example.com
+      locality_name: Example Locality
+      organization_name: Example Org
+      organizational_unit_name: Example Dept.
+      state_or_province_name: Example State
+
+  - dir: "/etc/buildbot-worker1"
+    key: "/etc/buildbot-worker1/worker1.key"
+    csr: "/etc/buildbot-worker1/worker1.csr"
+    pem: "/etc/buildbot-worker1/worker1.pem"
+    fields:
+      common_name: buildbot-worker1.example.com
+      country_name: US
+      email_address: buildbot.worker1@example.com
+      locality_name: Example Locality
+      organization_name: Example Org
+      organizational_unit_name: Example Dept.
+      state_or_province_name: Example State
+
+  - dir: "/etc/buildbot-worker2"
+    key: "/etc/buildbot-worker2/worker2.key"
+    csr: "/etc/buildbot-worker2/worker2.csr"
+    pem: "/etc/buildbot-worker2/worker2.pem"
+    fields:
+      common_name: buildbot-worker2.example.com
+      country_name: US
+      email_address: buildbot.worker2@example.com
+      locality_name: Example Locality
+      organization_name: Example Org
+      organizational_unit_name: Example Dept.
+      state_or_province_name: Example State

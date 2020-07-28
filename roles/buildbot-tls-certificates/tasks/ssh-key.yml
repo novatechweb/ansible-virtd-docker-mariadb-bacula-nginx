@@ -1,0 +1,15 @@
+---
+
+- name: Make sure the local dir '{{ client_sshkey_dir }}' for ssl files exists.
+  file:
+    mode: 0700
+    path: '{{ client_sshkey_dir }}'
+    state: directory
+
+- name: Generate SSH keypair '{{ client_sshkey }}'.
+  openssh_keypair:
+    path: '{{ client_sshkey }}'
+    state: present
+    type: rsa
+    size: 4096
+  register: configs

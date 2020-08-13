@@ -179,6 +179,12 @@ buildbot_image_dir: '{{ docker_projects_dir }}/buildbot-master'
 buildbot_image_name: '{{ docker_registry_username }}/buildbot:{{ docker_image_tag }}'
 
 buildbot_name: '{{ docker_name_prefix }}buildbot'
+
+buildbot_networks:
+  - name: '{{ docker_network_frontend }}'
+    aliases:
+    - '{{ buildbot_hostname }}'
+
 buildbot_hostdir_config: '{{ docker_restore_config_base_dir }}/buildbot'
 buildbot_hostdir_config_ssl: '{{ buildbot_hostdir_config }}/ssl'
 

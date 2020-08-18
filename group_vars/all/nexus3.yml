@@ -1,5 +1,5 @@
 ---
-nexus_version: ''
+nexus_version: 3.27.0
 
 # Nexus Backup
 nexus_backup_dir_create: false  # Shall we create the dir, or do you already have something in place?

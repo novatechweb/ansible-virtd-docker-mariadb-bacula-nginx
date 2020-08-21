@@ -36,7 +36,6 @@ Role Variables
 | `buildbot_https_port`        | port number for encrypted web access |
 | `buildbot_connection_string` | Twisted library connection string for worker to contact master       |
 | `buildbot_worker_port`       | port number for workers to communicate with master |
-| `hsm_host`                          | hostname of cryptographic signing server                             |
 
 Example Playbook
 ----------------

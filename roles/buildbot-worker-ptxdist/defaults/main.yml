@@ -9,7 +9,7 @@ asset_password: 'buildbot'
 
 # address of buildbot master service
 buildbot_hostname: 'buildbot'
-buildbot_master_worker_port: '9989'
+buildbot_worker_port: '9989'
 
 # numeric version of buildbot service
 buildbot_worker_version: '2.4.0'
@@ -18,7 +18,7 @@ buildbot_worker_version: '2.4.0'
 buildbot_worker_connection_string: "\
   tls\
   :host={{ buildbot_hostname }}\
-  :port={{ buildbot_master_worker_port }}\
+  :port={{ buildbot_worker_port }}\
   :certificate={{ worker_ssl_dir }}/{{ worker_tlspem }}\
   :privateKey={{ worker_ssl_dir }}/{{ worker_tlskey }}\
   :trustRoots={{ worker_ssl_dir }}"

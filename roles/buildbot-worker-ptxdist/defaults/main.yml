@@ -57,7 +57,7 @@ buildbot_worker_networks:
 buildbot_worker_image_args:
   BUILDBOT_GID: '{{ buildbot_worker_gid }}'
   BUILDBOT_UID: '{{ buildbot_worker_uid }}'
-  BUILDBOT_VERSION: 'v{{ buildbot_worker_version }}'
+  BUILDBOT_VERSION: '{{ buildbot_worker_version }}'
 
 # directory of the image source
 buildbot_worker_image_dir: '/tmp/{{ buildbot_worker_container }}'

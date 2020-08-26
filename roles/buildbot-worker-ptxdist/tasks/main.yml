@@ -76,10 +76,6 @@
     dest: '{{ buildbot_worker_image_dir }}/'
   register: deploy_source
 
-# A helpful reminder of what to look out for post-update.
-- pause:
-    prompt: "Manually build {{ buildbot_worker_image_name }} image with these build arguments: {{ buildbot_worker_image_args }}"
-
 - name: Create buildbot worker image
   docker_image:
     build:

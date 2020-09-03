@@ -42,7 +42,8 @@ RUN sed -i 's| main$| main contrib non-free|' /etc/apt/sources.list \
     && rm -rf /var/www/html/index.html \
     && DEBIAN_FRONTEND=noninteractive apt-get autoremove --yes \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && mv "${PHP_INI_DIR}/php.ini-production" "${PHP_INI_DIR}/php.ini"
 
 ENV MANTISBT_VERSION 2.24.2
 ENV MANTISBT_SHA512 81d339aa60b8878b5398d7f7ef1f66151877742fac22944e67394ac087c1f4f2c8d5f270127dacc59cbead1a478a6698380b113abbc6a38177e87cc78cd0acd8
@@ -65,7 +66,7 @@ COPY \
     config/000-default.conf \
     config/000-mantisbt.conf \
         /etc/apache2/sites-available/
-COPY config/php.ini /usr/local/etc/php/
+COPY config/mantisbt.ini /usr/local/etc/php/conf.d/
 COPY ./docker-entrypoint.sh \
     ./configure.sh \
         /

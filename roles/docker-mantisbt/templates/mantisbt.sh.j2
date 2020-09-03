@@ -85,8 +85,8 @@ case ${1} in
         ;;
 
     restore)
-        printf >&2 '==> Lock MantisBT\n    '
-        docker exec "${MANTISBT_CONTAINER_NAME}" /docker-entrypoint.sh lock
+        printf >&2 '==> Stop MantisBT during restore\n    '
+        docker stop "${MANTISBT_CONTAINER_NAME}"
 
         printf >&2 '==> Restore MantisBT database (files table)\n    '
         docker exec -i "${MANTISBT_DB_CONTAINER_NAME}" \
@@ -106,8 +106,8 @@ case ${1} in
                 ${MANTISBT_DB_DB_NAME} < \
                     ${HOST_MANTISBT_RESTORE_DIR}${DATABASE_BACKUP_FILE}
 
-        printf >&2 '==> Unlock MantisBT\n    '
-        docker exec "${MANTISBT_CONTAINER_NAME}" /docker-entrypoint.sh unlock
+        printf >&2 '==> Restart MantisBT\n    '
+        docker restart "${MANTISBT_CONTAINER_NAME}"
 
         printf >&2 '==> Finished running script\n'
         ;;

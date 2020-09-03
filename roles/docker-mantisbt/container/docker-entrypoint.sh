@@ -6,6 +6,7 @@ source /etc/apache2/envvars
 
 
 MANTISBT_BASE_DIR=$(pwd)
+: ${MANTIS_SRC:=/usr/src/mantisbt}
 
 lock_mantisbt() {
     # set mantisbt to readonly if not already
@@ -27,6 +28,12 @@ case ${1} in
         chown -R ${APACHE_RUN_USER}:${APACHE_RUN_GROUP} .
         # Apache gets grumpy about PID files pre-existing
         rm -f "${APACHE_PID_FILE}"
+        # Run unattended upgrade script.
+        if [ -f ${MANTISBT_BASE_DIR}/admin/upgrade_unattended.php ]; then
+            cd ${MANTISBT_BASE_DIR}
+            php ${MANTISBT_BASE_DIR}/admin/upgrade_unattended.php
+            rm -rf ${MANTISBT_BASE_DIR}/admin/
+        fi
         # Start apache
         exec apache2-foreground
         ;;

@@ -1,1 +1,2 @@
-hsm_host: 172.16.64.38
+# Use ProtectServer2 as HSM signing host
+ptk_hsm_host: 172.16.0.238

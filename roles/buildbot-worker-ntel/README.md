@@ -41,7 +41,7 @@ Role Variables
 | `asset_user`                        | user with which to download assets                                   |
 | `asset_pass`                        | password for `asset_user`                                            |
 | `buildbot_worker_connection_string` | Twisted library connection string for worker to contact master       |
-| `hsm_host`                          | hostname of cryptographic signing server                             |
+| `ptk_hsm_host`                      | hostname of cryptographic signing server                             |
 | `known_hosts`                       | list of ssh hosts the container should trust                         |
 
 Example Playbook

@@ -93,6 +93,27 @@
     state: present
   loop: '{{ buildbot_worker_networks }}'
 
+- name: Set volume permissions
+  docker_container:
+    cleanup: yes
+    detach: no
+    image: '{{ buildbot_worker_image_name }}'
+    name: 'tmp-buildbot-worker-permissions'
+    state: started
+    user: root
+    volumes: '{{ buildbot_worker_volumes }}'
+    command:
+      - 'chown'
+      - '--changes'
+      - '-R'
+      - '{{ buildbot_worker_uid }}:{{ buildbot_worker_gid }}'
+      - '{{ item }}'
+  loop:
+    - '{{ buildbot_worker_cache_path }}'
+    - '{{ buildbot_worker_data_path }}'
+  changed_when: chown_output['container']['Output']
+  register: chown_output
+
 - name: Start buildbot worker container
   docker_container:
     comparisons: {'*': strict}

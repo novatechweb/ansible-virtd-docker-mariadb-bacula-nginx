@@ -13,7 +13,7 @@ buildbot_gid: '1000'
 # full paths to buildbot config files
 buildbot_tac_file: '{{ buildbot_data_path }}/buildbot.tac'
 buildbot_cfg_file: '{{ buildbot_data_path }}/master.cfg'
-buildbot_ssh_id_file: /home/buildbot/.ssh/{{ buildbot_sshkey }}
+buildbot_ssh_id_file: /home/buildbot/.ssh/{{ master_sshkey }}
 buildbot_known_hosts: /home/buildbot/.ssh/known_hosts
 buildbot_ssl_dir: /etc/ssl/private
 

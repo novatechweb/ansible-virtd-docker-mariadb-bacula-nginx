@@ -1,5 +1,5 @@
 ---
-# Generage a client certificate
+# Generate a client certificate
 
 - name: Make sure the local dir '{{ client_certificate_dir }}' for ssl files exists.
   file:
@@ -18,13 +18,13 @@
   openssl_csr:
     path: '{{ client_certificate_csr }}'
     privatekey_path: '{{ client_certificate_key }}'
-    CN: '{{ client_certificate_fields.common_name | default(omit) }}'
-    C: '{{ client_certificate_fields.country_name | default(omit) }}'
-    E: '{{ client_certificate_fields.email_address | default(omit) }}'
-    L: '{{ client_certificate_fields.locality_name | default(omit) }}'
-    O: '{{ client_certificate_fields.organization_name | default(omit) }}'
-    OU: '{{ client_certificate_fields.organizational_unit_name | default(omit) }}'
-    ST: '{{ client_certificate_fields.state_or_province_name | default(omit) }}'
+    CN: '{{ client_certificate_fields.CN | default(omit) }}'
+    C: '{{ client_certificate_fields.C | default(omit) }}'
+    E: '{{ client_certificate_fields.E | default(omit) }}'
+    L: '{{ client_certificate_fields.L | default(omit) }}'
+    O: '{{ client_certificate_fields.O | default(omit) }}'
+    OU: '{{ client_certificate_fields.OU | default(omit) }}'
+    ST: '{{ client_certificate_fields.ST | default(omit) }}'
     state: present
 
 - name: Generate server cert {{ client_certificate_pem }}.
@@ -33,6 +33,7 @@
     path: '{{ client_certificate_pem }}'
     privatekey_path: '{{ client_certificate_key }}'
     provider: ownca
-    ownca_not_after: "+3650d"
     ownca_path: '{{ buildbot_ca_pem }}'
     ownca_privatekey_path: '{{ buildbot_ca_key }}'
+    ownca_not_before: '{{ buildbot_ca_fields.not_before | default(omit) }}'
+    ownca_not_after: '{{ buildbot_ca_fields.not_after | default(omit) }}'

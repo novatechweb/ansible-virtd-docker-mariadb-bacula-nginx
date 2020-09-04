@@ -1,17 +1,4 @@
 ---
-
-- name: Generate Buildbot master and worker credentials
-  hosts: localhost
-  become: no
-  tags:
-    - buildbot
-  tasks:
-    - name: Generate Buildbot TLS certificates
-      import_role:
-        name: buildbot-tls-certificates
-      tags:
-        - buildbot-tls
-
 - name: Install/Setup Docker images and containers on Daedalus
   hosts: daedalus
   become: true
@@ -19,7 +6,6 @@
   become_method: sudo
   tags:
     - buildbot
-    - buildbot-master
   vars:
     known_hosts: "{{ gitlab_keys.stdout_lines | sort | join('\n') }}"
   tasks:
@@ -30,9 +16,79 @@
       tags:
         - always
 
+    - name: Generate Buildbot TLS certificates
+      delegate_to: localhost
+      become: no
+      import_role:
+        name: buildbot-tls-certificates
+      tags:
+        - buildbot-tls
+
+    - name: Install Buildbot SSH public keys on GitLab
+      become: no
+      gitlab_user:
+        state:        present
+        server_url:   "https://{{ gitlab_hostname }}/"
+        api_token:    "{{ gitlab_root_private_token }}"
+
+        username:     "{{ item.username     | default(omit) }}"
+        name:         "{{ item.name         | default(omit) }}"
+        email:        "{{ item.email        | default(omit) }}"
+        password:     "{{ item.password     | default(omit) }}"
+        sshkey_file:  "{{ lookup('file', item.sshkey + '.pub')  | default(omit) }}"
+        sshkey_name:  "{{ item.sshkey_name  | default(omit) }}"
+      loop: '{{ buildbot_ssh_clients }}'
+      tags:
+        - buildbot-gitlab
+        - buildbot-gitlab-user
+
+    - name: Set Buildbot groups on Gitlab
+      become: no
+      gitlab_user:
+        state:        present
+        server_url:   "https://{{ gitlab_hostname }}/"
+        api_token:    "{{ gitlab_root_private_token }}"
+
+        username:     "{{ item.username     | default(omit) }}"
+        name:         "{{ item.name         | default(omit) }}"
+        email:        "{{ item.email        | default(omit) }}"
+        password:     "{{ item.password     | default(omit) }}"
+        access_level: "{{ item.access_level | default(omit) }}"
+        group:        "{{ item.group        | default(omit) }}"
+      loop: '{{ buildbot_gitlab_groups }}'
+      tags:
+        - buildbot-gitlab
+        - buildbot-gitlab-groups
+
+    - name: Create Buildbot change hooks (Always reported as "changed")
+      become: no
+      gitlab_hook:
+        state:         present
+        api_url:       "https://{{ gitlab_hostname }}/api"
+        api_token:     "{{ gitlab_root_private_token }}"
+
+        hook_url:              '{{ item.hook_url              | default(omit) }}'
+        hook_validate_certs:   '{{ item.hook_validate_certs   | default(omit) }}'
+        issues_events:         '{{ item.issues_events         | default(omit) }}'
+        job_events:            '{{ item.job_events            | default(omit) }}'
+        merge_requests_events: '{{ item.merge_requests_events | default(omit) }}'
+        note_events:           '{{ item.note_events           | default(omit) }}'
+        pipeline_events:       '{{ item.pipeline_events       | default(omit) }}'
+        project:               '{{ item.project               | default(omit) }}'
+        push_events:           '{{ item.push_events           | default(omit) }}'
+        tag_push_events:       '{{ item.tag_push_events       | default(omit) }}'
+        token:                 '{{ item.token                 | default(omit) }}'
+        wiki_page_events:      '{{ item.wiki_page_events      | default(omit) }}'
+      loop: '{{ buildbot_gitlab_hooks }}'
+      tags:
+        - buildbot-gitlab
+        - buildbot-gitlab-hook
+
     - name: Build and start the Buildbot master container
       import_role:
         name: buildbot-master
+      tags:
+        - buildbot-master
 
 - name: Setup Buildbot worker system
   hosts: builder

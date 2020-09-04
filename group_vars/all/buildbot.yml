@@ -2,9 +2,12 @@
 
 buildbot_version: '2.4.0'
 
-buildbot_hostname: buildbot.novatech-llc.com
+buildbot_hostname: '{{ docker_name_prefix }}buildbot.novatech-llc.com'
 
 buildbot_worker_port: '9989'
+
+buildbot_certificate_not_before: '20200701000000Z'
+buildbot_certificate_not_after: '20300701000000Z'
 
 buildbot_ca_creds: '{{ playbook_dir + "/credentials/buildbot-ca" }}'
 buildbot_ca_dir: '{{ buildbot_ca_creds }}'
@@ -12,12 +15,14 @@ buildbot_ca_csr: '{{ buildbot_ca_creds + "/ca.csr" }}'
 buildbot_ca_key: '{{ buildbot_ca_creds + "/ca.key" }}'
 buildbot_ca_pem: '{{ buildbot_ca_creds + "/ca.pem" }}'
 buildbot_ca_fields:
-  common_name: cert_auth_ts.novatech-llc.com
-  organization_name: NovaTech
-  organizational_unit_name: Orion
-  country_name: US
-  state_or_province_name: Kansas
-  locality_name: Lenexa
+  CN: cert_auth_ts.novatech-llc.com
+  O: NovaTech
+  OU: Orion
+  C: US
+  ST: Kansas
+  L: Lenexa
+  not_before: '{{ buildbot_certificate_not_before }}'
+  not_after: '{{ buildbot_certificate_not_after }}'
 
 buildbot_client_certificates:
   - dir: '{{ buildbot_creds }}'
@@ -31,6 +36,8 @@ buildbot_client_certificates:
       C: US
       ST: Kansas
       L: Lenexa
+      not_before: '{{ buildbot_certificate_not_before }}'
+      not_after: '{{ buildbot_certificate_not_after }}'
   - dir: '{{ buildbot_worker_ntel_morty_creds }}'
     csr: '{{ buildbot_worker_ntel_morty_tlscsr }}'
     key: '{{ buildbot_worker_ntel_morty_tlskey }}'
@@ -42,6 +49,8 @@ buildbot_client_certificates:
       C: US
       ST: Kansas
       L: Lenexa
+      not_before: '{{ buildbot_certificate_not_before }}'
+      not_after: '{{ buildbot_certificate_not_after }}'
   - dir: '{{ buildbot_worker_ntel_sumo_creds }}'
     csr: '{{ buildbot_worker_ntel_sumo_tlscsr }}'
     key: '{{ buildbot_worker_ntel_sumo_tlskey }}'
@@ -53,6 +62,8 @@ buildbot_client_certificates:
       C: US
       ST: Kansas
       L: Lenexa
+      not_before: '{{ buildbot_certificate_not_before }}'
+      not_after: '{{ buildbot_certificate_not_after }}'
   - dir: '{{ buildbot_worker_ntel_warrior_creds }}'
     csr: '{{ buildbot_worker_ntel_warrior_tlscsr }}'
     key: '{{ buildbot_worker_ntel_warrior_tlskey }}'
@@ -64,6 +75,8 @@ buildbot_client_certificates:
       C: US
       ST: Kansas
       L: Lenexa
+      not_before: '{{ buildbot_certificate_not_before }}'
+      not_after: '{{ buildbot_certificate_not_after }}'
   - dir: '{{ buildbot_worker_ptxdist_creds }}'
     csr: '{{ buildbot_worker_ptxdist_tlscsr }}'
     key: '{{ buildbot_worker_ptxdist_tlskey }}'
@@ -75,6 +88,8 @@ buildbot_client_certificates:
       C: US
       ST: Kansas
       L: Lenexa
+      not_before: '{{ buildbot_certificate_not_before }}'
+      not_after: '{{ buildbot_certificate_not_after }}'
 
 buildbot_ssh_clients:
   - dir: '{{ buildbot_creds }}'
@@ -83,35 +98,123 @@ buildbot_ssh_clients:
     name: Build Robot
     email: buildbot@novatech-llc.com
     password: "{{ gitlab_user_buildbot_password }}"
-    sshkey_name: "buildbot_master"
+    sshkey_name: "{{ docker_name_prefix }}buildbot_master"
   - dir: '{{ buildbot_worker_ntel_morty_creds }}'
     sshkey: '{{ buildbot_worker_ntel_morty_sshkey }}'
     username: buildbot
     name: Build Robot
     email: buildbot@novatech-llc.com
     password: "{{ gitlab_user_buildbot_password }}"
-    sshkey_name: "buildbot_worker_ntel_morty"
+    sshkey_name: "{{ docker_name_prefix }}buildbot_worker_ntel_morty"
   - dir: '{{ buildbot_worker_ntel_sumo_creds }}'
     sshkey: '{{ buildbot_worker_ntel_sumo_sshkey }}'
     username: buildbot
     name: Build Robot
     email: buildbot@novatech-llc.com
     password: "{{ gitlab_user_buildbot_password }}"
-    sshkey_name: "buildbot_worker_ntel_sumo"
+    sshkey_name: "{{ docker_name_prefix }}buildbot_worker_ntel_sumo"
   - dir: '{{ buildbot_worker_ntel_warrior_creds }}'
     sshkey: '{{ buildbot_worker_ntel_warrior_sshkey }}'
     username: buildbot
     name: Build Robot
     email: buildbot@novatech-llc.com
     password: "{{ gitlab_user_buildbot_password }}"
-    sshkey_name: "buildbot_worker_ntel_warrior"
+    sshkey_name: "{{ docker_name_prefix }}buildbot_worker_ntel_warrior"
   - dir: '{{ buildbot_worker_ptxdist_creds }}'
     sshkey: '{{ buildbot_worker_ptxdist_sshkey }}'
     username: buildbot
     name: Build Robot
     email: buildbot@novatech-llc.com
     password: "{{ gitlab_user_buildbot_password }}"
-    sshkey_name: "buildbot_worker_ptxd"
+    sshkey_name: "{{ docker_name_prefix }}buildbot_worker_ptxdist"
+
+buildbot_gitlab_groups:
+  - group: "Orion-Userspace"
+    access_level: "developer"
+    username: buildbot
+    name: Build Robot
+    email: buildbot@novatech-llc.com
+    password: "{{ gitlab_user_buildbot_password }}"
+  - group: "Orion"
+    access_level: "developer"
+    username: buildbot
+    name: Build Robot
+    email: buildbot@novatech-llc.com
+    password: "{{ gitlab_user_buildbot_password }}"
+  - group: "ntel"
+    access_level: "developer"
+    username: buildbot
+    name: Build Robot
+    email: buildbot@novatech-llc.com
+    password: "{{ gitlab_user_buildbot_password }}"
+  - group: "Orion-ptxdist"
+    access_level: "developer"
+    username: buildbot
+    name: Build Robot
+    email: buildbot@novatech-llc.com
+    password: "{{ gitlab_user_buildbot_password }}"
+
+buildbot_gitlab_hooks:
+  - hook_url: "http://{{ buildbot_hostname }}:{{ buildbot_http_port }}/change_hook/gitlab"
+    project: ntel/setup-scripts
+    token: "{{ buildbot_webhook_secret }}"
+    hook_validate_certs: yes
+    merge_requests_events: yes
+    push_events: yes
+  - hook_url: "http://{{ buildbot_hostname }}:{{ buildbot_http_port }}/change_hook/gitlab"
+    project: ntel/meta-ntel
+    token: "{{ buildbot_webhook_secret }}"
+    hook_validate_certs: yes
+    merge_requests_events: yes
+    push_events: yes
+  - hook_url: "http://{{ buildbot_hostname }}:{{ buildbot_http_port }}/change_hook/gitlab"
+    project: ntel/meta-orion-bsp
+    token: "{{ buildbot_webhook_secret }}"
+    hook_validate_certs: yes
+    merge_requests_events: yes
+    push_events: yes
+  - hook_url: "http://{{ buildbot_hostname }}:{{ buildbot_http_port }}/change_hook/gitlab"
+    project: ntel/meta-backports
+    token: "{{ buildbot_webhook_secret }}"
+    hook_validate_certs: yes
+    merge_requests_events: yes
+    push_events: yes
+  - hook_url: "http://{{ buildbot_hostname }}:{{ buildbot_http_port }}/change_hook/gitlab"
+    project: ntel/meta-copalp
+    token: "{{ buildbot_webhook_secret }}"
+    hook_validate_certs: yes
+    merge_requests_events: yes
+    push_events: yes
+  - hook_url: "http://{{ buildbot_hostname }}:{{ buildbot_http_port }}/change_hook/gitlab"
+    project: ntel/meta-orion
+    token: "{{ buildbot_webhook_secret }}"
+    hook_validate_certs: yes
+    merge_requests_events: yes
+    push_events: yes
+  - hook_url: "http://{{ buildbot_hostname }}:{{ buildbot_http_port }}/change_hook/gitlab"
+    project: ntel/meta-sssd
+    token: "{{ buildbot_webhook_secret }}"
+    hook_validate_certs: yes
+    merge_requests_events: yes
+    push_events: yes
+  - hook_url: "http://{{ buildbot_hostname }}:{{ buildbot_http_port }}/change_hook/gitlab"
+    project: ntel/meta-mz-automation
+    token: "{{ buildbot_webhook_secret }}"
+    hook_validate_certs: yes
+    merge_requests_events: yes
+    push_events: yes
+  - hook_url: "http://{{ buildbot_hostname }}:{{ buildbot_http_port }}/change_hook/gitlab"
+    project: forks/meta-selinux
+    token: "{{ buildbot_webhook_secret }}"
+    hook_validate_certs: yes
+    merge_requests_events: yes
+    push_events: yes
+  - hook_url: "http://{{ buildbot_hostname }}:{{ buildbot_http_port }}/change_hook/gitlab"
+    project: forks/meta-mingw
+    token: "{{ buildbot_webhook_secret }}"
+    hook_validate_certs: yes
+    merge_requests_events: yes
+    push_events: yes
 
 buildbot_creds: '{{ playbook_dir + "/credentials/buildbot" }}'
 buildbot_sshkey: '{{ buildbot_creds }}/id_rsa'
@@ -164,6 +267,12 @@ buildbot_image_dir: '{{ docker_projects_dir }}/buildbot-master'
 buildbot_image_name: '{{ docker_registry_username }}/buildbot:{{ docker_image_tag }}'
 
 buildbot_name: '{{ docker_name_prefix }}buildbot'
+
+buildbot_networks:
+  - name: '{{ docker_network_frontend }}'
+    aliases:
+    - '{{ buildbot_hostname }}'
+
 buildbot_hostdir_config: '{{ docker_restore_config_base_dir }}/buildbot'
 buildbot_hostdir_config_ssl: '{{ buildbot_hostdir_config }}/ssl'
 

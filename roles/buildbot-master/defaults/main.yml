@@ -75,7 +75,7 @@ buildbot_volumes:
   - '{{ buildbot_hostdir_config }}/buildbot.tac:{{ buildbot_tac_file }}:ro'
   - '{{ buildbot_hostdir_config }}/master.cfg:{{ buildbot_cfg_file }}:ro'
   - '{{ buildbot_hostdir_config }}/novatech.py:{{ buildbot_data_path }}/novatech.py'
-  - '{{ buildbot_hostdir_config }}/{{ buildbot_sshkey }}:{{ buildbot_ssh_id_file }}:ro'
+  - '{{ buildbot_hostdir_config }}/{{ master_sshkey }}:{{ buildbot_ssh_id_file }}:ro'
   - '{{ buildbot_hostdir_config }}/known_hosts:{{ buildbot_known_hosts }}:ro'
   - '{{ buildbot_hostdir_ssl }}:{{ buildbot_ssl_dir }}:ro'
 

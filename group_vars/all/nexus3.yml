@@ -1,47 +1,87 @@
-nexus_version: 3.16.2
-nexus_hostname: '{{ docker_name_prefix }}nexus.novatech-llc.com'
-nexus_networks:
-  - name: '{{ docker_network_frontend }}'
-    aliases:
-      - '{{ nexus_hostname }}'
-nexus_host_docker: true
-nexus_default_port: 8081
-nexus_monitor_container_name: '{{ docker_name_prefix }}nexus_monitor'
-nexus_monitor_port: "9184"
+---
+nexus_version: ''
 
 # Nexus Backup
-nexus_docker_backup_dir: "{{ docker_backup_dir }}/NEXUS3"
-nexus_docker_restore_dir: "{{ bacula_dest }}{{ nexus_docker_backup_dir }}"
-nexus_backup_dir: '/var/nexus-backup'
-nexus_backup_blob_filter:
-  - permanent
-# Shall we configure backup ?
-nexus_backup_configure: false
-# Backup time cron expression
-nexus_backup_manual: true
-# Shall we rotate backups ? No effect if nexus_backup_configure is false
-nexus_backup_rotate: false
-nexus_backup_keep_rotations: 1  # Keep 4 backup rotation by default (current + last 3)
-nexus_backup_task_name: 'Database Export'
+nexus_backup_dir_create: false  # Shall we create the dir, or do you already have something in place?
+nexus_backup_configure: false  # Shall we configure backup ?
+# Nexus default properties
+# nexus_default_port: 8081
+# nexus_docker_hosted_port: 9080
+# nexus_docker_proxy_port: 9081
+# nexus_docker_group_port: 9082
+# nexus_default_context_path: '/'
+# nexus_application_host: '{{ httpd_setup_enable | ternary("127.0.0.1", "0.0.0.0") }}'
 
-nexus_restore_log: '/tmp/nexus-restore.log'
-nexus_backup_log: '/tmp/nexus-backup.log'
+# Nexus default admin password on first time install.
+# This should not be set in your playbook.
+# You can use your old password on the command line if
+# you want to change your admin password after first install
+# i.e.
+# - Set your new password in nexus_admin_password
+# - Run `ansible-playbook -i your/inventory.ini your_playbook.yml -e nexus_default_admin_password=oldpassword`
+# nexus_default_admin_password: 'admin123'
+# Nexus admin password to set and use.
+# Note: this should be vault encrypted in your playbook.
+# nexus_admin_password: 'changeme'
 
-# Nexus Blobstore Compacting
-nexus_compact_default_task_name: 'Compact "Default" Blobstore'
-nexus_compact_permanent_task_name: 'Compact "Permanent" Blobstore'
+nexus_anonymous_access: true
 
-nexus_email_server_enabled: true
-nexus_email_server_host: "mail.novatech-llc.com"
-nexus_email_server_port: 587
-nexus_email_server_username: "wiki"
-nexus_email_server_password: "{{ nexus_email_password }}"
-nexus_email_from_address: "nexus@novatech-llc.com"
-nexus_email_subject_prefix: "[NEXUS]"
-nexus_email_tls_enabled: true
-nexus_email_tls_required: true
+nexus_public_hostname: '{{ docker_name_prefix }}nexus.novatech-llc.com'
+nexus_hostname: '{{ nexus_public_hostname }}' # used by other parts of the system
+nexus_public_scheme: https
+nexus_public_port: 443
 
+# How should the role access the API for provisionning
+nexus_api_hostname: '{{ nexus_public_hostname }}'
+nexus_api_scheme: '{{ nexus_public_scheme }}'
+nexus_api_validate_certs: "{{ nexus_api_scheme == 'https' }}"
+nexus_api_context_path: "{{ nexus_default_context_path }}"
+nexus_api_port: "{{ nexus_public_port }}"
+
+# security realms
+nexus_nuget_api_key_realm: false
+nexus_npm_bearer_token_realm: false
+nexus_rut_auth_realm: false
+# nexus_rut_auth_header: "CUSTOM_HEADER"
 nexus_ldap_realm: true
+nexus_docker_bearer_token_realm: false
+
+# Enable/disable audit capability
+# nexus_audit_enabled: false
+
+# email server
+nexus_email_server_enabled: false
+# nexus_email_server_host: "localhost"
+# nexus_email_server_port: 25
+# nexus_email_server_username: ""
+# nexus_email_server_password: ""
+# nexus_email_from_address: "nexus@example.org"
+# nexus_email_subject_prefix: ""
+# nexus_email_tls_enabled: false
+# nexus_email_tls_required: false
+# nexus_email_ssl_on_connect_enabled: false
+# nexus_email_ssl_check_server_identity_enabled: false
+# nexus_email_trust_store_enabled: false
+
+# nexus_branding_header: ""
+# nexus_branding_footer: "Last provisionned {{ ansible_facts.date_time.iso8601 }}"
+
+httpd_setup_enable: false
+# httpd_server_name: "{{ nexus_public_hostname }}"
+# httpd_default_admin_email: "admin@example.com"
+# httpd_ssl_certificate_file: 'files/nexus.vm.crt'
+# httpd_ssl_certificate_key_file: 'files/nexus.vm.key'
+# httpd_ssl_certificate_chain_file: "{{ httpd_ssl_certificate_file }}"
+# If httpd_copy_ssl_files is false you need to provide the following variables:
+# - httpd_ssl_cert_file_location
+# - httpd_ssl_cert_key_location
+# - httpd_ssl_cert_chain_file_location <= optionnal. Leave unset if none
+# httpd_copy_ssl_files: true
+# These specifies to the vhost file where to find on the remote file system the certificates files.
+# httpd_ssl_cert_file_location: "/etc/pki/tls/certs/nexus.vm.crt"
+# httpd_ssl_cert_key_location: "/etc/pki/tls/private/nexus.vm.key"
+# httpd_ssl_cert_chain_file_location: "{{ httpd_ssl_cert_file_location }}"
+
 ldap_connections:
   - ldap_name: 'NovaTech LDAP' # used as a key to update the ldap config
     ldap_protocol: 'ldap' # ldap or ldaps
@@ -68,8 +108,25 @@ ldap_connections:
     ldap_user_subtree: false
     ldap_group_subtree: true
 
-nexus_anonymous_access: true
+# http proxy
+nexus_with_http_proxy: false
+nexus_with_https_proxy: false
 
+nexus_config_maven: false
+nexus_config_pypi: true
+nexus_config_docker: true
+nexus_config_raw: true
+nexus_config_rubygems: false
+nexus_config_bower: false
+nexus_config_npm: false
+nexus_config_nuget: false
+nexus_config_gitlfs: false
+nexus_config_yum: false
+nexus_config_apt: false
+
+nexus_content_selectors: []
+
+# also see _nexus_privilege_defaults below
 nexus_privileges:
   - name: all-repos-read  # used as key to update a privilege
     description: 'Read & Browse access to all repos'
@@ -83,8 +140,6 @@ nexus_roles:
     name: anonymous
     description: Selective anonymous access
     privileges:
-      - nx-repository-view-docker-docker-browse
-      - nx-repository-view-docker-docker-read
       - nx-repository-view-pypi-pypi-browse
       - nx-repository-view-pypi-pypi-read
       - nx-repository-view-raw-debian-browse
@@ -172,136 +227,227 @@ nexus_local_users:
     roles:
       - Buildbot
 
-nexus_delete_default_blobstore: false
-nexus_blob_split: false     # True - blobstores per format
-
-nexus_blobstores:
-- name: permanent
-  path: '{{ nexus_data_dir }}/blobs/permanent'
+nexus_ldap_users: []
 
 nexus_delete_default_repos: true
 
-nexus_config_maven: false
+nexus_delete_default_blobstore: false
 
-nexus_config_docker: true
-nexus_repos_docker_group:
-  - name: docker
-    http_port: "{{ nexus_docker_group_port }}"
-    v1_enabled: True
-    member_repos:
-      - docker-hosted
-      - docker-proxy
-nexus_repos_docker_hosted:
-  - name: docker-hosted
-    http_port: "{{ nexus_docker_hosted_port }}"
-    v1_enabled: True
-nexus_repos_docker_proxy:
-  - name: docker-proxy
-    http_port: "{{ nexus_docker_proxy_port }}"
-    v1_enabled: True
-    index_type: "HUB"
-    proxy_url: "https://registry-1.docker.io"
-    use_nexus_certificates_to_access_index: false
+#
+# Nexus blobstore config
+nexus_blobstores:
+- name: permanent
+  path: '{{ nexus_data_mountpoint }}/blobs/permanent'
 
-nexus_config_pypi: true
-nexus_repos_pypi_group:
-  - name: pypi
-    member_repos:
-      - pypi-hosted
-      - pypi-proxy
-nexus_repos_pypi_hosted:
-  - name: pypi-hosted
-    write_policy: allow  # one of "allow", "allow_once" or "deny"
-nexus_repos_pypi_proxy:
-  - name: pypi-proxy
-    remote_url: 'https://pypi.python.org/'
+# Cleanup Polices
+nexus_repos_cleanup_policies: []
 
-nexus_config_raw: true
-nexus_repos_raw_group: []
-nexus_repos_raw_hosted:
-  - name: docs
-    strict_content_validation: false
-    write_policy: allow  # one of "allow", "allow_once" or "deny"
-    blob_store: permanent
-  - name: download
-    strict_content_validation: false
-    write_policy: allow  # one of "allow", "allow_once" or "deny"
-    blob_store: permanent
-  - name: ntel-release
-    strict_content_validation: false
-    write_policy: allow  # one of "allow", "allow_once" or "deny"
-    blob_store: permanent
-  - name: ntel-sstate
-    strict_content_validation: false
-    write_policy: allow  # one of "allow", "allow_once" or "deny"
-    blob_store: default
-  - name: ntel-unofficial
-    strict_content_validation: false
-    write_policy: allow  # one of "allow", "allow_once" or "deny"
-    blob_store: default
-  - name: orphans
-    strict_content_validation: false
-    write_policy: allow  # one of "allow", "allow_once" or "deny"
-    blob_store: permanent
-  - name: ptxdist-release
-    strict_content_validation: false
-    write_policy: allow  # one of "allow", "allow_once" or "deny"
-    blob_store: permanent
-  - name: ptxdist-unofficial
-    strict_content_validation: false
-    write_policy: allow  # one of "allow", "allow_once" or "deny"
-    blob_store: default
-  - name: public-releases
-    strict_content_validation: false
-    write_policy: allow  # one of "allow", "allow_once" or "deny"
-    blob_store: permanent
-  - name: test-fixtures
-    strict_content_validation: false
-    write_policy: allow  # one of "allow", "allow_once" or "deny"
-    blob_store: permanent
-nexus_repos_raw_proxy:
-  - name: debian
-    remote_url: 'http://ftp.us.debian.org/debian/'
-    strict_content_validation: false
-    blob_store: default
-  - name: gnu
-    remote_url: 'http://mirror.team-cymru.com/gnu/'
-    strict_content_validation: false
-    blob_store: default
-  - name: kernel
-    remote_url: 'https://mirrors.edge.kernel.org/pub/'
-    strict_content_validation: false
-    blob_store: default
-  - name: sourceforge
-    remote_url: 'http://downloads.sourceforge.net/project'
-    strict_content_validation: false
-    blob_store: default
-  - name: ubuntu-archive
-    remote_url: 'http://archive.ubuntu.com/ubuntu/'
-    strict_content_validation: false
-    blob_store: default
-  - name: xorg
-    remote_url: 'http://xorg.mirrors.pair.com/'
-    strict_content_validation: false
-    blob_store: default
 
-nexus_config_rubygems: false
-nexus_config_bower: false
-nexus_config_npm: false
-nexus_config_nuget: false
-nexus_config_gitlfs: false
-nexus_config_yum: false
+# also see _nexus_repos_maven_defaults below
+nexus_repos_maven_proxy: []
 
+nexus_repos_maven_hosted: []
+
+nexus_repos_maven_group: []
+
+# Scheduled tasks
+# Note: these are tasks you define by yourself (default: none)
+# If you used `nexus_backup_configure: true` above you will see a scheduled task for this
+# in your GUI which is not part of the below list
+nexus_backup_task_name: 'Database Export'
+nexus_compact_default_task_name: 'Compact "Default" Blobstore'
+nexus_compact_permanent_task_name: 'Compact "Permanent" Blobstore'
 nexus_scheduled_tasks:
 - name: '{{ nexus_compact_default_task_name }}'
   typeId: blobstore.compact
+  schedule_type: manual
   taskProperties:
     blobstoreName: default
 - name: '{{ nexus_compact_permanent_task_name }}'
   typeId: blobstore.compact
+  schedule_type: manual
   taskProperties:
     blobstoreName: permanent
 - name: '{{ nexus_backup_task_name }}'
   typeId: db.backup
+  schedule_type: manual
   taskProperties:
-    location: '{{ nexus_backup_dir }}/db'
+    location: '{{ nexus_backup_mountpoint }}/db'
+
+# _nexus_privilege_defaults:
+#   type: repository-view
+#   format: maven2
+#   actions:
+#     - read
+
+_nexus_repos_maven_defaults: {}
+
+# pypi support ...
+_nexus_repos_pypi_defaults:
+  blob_store: "default"
+  strict_content_validation: true
+  version_policy: release  # release, snapshot or mixed
+  layout_policy: strict  # strict or permissive
+  write_policy: allow_once  # one of "allow", "allow_once" or "deny"
+  maximum_component_age: 1440  # Nexus gui default. For proxies only
+  maximum_metadata_age: 1440  # Nexus gui default. For proxies only
+  negative_cache_enabled: true  # Nexus gui default. For proxies only
+  negative_cache_ttl: 1440  # Nexus gui default. For proxies only
+
+nexus_repos_pypi_hosted:
+  - name: pypi-internal
+    version_policy: release
+    write_policy: allow  # one of "allow", "allow_once" or "deny"
+
+nexus_repos_pypi_group:
+  - name: pypi
+    member_repos:
+      - pypi-internal
+      - pypi-proxy
+
+nexus_repos_pypi_proxy:
+  - name: pypi-proxy
+    remote_url: 'https://pypi.python.org/'
+    # maximum_component_age: 1440
+    # maximum_metadata_age: 1440
+    # negative_cache_enabled: true
+    # negative_cache_ttl: 1440
+
+# raw repo support
+
+_nexus_repos_raw_defaults:
+  blob_store: "default"
+  strict_content_validation: false
+  version_policy: release  # release, snapshot or mixed
+  layout_policy: strict  # strict or permissive
+  write_policy: allow_once  # one of "allow", "allow_once" or "deny"
+  maximum_component_age: 1440  # Nexus gui default. For proxies only
+  maximum_metadata_age: 1440  # Nexus gui default. For proxies only
+  negative_cache_enabled: true  # Nexus gui default. For proxies only
+  negative_cache_ttl: 1440  # Nexus gui default. For proxies only
+
+
+nexus_repos_raw_proxy:
+  - name: debian
+    remote_url: 'http://ftp.us.debian.org/debian/'
+  - name: gnu
+    remote_url: 'http://mirror.team-cymru.com/gnu/'
+  - name: kernel
+    remote_url: 'https://mirrors.edge.kernel.org/pub/'
+  - name: sourceforge
+    remote_url: 'http://downloads.sourceforge.net/project'
+  - name: ubuntu-archive
+    remote_url: 'http://archive.ubuntu.com/ubuntu/'
+  - name: xorg
+    remote_url: 'http://xorg.mirrors.pair.com/'
+
+nexus_repos_raw_hosted:
+  - name: docs
+    write_policy: allow
+    blob_store: permanent
+  - name: download
+    write_policy: allow
+    blob_store: permanent
+  - name: ntel-release
+    blob_store: permanent
+  - name: ntel-sstate
+    write_policy: allow
+    blob_store: default
+  - name: ntel-unofficial
+    blob_store: default
+  - name: orphans
+    write_policy: allow
+    blob_store: permanent
+  - name: ptxdist-release
+    blob_store: permanent
+  - name: ptxdist-unofficial
+    blob_store: default
+  - name: public-releases
+    blob_store: permanent
+  - name: test-fixtures
+    blob_store: permanent
+
+nexus_repos_raw_group: []
+
+# Docker support
+_nexus_repos_docker_defaults: {}
+
+nexus_repos_docker_hosted: []
+
+nexus_repos_docker_proxy: []
+
+nexus_repos_docker_group: []
+
+# RubyGems support
+_nexus_repos_rubygems_defaults: {}
+
+nexus_repos_rubygems_hosted: []
+
+nexus_repos_rubygems_group: []
+
+nexus_repos_rubygems_proxy: []
+
+# Bower support
+_nexus_repos_bower_defaults: {}
+
+nexus_repos_bower_hosted: []
+
+nexus_repos_bower_group: []
+
+nexus_repos_bower_proxy: []
+
+# npm support
+_nexus_repos_npm_defaults: {}
+
+nexus_repos_npm_hosted: []
+
+nexus_repos_npm_group: []
+
+nexus_repos_npm_proxy: []
+
+# nuget support
+_nexus_repos_nuget_defaults: {}
+
+nexus_repos_nuget_hosted: []
+
+nexus_repos_nuget_group: []
+
+nexus_repos_nuget_proxy: []
+
+# gitlfs support
+_nexus_repos_gitlfs_defaults: {}
+
+nexus_repos_gitlfs_hosted: []
+
+# yum support ...
+nexus_repos_yum_hosted: []
+nexus_repos_yum_proxy: []
+nexus_repos_yum_group: []
+
+_nexus_repos_yum_defaults: {}
+
+# apt support
+# More on how to work with apt repos https://help.sonatype.com/repomanager3/formats/apt-repositories
+_nexus_repos_apt_defaults: {}
+
+nexus_repos_apt_hosted: []
+nexus_repos_apt_proxy: []
+
+
+# Nexus Docker Install Configuration
+nexus_host_docker: true
+nexus_container_name: '{{ docker_name_prefix }}nexus3'
+nexus_image_tag: 'sonatype/nexus3:{{ nexus_version}}'
+nexus_backup_volume: '{{ docker_name_prefix }}nexus-backup'
+nexus_data_volume: '{{ docker_name_prefix }}nexus-data'
+nexus_networks:
+  - name: '{{ docker_network_frontend }}'
+    aliases:
+      - '{{ nexus_public_hostname }}'
+nexus_port_args:
+  - "{{ nexus_default_port }}"
+nexus_volumes:
+  - '{{ nexus_data_volume }}:{{ nexus_data_mountpoint }}:z'
+  - '{{ nexus_backup_volume }}:{{ nexus_backup_mountpoint }}:z'
+nexus_docker_backup_dir: "{{ docker_backup_dir }}/NEXUS3"
+nexus_docker_restore_dir: "{{ bacula_dest }}{{ nexus_docker_backup_dir }}"

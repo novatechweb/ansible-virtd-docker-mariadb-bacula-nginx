@@ -6,30 +6,30 @@ printf '==> Restoring Nexus blobstores\n'
 time docker run --rm \
     --network none \
     --volume {{ nexus_docker_restore_dir }}:/src:z \
-    --volume {{ nexus_data_volume }}:{{ nexus_data_dir }}:z \
+    --volume {{ nexus_data_volume }}:{{ nexus_data_mountpoint }}:z \
     instrumentisto/rsync-ssh:latest \
     rsync --archive --itemize-changes --delete --ignore-missing-args \
         /src/blobs/ \
-        {{ nexus_data_dir }}/blobs/
+        {{ nexus_data_mountpoint }}/blobs/
 
 printf '==> Clearing old Nexus Databases\n'
 time docker run --rm \
     --network none \
-    --volume {{ nexus_data_volume }}:{{ nexus_data_dir }}:z \
+    --volume {{ nexus_data_volume }}:{{ nexus_data_mountpoint }}:z \
     alpine:latest \
     rm -rf \
-        '{{ nexus_data_dir }}/db/accesslog' \
-        '{{ nexus_data_dir }}/db/analytics' \
-        '{{ nexus_data_dir }}/db/audit' \
-        '{{ nexus_data_dir }}/db/component' \
-        '{{ nexus_data_dir }}/db/config' \
-        '{{ nexus_data_dir }}/db/security'
+        '{{ nexus_data_mountpoint }}/db/accesslog' \
+        '{{ nexus_data_mountpoint }}/db/analytics' \
+        '{{ nexus_data_mountpoint }}/db/audit' \
+        '{{ nexus_data_mountpoint }}/db/component' \
+        '{{ nexus_data_mountpoint }}/db/config' \
+        '{{ nexus_data_mountpoint }}/db/security'
 
 printf '==> Restoring Nexus Databases\n'
 time docker run --rm \
     --network none \
     --volume {{ nexus_docker_restore_dir }}:/src:z \
-    --volume {{ nexus_data_volume }}:{{ nexus_data_dir }}:z \
+    --volume {{ nexus_data_volume }}:{{ nexus_data_mountpoint }}:z \
     instrumentisto/rsync-ssh:latest \
     rsync --archive --itemize-changes --delete --ignore-missing-args \
         /src/db/ \
@@ -38,8 +38,8 @@ time docker run --rm \
 printf '==> Setting permissions on restored data\n'
 time docker run --rm \
     --network none \
-    --volume {{ nexus_data_volume }}:{{ nexus_data_dir }}:z \
+    --volume {{ nexus_data_volume }}:{{ nexus_data_mountpoint }}:z \
     --entrypoint=""\
     --user root \
     '{{ nexus_image_tag }}' \
-    /usr/bin/chown -R nexus:nexus '{{ nexus_data_dir }}'
+    /usr/bin/chown -R nexus:nexus '{{ nexus_data_mountpoint }}'

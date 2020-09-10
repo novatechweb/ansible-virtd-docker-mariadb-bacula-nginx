@@ -7,7 +7,7 @@
   include_vars: "configure-{{ ansible_facts.os_family }}.yml"
 
 - name: Include OS specific selinux libs and utils if needed
-  include_tasks: "selinux-{{ ansible_os_family }}.yml"
+  include_tasks: "selinux-{{ ansible_facts.os_family }}.yml"
   when: ansible_selinux.status is defined and ansible_selinux.status == "enabled"
 
 - name: Check if SystemD service is installed
@@ -21,13 +21,20 @@
   register: nexus_sysv_service_file
 
 - include_tasks: nexus_purge.yml
-  when: nexus_purge | default(false) | bool
+  when: nexus_purge | default(false) | bool and not nexus_host_docker | bool
+
+- include_tasks: nexus_purge_docker.yml
+  when: nexus_purge | default(false) | bool and nexus_host_docker | bool
 
 - name: "Digest splited blob list var"
   include_vars: blob_vars.yml
   when: nexus_blob_split | bool
 
-- import_tasks: nexus_install.yml
+- include_tasks: nexus_install.yml
+  when: not nexus_host_docker
+
+- include_tasks: nexus_install_docker.yml
+  when: nexus_host_docker | bool
 
 - include_tasks: httpd_reverse_proxy_config.yml
   when: httpd_setup_enable | bool
@@ -272,10 +279,31 @@
     path: /usr/libexec/bacula/backup-scripts
     state: directory
 
+- name: Get list of tasks
+  uri:
+    url: "{{ nexus_api_scheme }}://{{ nexus_api_hostname }}:{{ nexus_api_port }}\
+      {{ nexus_api_context_path }}service/rest/v1/tasks"
+    user: 'admin'
+    password: "{{ current_nexus_admin_password }}"
+    method: GET
+    force_basic_auth: yes
+    validate_certs: "{{ nexus_api_validate_certs }}"
+    return_content: yes
+    body_format: json
+  register: all_tasks
+
+- name: Find id of backup task
+  set_fact:
+    backup_task_id: "{{ all_tasks.json | json_query(task_name_query) }}"
+  vars:
+    task_name_query: 'items[?name==`{{nexus_backup_task_name}}`].id | [0]'
+
 - name: before_backup script part
   template:
     src: before_backup.j2
     dest: /usr/libexec/bacula/backup-scripts/55.before_backup.nexus3
+  vars:
+    backup_task_id: '{{ backup_task_id }}'
 
 - name: after_backup script part
   template:

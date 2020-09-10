@@ -15,7 +15,7 @@ nexus_os_max_filedescriptors: 65536  # minimum value for nexus > 3.5.x
 nexus_installation_dir: '/opt'
 nexus_data_dir: '/var/nexus'
 nexus_timezone: 'UTC'  # java timezone
-nexus_tmp_dir: "{{ (ansible_os_family == 'RedHat') | ternary('/var/nexus-tmp', '/tmp/nexus') }}"
+nexus_tmp_dir: "{{ (ansible_facts.os_family == 'RedHat') | ternary('/var/nexus-tmp', '/tmp/nexus') }}"
 nexus_script_dir: '{{ nexus_installation_dir }}/nexus-{{ nexus_version }}/etc/scripts'
 nexus_plugin_urls: []
 nexus_onboarding_wizard: false
@@ -660,9 +660,11 @@ nexus_repos_apt_proxy: []
 #   distribution: jessie
 #   flat: true
 
+
+# Nexus Docker Install Configuration
 nexus_host_docker: false
 nexus_container_name: 'nexus3'
-nexus_image_tag: 'sonatype/nexus3:{{ nexus_version}}'
+nexus_image_tag: 'sonatype/nexus3:{{ nexus_version }}'
 nexus_backup_volume: nexus-backup
 nexus_data_volume: nexus-data
 nexus_networks:
@@ -670,6 +672,7 @@ nexus_networks:
 nexus_port_args:
   - "{{ nexus_default_port }}"
 nexus_volumes:
-  - '{{ nexus_data_volume }}:{{ nexus_data_dir }}:z'
-  - '{{ nexus_backup_volume }}:{{ nexus_backup_dir }}:z'
+  - '{{ nexus_data_volume }}:{{ nexus_data_mountpoint }}:z'
+  - '{{ nexus_backup_volume }}:{{ nexus_backup_mountpoint }}:z'
 nexus_docker_backup_dir: "/tmp/nexus-backup"
+nexus_docker_restore_dir: "/tmp/nexus-restore"

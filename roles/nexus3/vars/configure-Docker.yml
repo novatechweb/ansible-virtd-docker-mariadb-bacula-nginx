@@ -1,0 +1,6 @@
+---
+
+nexus_backup_mountpoint: '/var/nexus-backup'
+nexus_data_mountpoint: '/nexus-data'
+nexus_os_group: '200'
+nexus_os_user: '200'

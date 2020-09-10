@@ -3,11 +3,11 @@
 # *****************************************************************************
 # Backup nexus3
 
-nexus_backup_task_id="{{ nexus_tasks[nexus_backup_task_name]['id'] }}"
+nexus_backup_task_id="{{ backup_task_id }}"
 
 function nexus_task_get_state {
     local taskid="$1"
-    local url="https://{{ nexus_hostname }}/service/rest/v1/tasks/${taskid}"
+    local url="{{ nexus_api_scheme }}://{{ nexus_api_hostname }}:{{ nexus_api_port }}{{ nexus_api_context_path }}service/rest/v1/tasks/${taskid}"
     curl --user "bacula:{{ nexus_bacula_password }}" -s --request GET "$url" | python -c "import sys,json; print json.load(sys.stdin)['currentState']"
 }
 
@@ -22,7 +22,7 @@ function nexus_task_wait_state() {
 
 function nexus_task_run() {
     local taskid="$1"
-    local url="https://{{ nexus_hostname }}/service/rest/v1/tasks/${taskid}/run"
+    local url="{{ nexus_api_scheme }}://{{ nexus_api_hostname }}:{{ nexus_api_port }}{{ nexus_api_context_path }}service/rest/v1/tasks/${taskid}/run"
 
     nexus_task_wait_state "$nexus_backup_task_id" "WAITING"
     curl --user "bacula:{{ nexus_bacula_password }}" -s --request POST "$url"
@@ -33,8 +33,8 @@ mkdir -p -m u=rwx,g=rwx,o= {{ nexus_docker_backup_dir }}
 
 printf '==> Backing up Nexus database\n'
 docker exec '{{ nexus_container_name }}' bash -c '\
-    chown -R nexus:nexus "{{ nexus_backup_dir }}"; \
-    rm -rf "{{ nexus_backup_dir }}/db";'
+    chown -R nexus:nexus "{{ nexus_backup_mountpoint }}"; \
+    rm -rf "{{ nexus_backup_mountpoint }}/db";'
 time nexus_task_run "$nexus_backup_task_id"
 time docker run --rm \
     --network none \

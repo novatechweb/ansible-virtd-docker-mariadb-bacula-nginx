@@ -3,7 +3,7 @@
 
 prometheus_version: v2.17.2
 prometheus_image: 'quay.io/prometheus/prometheus:{{ prometheus_version }}'
-# prometheus_container: '{{ docker_name_prefix }}prometheus'
+prometheus_container: '{{ docker_name_prefix }}prometheus'
 prometheus_restart_policy: '{{ docker_restart_policy }}'
 
 # prometheus_config_dir: /etc/prometheus

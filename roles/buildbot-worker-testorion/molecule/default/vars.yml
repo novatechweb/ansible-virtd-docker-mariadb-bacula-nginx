@@ -1,0 +1,83 @@
+---
+
+buildbot_version: 2.4.0
+
+asset_host: 'https://nexus.novatech-llc.com/repository/download/'
+asset_pypi: 'https://nexus.novatech-llc.com/repository/pypi/'
+
+buildbot_ca_hostdir_config: '{{ molecule_ephemeral_directory + "/buildbot-ca" }}'
+buildbot_ca_creds: '{{ buildbot_ca_hostdir_config + "/creds" }}'
+buildbot_ca_dir: '{{ buildbot_ca_creds }}'
+buildbot_ca_csr: '{{ buildbot_ca_creds + "/ca.csr" }}'
+buildbot_ca_key: '{{ buildbot_ca_creds + "/ca.key" }}'
+buildbot_ca_pem: '{{ buildbot_ca_creds + "/ca.pem" }}'
+buildbot_ca_fields:
+  common_name: ca.example.com
+  country_name: US
+  email_address: ca@example.com
+  locality_name: Example Locality
+  organization_name: Example Org
+  organizational_unit_name: Example Dept.
+  state_or_province_name: Example State
+
+buildbot_hostdir_config: '{{ molecule_ephemeral_directory + "/buildbot-master" }}'
+buildbot_creds: '{{ buildbot_hostdir_config + "/creds" }}'
+buildbot_sshkey: '{{ buildbot_creds }}/id_rsa'
+buildbot_tlsca:  '{{ buildbot_ca_pem }}'
+buildbot_tlscsr: '{{ buildbot_creds }}/server.csr'
+buildbot_tlskey: '{{ buildbot_creds }}/server.key'
+buildbot_tlspem: '{{ buildbot_creds }}/server.pem'
+
+buildbot_ssh_clients:
+  - dir: '{{ buildbot_creds }}'
+    sshkey: '{{ buildbot_sshkey }}'
+  - dir: '{{ buildbot_worker1_creds }}'
+    sshkey: '{{ buildbot_worker1_sshkey }}'
+
+# the name of the container being started
+buildbot_name: 'buildbot'
+
+buildbot_volume_data: 'buildbot_DV'
+
+buildbot_worker_configs:
+  - module: 'worker1'
+    buildbot_worker_name: '{{ buildbot_worker1 }}'
+    buildbot_worker_passwd: 'pass'
+
+buildbot_worker1: 'buildbot-worker1'
+buildbot_worker1_hostdir_config: '{{ molecule_ephemeral_directory + "/buildbot-worker1" }}'
+buildbot_worker1_creds: '{{ buildbot_worker1_hostdir_config + "/creds" }}'
+buildbot_worker1_sshkey: '{{ buildbot_worker1_creds }}/id_rsa'
+buildbot_worker1_tlsca:  '{{ buildbot_ca_pem }}'
+buildbot_worker1_tlscsr: '{{ buildbot_worker1_creds }}/worker1.csr'
+buildbot_worker1_tlskey: '{{ buildbot_worker1_creds }}/worker1.key'
+buildbot_worker1_tlspem: '{{ buildbot_worker1_creds }}/worker1.pem'
+
+buildbot_client_certificates:
+  - dir: '{{ buildbot_creds }}'
+    csr: '{{ buildbot_tlscsr }}'
+    key: '{{ buildbot_tlskey }}'
+    pem: '{{ buildbot_tlspem }}'
+    fields:
+      common_name: buildbot
+      country_name: US
+      email_address: buildbot@example.com
+      locality_name: Example Locality
+      organization_name: Example Org
+      organizational_unit_name: Example Dept.
+      state_or_province_name: Example State
+  - dir: '{{ buildbot_worker1_creds }}'
+    csr: '{{ buildbot_worker1_tlscsr }}'
+    key: '{{ buildbot_worker1_tlskey }}'
+    pem: '{{ buildbot_worker1_tlspem }}'
+    fields:
+      common_name: buildbot-worker1
+      country_name: US
+      email_address: buildbot.worker1@example.com
+      locality_name: Example Locality
+      organization_name: Example Org
+      organizational_unit_name: Example Dept.
+      state_or_province_name: Example State
+
+buildbot_networks:
+  - name: 'workers'

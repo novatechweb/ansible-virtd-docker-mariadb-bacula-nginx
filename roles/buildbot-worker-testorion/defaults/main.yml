@@ -1,0 +1,36 @@
+---
+# defaults file for buildbot-worker-testorion
+
+# host containing build assets
+asset_host: 'http://localhost/'
+asset_user: 'buildbot'
+asset_password: 'buildbot'
+
+# address of buildbot master service
+buildbot_hostname: 'buildbot'
+buildbot_worker_port: '9989'
+
+# connection string for workers to communicate with master
+buildbot_testorion_connection_string: "\
+  tls\
+  :host={{ buildbot_hostname }}\
+  :port={{ buildbot_worker_port }}\
+  :certificate={{ worker_ssl_dir }}/{{ worker_tlspem }}\
+  :privateKey={{ worker_ssl_dir }}/{{ worker_tlskey }}\
+  :trustRoots={{ worker_ssl_dir }}"
+
+# mount path of the data volume
+
+# worker variables
+
+# worker identifier
+buildbot_testorion_name: 'testorion_generic'
+
+# worker password
+buildbot_testorion_passwd:
+buildbot_testorion_sshkey: '{{ worker_config_dir }}/{{ worker_sshkey }}'
+
+# worker TLS connection certificates
+buildbot_testorion_tlsca: '{{ worker_config_dir }}/{{ worker_tlsca }}'
+buildbot_testorion_tlskey: '{{ worker_config_dir }}/{{ worker_tlskey }}'
+buildbot_testorion_tlspem: '{{ worker_config_dir }}/{{ worker_tlspem }}'

@@ -71,6 +71,7 @@ RUN curl https://github.com/Yelp/dumb-init/releases/download/v1.2.1/dumb-init_1.
 &&  python3 -m pip --no-cache-dir install \
     'twisted[tls]' \
     buildbot-worker==${BUILDBOT_VERSION} \
+    requests \
 
 # Install software for image signing
 &&  curl ${PTK_URI} -Lo /tmp/ptk.tar \

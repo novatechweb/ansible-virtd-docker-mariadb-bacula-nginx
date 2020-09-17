@@ -1,0 +1,12 @@
+---
+
+ansible_host: 172.16.103.51
+ansible_password: '{{ lookup("password", buildbot_worker_testorionlxcpx_creds + "/novatech@buildbot_worker_testorionlxcpx length=20") }}'
+ansible_become_password: '{{ lookup("password", buildbot_worker_testorionlxcpx_creds + "/root@buildbot_worker_testorionlxcpx length=20") }}'
+
+buildbot_testorion_name: '{{ buildbot_worker_testorionlxcpx }}'
+buildbot_testorion_passwd: '{{ buildbot_worker_testorionlxcpx_passwd }}'
+buildbot_testorion_sshkey: '{{ buildbot_worker_testorionlxcpx_sshkey }}'
+buildbot_testorion_tlsca: '{{ buildbot_ca_pem }}'
+buildbot_testorion_tlskey: '{{ buildbot_worker_testorionlxcpx_tlskey }}'
+buildbot_testorion_tlspem: '{{ buildbot_worker_testorionlxcpx_tlspem }}'

@@ -179,3 +179,17 @@
         buildbot_worker_image_dockerfile: 'Dockerfile'
       tags:
         - buildbot-worker-ptxdist
+
+- name: Setup Buildbot tester units
+  hosts: buildbot_testers
+  tags:
+    - buildbot
+    - buildbot-worker-testorion
+  vars:
+    asset_host: "https://{{nexus_hostname}}/repository"
+    asset_user: "buildbot"
+    asset_password: "{{nexus_buildbot_password}}"
+  tasks:
+    - name: Setup Buildbot worker on Orion test unit
+      import_role:
+        name: buildbot-worker-testorion

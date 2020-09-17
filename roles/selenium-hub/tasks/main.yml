@@ -1,0 +1,22 @@
+---
+# tasks file for selenium-hub
+
+- name: Create selenium container networks
+  docker_network:
+    name: '{{ item.name }}'
+    state: present
+  loop: '{{ selenium_hub_networks }}'
+
+- name: Start selenium container
+  docker_container:
+    comparisons: {'*': strict}
+    name: '{{ selenium_hub_container }}'
+    env: '{{ selenium_hub_env }}'
+    hostname: '{{ selenium_hub_hostname }}'
+    image: '{{ selenium_hub_image }}'
+    networks: '{{ selenium_hub_networks }}'
+    networks_cli_compatible: yes
+    ports: '{{ selenium_hub_port_args }}'
+    purge_networks: true
+    state: started
+    volumes: '{{ selenium_hub_volumes }}'

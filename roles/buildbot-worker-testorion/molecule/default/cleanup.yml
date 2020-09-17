@@ -1,0 +1,17 @@
+---
+
+- name: Prepare Dependencies on localhost
+  hosts: localhost
+  become: no
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: Remove buildbot master container
+      docker_container:
+        name: '{{ buildbot_name }}'
+        state: absent
+
+    - name: Remove buildbot master data volume
+      docker_volume:
+        name: '{{ buildbot_volume_data }}'
+        state: absent

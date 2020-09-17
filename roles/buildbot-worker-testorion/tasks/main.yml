@@ -1,0 +1,106 @@
+---
+# tasks file for buildbot-worker-testorion
+
+- name: "Assert a password is defined"
+  assert:
+    that:
+    - buildbot_testorion_passwd is defined
+    - buildbot_testorion_passwd is not none
+    fail_msg: "A password must be defined. A default is not provided."
+
+- name: Add public keys to authorized_keys for container
+  authorized_key:
+    key: '{{ lookup("file", item.src) }}'
+    manage_dir: yes
+    state: present
+    user: '{{ ansible_user }}'
+  with_filetree: '{{ playbook_dir }}/public_keys'
+
+- name: Create buildbot-worker config directory
+  become: yes
+  file:
+    path: '{{ worker_config_dir }}/'
+    group: '{{ worker_gid }}'
+    owner: '{{ worker_uid }}'
+    state: directory
+
+- name: Create buildbot-worker working directory
+  become: yes
+  file:
+    path: '{{ worker_dir }}/'
+    group: '{{ worker_gid }}'
+    owner: '{{ worker_uid }}'
+    state: directory
+
+- name: Populate config templates
+  become: yes
+  template:
+    src: "{{ item.src }}"
+    dest: '{{ item.dest }}'
+    group: '{{ worker_gid }}'
+    owner: '{{ worker_uid }}'
+    mode: "u=rw,g=,o="
+    unsafe_writes: yes
+  register: templates
+  loop:
+    - src: buildbot.tac.j2
+      dest: '{{ worker_dir }}/buildbot.tac'
+    - src: .netrc.j2
+      dest: '/root/.netrc'
+
+- name: Create credential directory
+  become: yes
+  file:
+    path: '{{ worker_ssl_dir }}'
+    state: directory
+
+- name: Populate credential files
+  become: yes
+  copy:
+    src: '{{ item.src }}'
+    dest: "{{ item.dest }}"
+    group: '{{ worker_gid }}'
+    owner: '{{ worker_uid }}'
+    mode: "u=rw,g=,o="
+    unsafe_writes: yes
+  register: credentials
+  loop:
+    - src: '{{ buildbot_testorion_sshkey }}'
+      dest: '{{ worker_ssl_dir }}/{{ worker_sshkey }}'
+    - src: '{{ buildbot_testorion_tlsca }}'
+      dest: '{{ worker_ssl_dir }}/{{ worker_tlsca }}'
+    - src: '{{ buildbot_testorion_tlskey }}'
+      dest: '{{ worker_ssl_dir }}/{{ worker_tlskey }}'
+    - src: '{{ buildbot_testorion_tlspem }}'
+      dest: '{{ worker_ssl_dir }}/{{ worker_tlspem }}'
+
+- name: Enable and Start buildbot worker service
+  become: yes
+  systemd:
+    daemon_reload: yes
+    enabled: yes
+    name: buildbot-worker@-var-lib-buildbot.service
+    state: started
+
+- name: Add override configuration for swupdate.service
+  become: yes
+  file:
+    path: '/etc/systemd/system/swupdate.service.d/'
+    group: 'root'
+    owner: 'root'
+    mode: 'u=rwx,g=rx,o=rx'
+    state: directory
+
+- name: Add override configuration for swupdate.service
+  become: yes
+  template:
+    src: 'swupdate.override.conf.j2'
+    dest: '/etc/systemd/system/swupdate.service.d/override.conf'
+    group: 'root'
+    owner: 'root'
+    mode: 'u=rw,g=r,o=r'
+
+- name: Reload systemd with swupdate.service override
+  become: yes
+  systemd:
+    daemon_reload: yes

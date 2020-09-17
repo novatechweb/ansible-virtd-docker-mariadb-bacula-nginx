@@ -1,0 +1,85 @@
+---
+
+- name: Prepare Dependencies on localhost
+  hosts: localhost
+  become: no
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: "Generate Buildbot TLS certificates"
+      include_role:
+        name: buildbot-tls-certificates
+
+    - name: Create buildbot data volume
+      docker_volume:
+        name: '{{ buildbot_volume_data }}'
+
+    - name: Set permissions on data volume
+      docker_container:
+        name: config-copy
+        detach: no
+        cleanup: yes
+        image: instrumentisto/rsync-ssh:latest
+        purge_networks: yes
+        volumes:
+          - '{{ buildbot_hostdir_config }}:/src:ro'
+          - '{{ buildbot_volume_data }}:/buildbot'
+        command: |
+          chown 1000:1000 /buildbot
+
+    - name: Create worker configuration directory
+      file:
+        path: "{{ buildbot_hostdir_config }}/{{ item.module }}/buildbot_ci"
+        state: directory
+        owner: '1000'
+        group: '1000'
+      loop: '{{ buildbot_worker_configs }}'
+
+    - name: Create worker configuration file
+      template:
+        src: "worker.py.j2"
+        dest: "{{ buildbot_hostdir_config }}/{{ item.module }}/buildbot_ci/__init__.py"
+        owner: '1000'
+        group: '1000'
+      vars:
+        buildbot_worker_name: '{{ item.buildbot_worker_name }}'
+        buildbot_worker_passwd: '{{ item.buildbot_worker_passwd }}'
+      loop: '{{ buildbot_worker_configs }}'
+
+    - name: Copy worker configuration to data volume
+      docker_container:
+        name: config-copy
+        detach: no
+        cleanup: yes
+        image: instrumentisto/rsync-ssh:latest
+        purge_networks: yes
+        volumes:
+          - '{{ buildbot_hostdir_config }}:/src:ro'
+          - '{{ buildbot_volume_data }}:/buildbot'
+        command: |
+          rsync --archive --itemize-changes --delete --ignore-missing-args
+          /src/{{ item.module }}/ /buildbot/{{ item.module }}/
+      loop: '{{ buildbot_worker_configs }}'
+
+    - name: "Install Buildbot master"
+      include_role:
+        name: buildbot-master
+
+- name: Prepare Dependencies on hosts
+  hosts: all
+  become: true
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: Install buildbot-worker
+      pip:
+        name:
+          - 'twisted[tls]'
+          - 'buildbot-worker=={{ buildbot_version }}'
+          - requests
+        state: present
+
+    - name: Install buildbot-worker service
+      copy:
+        src: 'buildbot-worker@.service'
+        dest: '/lib/systemd/system/buildbot-worker@.service'

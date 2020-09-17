@@ -90,6 +90,58 @@ buildbot_client_certificates:
       L: Lenexa
       not_before: '{{ buildbot_certificate_not_before }}'
       not_after: '{{ buildbot_certificate_not_after }}'
+  - dir: '{{ buildbot_worker_testorionio_creds }}'
+    csr: '{{ buildbot_worker_testorionio_tlscsr }}'
+    key: '{{ buildbot_worker_testorionio_tlskey }}'
+    pem: '{{ buildbot_worker_testorionio_tlspem }}'
+    fields:
+      CN: buildbot_worker_testorionio
+      O: NovaTech
+      OU: Orion
+      C: US
+      ST: Kansas
+      L: Lenexa
+      not_before: '{{ buildbot_certificate_not_before }}'
+      not_after: '{{ buildbot_certificate_not_after }}'
+  - dir: '{{ buildbot_worker_testorionlxm_creds }}'
+    csr: '{{ buildbot_worker_testorionlxm_tlscsr }}'
+    key: '{{ buildbot_worker_testorionlxm_tlskey }}'
+    pem: '{{ buildbot_worker_testorionlxm_tlspem }}'
+    fields:
+      CN: buildbot_worker_testorionlxm
+      O: NovaTech
+      OU: Orion
+      C: US
+      ST: Kansas
+      L: Lenexa
+      not_before: '{{ buildbot_certificate_not_before }}'
+      not_after: '{{ buildbot_certificate_not_after }}'
+  - dir: '{{ buildbot_worker_testorionlxcpx_creds }}'
+    csr: '{{ buildbot_worker_testorionlxcpx_tlscsr }}'
+    key: '{{ buildbot_worker_testorionlxcpx_tlskey }}'
+    pem: '{{ buildbot_worker_testorionlxcpx_tlspem }}'
+    fields:
+      CN: buildbot_worker_testorionlxcpx
+      O: NovaTech
+      OU: Orion
+      C: US
+      ST: Kansas
+      L: Lenexa
+      not_before: '{{ buildbot_certificate_not_before }}'
+      not_after: '{{ buildbot_certificate_not_after }}'
+  - dir: '{{ buildbot_worker_testorionlxplus_creds }}'
+    csr: '{{ buildbot_worker_testorionlxplus_tlscsr }}'
+    key: '{{ buildbot_worker_testorionlxplus_tlskey }}'
+    pem: '{{ buildbot_worker_testorionlxplus_tlspem }}'
+    fields:
+      CN: buildbot_worker_testorionlxplus
+      O: NovaTech
+      OU: Orion
+      C: US
+      ST: Kansas
+      L: Lenexa
+      not_before: '{{ buildbot_certificate_not_before }}'
+      not_after: '{{ buildbot_certificate_not_after }}'
 
 buildbot_ssh_clients:
   - dir: '{{ buildbot_creds }}'
@@ -127,6 +179,34 @@ buildbot_ssh_clients:
     email: buildbot@novatech-llc.com
     password: "{{ gitlab_user_buildbot_password }}"
     sshkey_name: "{{ docker_name_prefix }}buildbot_worker_ptxdist"
+  - dir: '{{ buildbot_worker_testorionio_creds }}'
+    sshkey: '{{ buildbot_worker_testorionio_sshkey }}'
+    username: buildbot
+    name: Build Robot
+    email: buildbot@novatech-llc.com
+    password: "{{ gitlab_user_buildbot_password }}"
+    sshkey_name: "{{ docker_name_prefix }}buildbot_worker_testorionio"
+  - dir: '{{ buildbot_worker_testorionlxm_creds }}'
+    sshkey: '{{ buildbot_worker_testorionlxm_sshkey }}'
+    username: buildbot
+    name: Build Robot
+    email: buildbot@novatech-llc.com
+    password: "{{ gitlab_user_buildbot_password }}"
+    sshkey_name: "{{ docker_name_prefix }}buildbot_worker_testorionlxm"
+  - dir: '{{ buildbot_worker_testorionlxcpx_creds }}'
+    sshkey: '{{ buildbot_worker_testorionlxcpx_sshkey }}'
+    username: buildbot
+    name: Build Robot
+    email: buildbot@novatech-llc.com
+    password: "{{ gitlab_user_buildbot_password }}"
+    sshkey_name: "{{ docker_name_prefix }}buildbot_worker_testorionlxcpx"
+  - dir: '{{ buildbot_worker_testorionlxplus_creds }}'
+    sshkey: '{{ buildbot_worker_testorionlxplus_sshkey }}'
+    username: buildbot
+    name: Build Robot
+    email: buildbot@novatech-llc.com
+    password: "{{ gitlab_user_buildbot_password }}"
+    sshkey_name: "{{ docker_name_prefix }}buildbot_worker_testorionlxplus"
 
 buildbot_gitlab_groups:
   - group: "Orion-Userspace"
@@ -254,6 +334,14 @@ buildbot_env:
   BUILDBOT_WORKER_PTXDIST_NAME: '{{ buildbot_worker_ptxdist }}'
   BUILDBOT_WORKER_PTXDIST_PASS: '{{ buildbot_worker_ptxdist_passwd }}'
   BUILDBOT_WORKER_PTXDIST_RELEASE_URI: '{{ ptxdist_release_uri }}'
+  BUILDBOT_WORKER_TESTORIONIO_NAME: '{{ buildbot_worker_testorionio }}'
+  BUILDBOT_WORKER_TESTORIONIO_PASS: '{{ buildbot_worker_testorionio_passwd }}'
+  BUILDBOT_WORKER_TESTORIONLXM_NAME: '{{ buildbot_worker_testorionlxm }}'
+  BUILDBOT_WORKER_TESTORIONLXM_PASS: '{{ buildbot_worker_testorionlxm_passwd }}'
+  BUILDBOT_WORKER_TESTORIONLXCPX_NAME: '{{ buildbot_worker_testorionlxcpx }}'
+  BUILDBOT_WORKER_TESTORIONLXCPX_PASS: '{{ buildbot_worker_testorionlxcpx_passwd }}'
+  BUILDBOT_WORKER_TESTORIONLXPLUS_NAME: '{{ buildbot_worker_testorionlxplus }}'
+  BUILDBOT_WORKER_TESTORIONLXPLUS_PASS: '{{ buildbot_worker_testorionlxplus_passwd }}'
   GITLAB_URI: 'https://{{ gitlab_hostname }}/'
   GITLAB_OAUTH_ID: '{{ gitlab_oauth_buildbot_id }}'
   GITLAB_OAUTH_SECRET: '{{ gitlab_oauth_buildbot_secret }}'
@@ -338,6 +426,38 @@ buildbot_worker_ptxdist_sshkey: '{{ buildbot_worker_ptxdist_creds }}/id_rsa'
 buildbot_worker_ptxdist_tlscsr: '{{ buildbot_worker_ptxdist_creds }}/worker.csr'
 buildbot_worker_ptxdist_tlskey: '{{ buildbot_worker_ptxdist_creds }}/worker.key'
 buildbot_worker_ptxdist_tlspem: '{{ buildbot_worker_ptxdist_creds }}/worker.pem'
+
+buildbot_worker_testorionio: '{{ docker_name_prefix }}buildbot_worker_testorionio'
+buildbot_worker_testorionio_creds: '{{ playbook_dir }}/credentials/buildbot_worker_testorionio'
+buildbot_worker_testorionio_passwd: '{{ lookup("password", buildbot_worker_testorionio_creds + "/passwd length=20") }}'
+buildbot_worker_testorionio_sshkey: '{{ buildbot_worker_testorionio_creds }}/id_rsa'
+buildbot_worker_testorionio_tlscsr: '{{ buildbot_worker_testorionio_creds }}/worker.csr'
+buildbot_worker_testorionio_tlskey: '{{ buildbot_worker_testorionio_creds }}/worker.key'
+buildbot_worker_testorionio_tlspem: '{{ buildbot_worker_testorionio_creds }}/worker.pem'
+
+buildbot_worker_testorionlxm: '{{ docker_name_prefix }}buildbot_worker_testorionlxm'
+buildbot_worker_testorionlxm_creds: '{{ playbook_dir }}/credentials/buildbot_worker_testorionlxm'
+buildbot_worker_testorionlxm_passwd: '{{ lookup("password", buildbot_worker_testorionlxm_creds + "/passwd length=20") }}'
+buildbot_worker_testorionlxm_sshkey: '{{ buildbot_worker_testorionlxm_creds }}/id_rsa'
+buildbot_worker_testorionlxm_tlscsr: '{{ buildbot_worker_testorionlxm_creds }}/worker.csr'
+buildbot_worker_testorionlxm_tlskey: '{{ buildbot_worker_testorionlxm_creds }}/worker.key'
+buildbot_worker_testorionlxm_tlspem: '{{ buildbot_worker_testorionlxm_creds }}/worker.pem'
+
+buildbot_worker_testorionlxcpx: '{{ docker_name_prefix }}buildbot_worker_testorionlxcpx'
+buildbot_worker_testorionlxcpx_creds: '{{ playbook_dir }}/credentials/buildbot_worker_testorionlxcpx'
+buildbot_worker_testorionlxcpx_passwd: '{{ lookup("password", buildbot_worker_testorionlxcpx_creds + "/passwd length=20") }}'
+buildbot_worker_testorionlxcpx_sshkey: '{{ buildbot_worker_testorionlxcpx_creds }}/id_rsa'
+buildbot_worker_testorionlxcpx_tlscsr: '{{ buildbot_worker_testorionlxcpx_creds }}/worker.csr'
+buildbot_worker_testorionlxcpx_tlskey: '{{ buildbot_worker_testorionlxcpx_creds }}/worker.key'
+buildbot_worker_testorionlxcpx_tlspem: '{{ buildbot_worker_testorionlxcpx_creds }}/worker.pem'
+
+buildbot_worker_testorionlxplus: '{{ docker_name_prefix }}buildbot_worker_testorionlxplus'
+buildbot_worker_testorionlxplus_creds: '{{ playbook_dir }}/credentials/buildbot_worker_testorionlxplus'
+buildbot_worker_testorionlxplus_passwd: '{{ lookup("password", buildbot_worker_testorionlxplus_creds + "/passwd length=20") }}'
+buildbot_worker_testorionlxplus_sshkey: '{{ buildbot_worker_testorionlxplus_creds }}/id_rsa'
+buildbot_worker_testorionlxplus_tlscsr: '{{ buildbot_worker_testorionlxplus_creds }}/worker.csr'
+buildbot_worker_testorionlxplus_tlskey: '{{ buildbot_worker_testorionlxplus_creds }}/worker.key'
+buildbot_worker_testorionlxplus_tlspem: '{{ buildbot_worker_testorionlxplus_creds }}/worker.pem'
 
 buildbot_webhook_secret: '{{ lookup("password", buildbot_creds + "/webhook length=20") }}'
 

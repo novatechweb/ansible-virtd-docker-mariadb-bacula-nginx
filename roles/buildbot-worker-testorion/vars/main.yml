@@ -1,0 +1,17 @@
+---
+# vars file for buildbot-worker-testorion
+worker_config_dir: '/etc/buildbot-worker'
+worker_dir: '/var/lib/buildbot'
+
+# numeric ID of buildbot group
+worker_gid: 'root'
+
+# numeric ID of buildbot user
+worker_uid: 'root'
+
+worker_sshkey: 'id_rsa'
+
+worker_ssl_dir: /etc/ssl/private
+worker_tlsca: 'ca.pem'
+worker_tlskey: 'worker.key'
+worker_tlspem: 'worker.pem'

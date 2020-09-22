@@ -13,11 +13,12 @@
 ## and produce unwanted errors.
 ##################################
 
-# Latest ansible 2.3.x
-ansible>=2.3,<2.4
-# Latest molecule
 molecule
-# Latest docker-py
-docker-py
-# Python vagrant only needed for local test for selinux
-# python-vagrant
+ansible
+ansible-lint
+flake8
+flake8-docstrings
+yamllint
+testinfra
+docker
+jmespath

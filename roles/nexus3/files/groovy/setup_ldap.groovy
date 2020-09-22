@@ -1,27 +1,25 @@
 
 import org.sonatype.nexus.ldap.persist.LdapConfigurationManager
-import org.sonatype.nexus.ldap.persist.entity.LdapConfiguration
 import org.sonatype.nexus.ldap.persist.entity.Connection
 import org.sonatype.nexus.ldap.persist.entity.Mapping
 import groovy.json.JsonSlurper
 
 parsed_args = new JsonSlurper().parseText(args)
 
+def ldapConfigMgr = container.lookup(LdapConfigurationManager.class.getName())
 
-def ldapConfigMgr = container.lookup(LdapConfigurationManager.class.getName());
+// Create a new configuration with the given name
+def ldapConfig = ldapConfigMgr.newConfiguration()
+ldapConfig.setName(parsed_args.name)
 
-def ldapConfig = new LdapConfiguration()
+// Look for existing config to update and replace the blank one created earlier if found
 boolean update = false;
-
-// Look for existing config to update
 ldapConfigMgr.listLdapServerConfigurations().each {
     if (it.name == parsed_args.name) {
         ldapConfig = it
         update = true
     }
 }
-
-ldapConfig.setName(parsed_args.name)
 
 // Connection
 connection = new Connection()
@@ -37,6 +35,7 @@ connection.setSearchBase(parsed_args.search_base)
 connection.setConnectionTimeout(30)
 connection.setConnectionRetryDelay(300)
 connection.setMaxIncidentsCount(3)
+connection.setUseTrustStore(Boolean.valueOf(parsed_args.use_trust_store))
 ldapConfig.setConnection(connection)
 
 
@@ -67,7 +66,6 @@ mapping.setUserSubtree(parsed_args.user_subtree)
 mapping.setGroupSubtree(parsed_args.group_subtree)
 
 ldapConfig.setMapping(mapping)
-
 
 if (update) {
     ldapConfigMgr.updateLdapServerConfiguration(ldapConfig)

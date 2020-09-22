@@ -4,9 +4,9 @@ extends: default
 rules:
   indentation:
     spaces: 2
-    check-multi-line-strings: true
+    check-multi-line-strings: false
   line-length:
-    max: 250
+    max: 120
     level: warning
   document-start:
     present: true
@@ -39,5 +39,4 @@ rules:
     max-spaces-inside: 0
     level: error
   truthy: disable
-  new-line-at-end-of-file: disable
   comments-indentation: enable

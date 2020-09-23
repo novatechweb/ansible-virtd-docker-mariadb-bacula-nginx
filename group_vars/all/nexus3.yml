@@ -388,6 +388,8 @@ nexus_repos_raw_hosted:
   - name: download
     write_policy: allow
     blob_store: permanent
+  - name: ntel-archive
+    blob_store: archive
   - name: ntel-release
     blob_store: permanent
   - name: ntel-sstate

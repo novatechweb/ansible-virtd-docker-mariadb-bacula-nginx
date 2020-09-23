@@ -154,6 +154,8 @@ nexus_roles:
       - nx-repository-view-raw-kernel-read
       - nx-repository-view-raw-orphans-browse
       - nx-repository-view-raw-orphans-read
+      - nx-repository-view-raw-ptxdist-sources-browse
+      - nx-repository-view-raw-ptxdist-sources-read
       - nx-repository-view-raw-public-releases-browse
       - nx-repository-view-raw-public-releases-read
       - nx-repository-view-raw-sourceforge-browse
@@ -399,6 +401,8 @@ nexus_repos_raw_hosted:
   - name: proprietary
     blob_store: permanent
   - name: ptxdist-release
+    blob_store: permanent
+  - name: ptxdist-sources
     blob_store: permanent
   - name: ptxdist-unofficial
     blob_store: default

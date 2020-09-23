@@ -210,6 +210,13 @@ nexus_roles:
       - nx-repository-view-*-*-browse
       - nx-repository-view-*-*-read
     roles: []
+  - id: proprietary
+    name: proprietary
+    description: Download Proprietary Source Code Archives
+    privileges:
+      - nx-repository-view-raw-proprietary-browse
+      - nx-repository-view-raw-proprietary-read
+    roles: []
 
 nexus_local_users:
   - username: anonymous
@@ -233,6 +240,13 @@ nexus_local_users:
     password: "{{ nexus_buildbot_password }}"
     roles:
       - Buildbot
+  - username: proprietary
+    first_name: Proprietary Code
+    last_name: User
+    email: admin@novatech-llc.com
+    password: '{{ nexus_proprietary_password }}'
+    roles:
+      - proprietary
 
 nexus_ldap_users: []
 
@@ -381,6 +395,8 @@ nexus_repos_raw_hosted:
     blob_store: default
   - name: orphans
     write_policy: allow
+    blob_store: permanent
+  - name: proprietary
     blob_store: permanent
   - name: ptxdist-release
     blob_store: permanent

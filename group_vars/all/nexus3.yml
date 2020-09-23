@@ -236,6 +236,8 @@ nexus_delete_default_blobstore: true
 #
 # Nexus blobstore config
 nexus_blobstores:
+- name: archive
+  path: '{{ nexus_data_mountpoint }}/blobs/archive'
 - name: default
   path: '{{ nexus_data_mountpoint }}/blobs/default'
 - name: permanent
@@ -257,9 +259,15 @@ nexus_repos_maven_group: []
 # If you used `nexus_backup_configure: true` above you will see a scheduled task for this
 # in your GUI which is not part of the below list
 nexus_backup_task_name: 'Database Export'
+nexus_compact_archive_task_name: 'Compact "Archive" Blobstore'
 nexus_compact_default_task_name: 'Compact "Default" Blobstore'
 nexus_compact_permanent_task_name: 'Compact "Permanent" Blobstore'
 nexus_scheduled_tasks:
+- name: '{{ nexus_compact_archive_task_name }}'
+  typeId: blobstore.compact
+  schedule_type: manual
+  taskProperties:
+    blobstoreName: archive
 - name: '{{ nexus_compact_default_task_name }}'
   typeId: blobstore.compact
   schedule_type: manual

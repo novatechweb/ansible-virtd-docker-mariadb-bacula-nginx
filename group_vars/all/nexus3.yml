@@ -231,11 +231,13 @@ nexus_ldap_users: []
 
 nexus_delete_default_repos: true
 
-nexus_delete_default_blobstore: false
+nexus_delete_default_blobstore: true
 
 #
 # Nexus blobstore config
 nexus_blobstores:
+- name: default
+  path: '{{ nexus_data_mountpoint }}/blobs/default'
 - name: permanent
   path: '{{ nexus_data_mountpoint }}/blobs/permanent'
 

@@ -203,6 +203,13 @@ nexus_roles:
       - nx-repository-view-raw-test-fixtures-browse
       - nx-repository-view-raw-test-fixtures-read
     roles: []
+  - id: testing
+    name: novatech-testing
+    description: Tech-Support-Testing Group
+    privileges:
+      - nx-repository-view-*-*-browse
+      - nx-repository-view-*-*-read
+    roles: []
 
 nexus_local_users:
   - username: anonymous

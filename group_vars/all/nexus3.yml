@@ -244,7 +244,14 @@ nexus_blobstores:
   path: '{{ nexus_data_mountpoint }}/blobs/permanent'
 
 # Cleanup Polices
-nexus_repos_cleanup_policies: []
+nexus_repos_cleanup_policies:
+  - name: ntel-unofficial-cleanup
+    format: raw
+    mode:
+    notes: "Cleanup ntel-unofficial (CI) builds older than 1 week"
+    criteria:
+      lastBlobUpdated: 7
+      lastBlobDownloaded: 7
 
 
 # also see _nexus_repos_maven_defaults below

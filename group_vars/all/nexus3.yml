@@ -413,7 +413,12 @@ nexus_repos_raw_hosted:
   - name: test-fixtures
     blob_store: permanent
 
-nexus_repos_raw_group: []
+nexus_repos_raw_group:
+  - name: ntel
+    member_repos:
+      - ntel-release
+      - ntel-archive
+      - ntel-unofficial
 
 # Docker support
 _nexus_repos_docker_defaults: {}

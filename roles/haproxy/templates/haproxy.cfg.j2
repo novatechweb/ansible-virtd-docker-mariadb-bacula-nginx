@@ -106,7 +106,8 @@ backend backend-buildbot
     server buildbot1 buildbot.frontend:8080
 
 backend backend-nexus
-    server nexus1 nexus3.frontend:8081
+    option httpchk /
+    server nexus1 {{ nexus_container_name }}.{{ docker_network_frontend }}:{{ nexus_default_port }}
 
 backend backend-prometheus
     option httpchk /

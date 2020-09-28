@@ -295,17 +295,20 @@ nexus_compact_permanent_task_name: 'Compact "Permanent" Blobstore'
 nexus_scheduled_tasks:
 - name: '{{ nexus_compact_archive_task_name }}'
   typeId: blobstore.compact
-  schedule_type: manual
+  schedule_type: cron
+  cron: '0 15 * * * ?'
   taskProperties:
     blobstoreName: archive
 - name: '{{ nexus_compact_default_task_name }}'
   typeId: blobstore.compact
-  schedule_type: manual
+  schedule_type: cron
+  cron: '0 30 * * * ?'
   taskProperties:
     blobstoreName: default
 - name: '{{ nexus_compact_permanent_task_name }}'
   typeId: blobstore.compact
-  schedule_type: manual
+  schedule_type: cron
+  cron: '0 45 * * * ?'
   taskProperties:
     blobstoreName: permanent
 - name: '{{ nexus_backup_task_name }}'

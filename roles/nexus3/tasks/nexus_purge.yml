@@ -1,7 +1,24 @@
 ---
 
-- include_tasks: nexus_purge_systemd.yml
-  when: not nexus_host_docker
+- name: get target path of current installed nexus version
+  command: 'readlink {{ nexus_installation_dir }}/nexus-latest'
+  register: nexus_readlink_latest_call
+  failed_when: false
+  changed_when: false
+  check_mode: no
 
-- include_tasks: nexus_purge_docker.yml
-  when: nexus_host_docker | bool
+- name: "Purge Nexus"
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ nexus_data_dir }}"
+    - "{{ nexus_readlink_latest_call.stdout | default(omit) }}"
+    - "{{ nexus_restore_log }}"
+    - "{{ nexus_installation_dir }}/nexus-latest"
+    # - "{{ nexus_backup_dir }}" # Optional
+
+- name: "remove nexus package if present"
+  package:
+    name: nexus
+    state: absent

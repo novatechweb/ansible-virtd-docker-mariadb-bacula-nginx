@@ -1,3 +1,8 @@
 ---
+# The tag of the image currently being used to build the container
+docker_image_tag: staging
+
+# A prefix to seperate containers and images without removing running containers
+docker_name_prefix: 'staging-'
 
 docker_storage_driver: overlay2

@@ -33,13 +33,13 @@ frontend container_https_in
 
     http-request redirect scheme https code 301 if !{ ssl_fc }
 
-    acl is_buildbot     hdr(host) eq {{ buildbot_hostname }}
-    acl is_gitlab       hdr(host) eq {{ gitlab_hostname }}
-    acl is_ldapadmin    hdr(host) eq {{ openldap_hostname }}
-    acl is_mantisbt     hdr(host) eq {{ mantisbt_hostname }}
-    acl is_nexus        hdr(host) eq {{ nexus_hostname }}
-    acl is_svn          hdr(host) eq {{ svn_hostname }}
-    acl is_wiki         hdr(host) eq {{ wiki_hostname }}
+    acl is_buildbot     hdr_dom(host) -i {{ buildbot_hostname }}
+    acl is_gitlab       hdr_dom(host) -i {{ gitlab_hostname }}
+    acl is_ldapadmin    hdr_dom(host) -i {{ openldap_hostname }}
+    acl is_mantisbt     hdr_dom(host) -i {{ mantisbt_hostname }}
+    acl is_nexus        hdr_dom(host) -i {{ nexus_hostname }}
+    acl is_svn          hdr_dom(host) -i {{ svn_hostname }}
+    acl is_wiki         hdr_dom(host) -i {{ wiki_hostname }}
 
     use_backend backend-buildbot if is_buildbot
     use_backend backend-nexus if is_nexus
@@ -49,10 +49,10 @@ frontend container_https_in
     use_backend backend-mantisbt if is_mantisbt
     use_backend backend-wiki if is_wiki
 
-    acl is_grafana      hdr(host) eq {{ grafana_hostname }}
+    acl is_grafana      hdr_dom(host) -i {{ grafana_hostname }}
     use_backend backend-grafana if is_grafana
 
-    acl is_prometheus   hdr(host) eq {{ prometheus_hostname }}
+    acl is_prometheus   hdr_dom(host) -i {{ prometheus_hostname }}
     use_backend backend-prometheus if is_prometheus
 
 # frontend container_ldap_in
@@ -106,7 +106,8 @@ backend backend-buildbot
     server buildbot1 buildbot.frontend:8080
 
 backend backend-nexus
-    server nexus1 nexus3.frontend:8081
+    option httpchk /
+    server nexus1 {{ nexus_container_name }}.{{ docker_network_frontend }}:{{ nexus_default_port }}
 
 backend backend-prometheus
     option httpchk /

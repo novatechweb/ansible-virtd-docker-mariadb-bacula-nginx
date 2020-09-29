@@ -6,3 +6,8 @@ netaddr
 passlib
 python-gitlab==1.12.1
 svn
+
+flake8
+flake8-docstrings
+yamllint
+jmespath

@@ -82,8 +82,6 @@
     role: nexus3
     tags:
     - nexus_container
-    vars:
-      public_hostname: '{{ nexus_hostname }}'
   - name: Build and start the SVN Docker container
     role: docker-svn
     svn_repos: 'ddio NCD_Release hardware'

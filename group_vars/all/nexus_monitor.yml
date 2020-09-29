@@ -1,0 +1,4 @@
+---
+
+nexus_monitor_container_name: '{{ docker_name_prefix }}nexus_monitor'
+nexus_monitor_port: "9184"

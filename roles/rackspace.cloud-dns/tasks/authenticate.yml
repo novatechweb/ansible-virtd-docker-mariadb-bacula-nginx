@@ -1,0 +1,30 @@
+---
+
+# REQUEST POST https://identity.api.rackspacecloud.com/v2.0/tokens
+# {
+#   "auth":{
+#     "RAX-KSKEY:apiKeyCredentials":{
+#       "username":"yourUserName",
+#       "apiKey":"$apiKey"
+#     }
+#   }
+# }
+# RESPONSE
+# code: 200
+- name: Authenticate to Rackspace API
+  ansible.builtin.uri:
+    url: '{{ RACKSPACE_IDENTITY_API }}'
+    body:
+      auth:
+        'RAX-KSKEY:apiKeyCredentials':
+          username: '{{ rackspace_username }}'
+          apiKey: '{{ rackspace_apikey }}'
+        tenantId: '{{ rackspace_tenant }}'
+    body_format: json
+    method: POST
+    return_content: yes
+    status_code: 200
+  register: rackspace_auth
+
+- set_fact:
+    RACKSPACE_AUTH_TOKEN: '{{ rackspace_auth.json.access.token.id }}'

@@ -1,1 +1,6 @@
 ---
+
+exim4_etc_dir: /etc/exim4/
+exim4_dkim_key: '{{ exim4_etc_dir }}/exim-dkim.key'
+exim4_dkim_pub: '{{ exim4_etc_dir }}/exim-dkim.pub'
+exim4_passwd_file: '{{ exim4_etc_dir }}/passwd'

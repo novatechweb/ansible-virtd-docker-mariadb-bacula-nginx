@@ -6,6 +6,9 @@
 
 - import_tasks: selinux-docker-log_rotate.yml
 
+# *****************************************************************************
+# Install configuration files
+
 - name: docker_container.conf dir
   file:
     state: directory
@@ -14,6 +17,37 @@
     group: root
     mode: 'u=rwx,g=rx,o=rx'
     recurse: no
+
+# *****************************************************************************
+# Create DKIM keypair
+
+- name: Create DKIM private key
+  become: no
+  delegate_to: localhost
+  openssl_privatekey:
+    path: '{{ exim4_dkim_private_key }}'
+    size: 4096
+    state: present
+    type: RSA
+
+- name: Create DKIM public key
+  become: no
+  delegate_to: localhost
+  openssl_publickey:
+    path: '{{ exim4_dkim_public_key }}'
+    privatekey_path: '{{ exim4_dkim_private_key }}'
+    state: present
+
+- name: Install to host
+  copy:
+    dest: '{{ docker_restore_config_base_dir }}/{{ exim4_dv_name }}/'
+    src: '{{ item }}'
+    owner: root
+    group: root
+    mode: 'u=rwx,g=rx,o=rx'
+  loop:
+    - '{{ exim4_dkim_private_key }}'
+    - '{{ exim4_dkim_public_key }}'
 
 # *****************************************************************************
 # Setup the directory for the datavolume for the syslog data
@@ -103,7 +137,7 @@
 
 - name: Create the email passwords file
   lineinfile:
-    path: '{{ docker_restore_config_base_dir }}/{{ exim4_dv_name }}/passwd'
+    path: '{{ docker_restore_config_base_dir }}/{{ exim4_dv_name }}/{{ exim4_passwd_file | basename }}'
     create: yes
     line: '{{ item.value.user }}:{{ item.value.password }}'
     regexp: '^{{ item.value.user }}:'
@@ -118,7 +152,7 @@
   docker_container:
     comparisons: {'*': strict}
     name: '{{ exim4_container_name }}'
-    hostname: '{{ exim4_container_name }}'
+    hostname: '{{ exim4_hostname }}'
     image: '{{ exim4_image_name }}:{{ docker_image_tag }}'
     networks:
       - name: '{{ docker_network_frontend }}'
@@ -129,7 +163,9 @@
     restart_policy: '{{ docker_restart_policy }}'
     state: started
     volumes:
-      - '{{ docker_restore_config_base_dir }}/{{ exim4_dv_name }}/passwd:/etc/exim4/passwd:z'
+      - '{{ docker_restore_config_base_dir }}/{{ exim4_dv_name }}/{{ exim4_dkim_private_key | basename }}:{{ exim4_dkim_key }}:z'
+      - '{{ docker_restore_config_base_dir }}/{{ exim4_dv_name }}/{{ exim4_dkim_public_key | basename }}:{{ exim4_dkim_pub }}:z'
+      - '{{ docker_restore_config_base_dir }}/{{ exim4_dv_name }}/{{ exim4_passwd_file | basename }}:{{ exim4_passwd_file }}:z'
       - '{{ exim4_dv_name }}:/var/spool/exim4:z'
       - '{{ exim4_syslog_datavolume_dir }}:/var/log/exim4:z'
       - '{{ openssl_dv_name }}:/etc/ssl/private:z'

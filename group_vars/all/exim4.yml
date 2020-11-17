@@ -5,3 +5,6 @@ exim4_container_name: '{{ docker_name_prefix }}exim4'
 
 # Data volume directory for the syslog data
 exim4_syslog_datavolume_dir: '/var/log/docker_container/{{ exim4_container_name }}'
+
+exim4_dkim_private_key: '{{ playbook_dir + "/credentials/exim4/exim-dkim.key" }}'
+exim4_dkim_public_key: '{{ playbook_dir + "/credentials/exim4/exim-dkim.pub" }}'

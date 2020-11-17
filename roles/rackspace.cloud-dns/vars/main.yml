@@ -1,0 +1,5 @@
+---
+# vars file for rackspace.cloud-dns
+
+RACKSPACE_IDENTITY_API: https://identity.api.rackspacecloud.com/v2.0/tokens
+RACKSPACE_DNS_API: https://dns.api.rackspacecloud.com/v1.0/{{ rackspace_tenant }}/domains

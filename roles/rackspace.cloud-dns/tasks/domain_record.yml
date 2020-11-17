@@ -1,0 +1,104 @@
+---
+
+# GET /v1.0/{account}/domains/{domainId}/records
+# Accept: application/json
+# X-Auth-Token: ea85e6ac-baff-4a6c-bf43-848020ea3812
+# Content-Type: application/json
+# Content-Length: 0
+#
+# RESPONSE
+# Status: 200 OK
+# Date: Thu, 28 Jul 2011 21:54:21 GMT
+# X-API-VERSION: 1.0.17
+# Content-Type: application/json
+# Content-Length: 1474
+# "json": {
+#   "records": [
+#     {
+#       "created": "2012-08-10T17:31:41.000+0000",
+#       "data": "v=spf1 a:mail.novatech-llc.com include:spf.microsoftonline.com ~all",
+#       "id": "TXT-417433",
+#       "name": "novatech-llc.com",
+#       "ttl": 86400,
+#       "type": "TXT",
+#       "updated": "2020-10-23T12:02:29.000+0000"
+#     }
+#   ]
+# },
+- name: Search domain records
+  ansible.builtin.uri:
+    url: '{{ RACKSPACE_DNS_API }}/{{ DOMAIN_ID }}/records?type={{ item.type }}&name={{ item.name }}'
+    method: GET
+    status_code: 200
+  register: domain_record_info
+
+- when: domain_record_info.json.records | length > 0
+  block:
+  - set_fact:
+      RECORD_ID: '{{ domain_record_info.json.records[0].id }}'
+
+  # PUT /v1.0/{account}/domains/{domainId}/records
+  # Accept: application/json
+  # X-Auth-Token: ea85e6ac-baff-4a6c-bf43-848020ea3812
+  # Content-Type: application/json
+  # Content-Length: 75
+  # {
+  #   "name" : "example.com",
+  #   "data" : "mail.example.com",
+  #   "ttl" : 3600
+  # }
+  - name: Update domain records
+    ansible.builtin.uri:
+      url: '{{ RACKSPACE_DNS_API }}/{{ DOMAIN_ID }}/records/{{ RECORD_ID }}'
+      body: '{{ item }}'
+
+      method: PUT
+      status_code: 202
+    register: record_async_call
+
+  - name: Wait for asynchronous operation to complete
+    ansible.builtin.uri:
+      url: '{{ record_async_call.json.callbackUrl }}'
+      method: GET
+      status_code: [200,202]
+    register: record_async_call
+    until: record_async_call.json.status in ["COMPLETED","ERROR"]
+    retries: 5
+    delay: 10
+    failed_when: record_async_call.json.status == "ERROR"
+
+- when: domain_record_info.json.records | length == 0
+  block:
+  # POST /v1.0/{account}/domains/{domainId}/records
+  # Accept: application/json
+  # X-Auth-Token: ea85e6ac-baff-4a6c-bf43-848020ea3812
+  # Content-Type: application/json
+  # Content-Length: 725
+  # {
+  #   "records" : [ {
+  #     "name" : "ftp.example.com",
+  #     "type" : "A",
+  #     "data" : "192.0.2.8",
+  #     "ttl" : 5771
+  #   },... ]
+  # }
+  - name: Create domain records
+    ansible.builtin.uri:
+      url: '{{ RACKSPACE_DNS_API }}/{{ DOMAIN_ID }}/records'
+      body:
+        records:
+          - '{{ item }}'
+      method: POST
+      status_code: 202
+    register: record_async_call
+
+  - name: Wait for asynchronous operation to complete
+    ansible.builtin.uri:
+      url: '{{ record_async_call.json.callbackUrl }}'
+      method: GET
+      status_code: [200,202]
+    register: record_async_call
+    until: record_async_call.json.status in ["COMPLETED","ERROR"]
+    retries: 5
+    delay: 10
+    failed_when: record_async_call.json.status == "ERROR"

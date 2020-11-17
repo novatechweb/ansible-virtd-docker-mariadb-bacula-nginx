@@ -1,0 +1,4 @@
+---
+
+ansible_ssh_port: 29322
+ansible_user: deploy

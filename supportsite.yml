@@ -1,0 +1,17 @@
+---
+
+- name: Setup supportsite
+  gather_facts: yes
+  hosts: supportsite
+  module_defaults:
+    ansible.builtin.uri:
+      body_format: json
+      headers:
+        X-Auth-Token: '{{ RACKSPACE_AUTH_TOKEN }}'
+        X-Auth-Project-Id: '{{ rackspace_tenant }}'
+      return_content: yes
+  tasks:
+  - import_role:
+      name: rackspace.cloud-dns
+    vars:
+      rackspace_clouddns_domains: '{{ supportsite_domains }}'

@@ -1,0 +1,10 @@
+---
+# tasks file for rackspace.cloud-dns
+
+- name: Authenticate
+  import_tasks: authenticate.yml
+
+- name: Create domains
+  include_tasks: domain.yml
+
+  loop: '{{ rackspace_clouddns_domains }}'

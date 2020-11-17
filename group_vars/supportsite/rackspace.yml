@@ -1,0 +1,5 @@
+---
+
+rackspace_username: '{{ lookup("file", playbook_dir + "/credentials/supportsite/rackspace_username" ) }}'
+rackspace_apikey: '{{ lookup("file", playbook_dir + "/credentials/supportsite/rackspace_apikey" ) }}'
+rackspace_tenant: '{{ lookup("file", playbook_dir + "/credentials/supportsite/rackspace_tenant" ) }}'

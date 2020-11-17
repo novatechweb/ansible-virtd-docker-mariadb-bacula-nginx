@@ -1,0 +1,10 @@
+---
+# defaults file for rackspace.cloud-dns
+
+rackspace_username: user
+rackspace_password:
+rackspace_apikey:
+rackspace_tenant:
+
+rackspace_clouddns_domains:
+RACKSPACE_AUTH_TOKEN:

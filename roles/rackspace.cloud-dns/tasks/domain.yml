@@ -1,0 +1,110 @@
+---
+
+# REQUEST GET /v1.0/{account}/domains?name={domainname}
+# RESPONSE
+# code: 200
+# # Domain not found
+# {
+#     "domains": [],
+#     "totalEntries": 0
+# },
+# # Domain found
+# {
+#     "domains": [
+#         {
+#             "accountId": 731664,
+#             "created": "2012-08-10T17:31:41.000+0000",
+#             "emailAddress": "ipadmin@stabletransit.com",
+#             "id": 3364739,
+#             "name": "novatech-llc.com",
+#             "ttl": 300,
+#             "updated": "2020-10-23T12:44:08.000+0000"
+#         }
+#     ],
+#     "totalEntries": 1
+# },
+- name: Find domain if it exists
+  ansible.builtin.uri:
+    url: '{{ RACKSPACE_DNS_API }}?name={{ item.name }}'
+    method: GET
+    status_code: 200
+  register: domain_info
+
+- when: domain_info.json.totalEntries > 0
+  block:
+  - set_fact:
+      DOMAIN_ID: '{{ domain_info.json.domains[0].id }}'
+
+  # REQUEST PUT /v1.0/{account}/domains/{domainId}
+  # {
+  #   "comment" : "Optional domain comment...",
+  #   "ttl" : 3600,
+  #   "emailAddress" : "sample@rackspace.com"
+  # }
+  # RESPONSE
+  # code: 202
+  - name: Update domain if exists
+    ansible.builtin.uri:
+      url: '{{ RACKSPACE_DNS_API }}/{{ DOMAIN_ID }}'
+      body: '{{ item.attributes }}'
+      method: PUT
+      status_code: 202
+    register: domain_async_call
+
+  - name: Wait for asynchronous operation to complete
+    ansible.builtin.uri:
+      url: '{{ domain_async_call.json.callbackUrl }}'
+      method: GET
+      status_code: [200,202]
+    register: domain_async_call
+    until: domain_async_call.json.status in ["COMPLETED","ERROR"]
+    retries: 5
+    delay: 10
+    failed_when: domain_async_call.json.status == "ERROR"
+
+- when: domain_info.json.totalEntries == 0
+  block:
+  # REQUEST POST /v1.0/{account}/domains
+  # {
+  #   "domains" : [ {
+  #     "name" : "your_domain_name",
+  #     "comment" : "Optional domain comment...",
+  #     "ttl" : 3600,
+  #     "emailAddress" : "sample@rackspace.com"
+  #   } ]
+  # }
+  # RESPONSE
+  # code: 202
+  # {
+  # "callbackUrl": "https://dns.api.rackspacecloud.com/v1.0/1234/status/ec180c96-5488-4b29-8d25-ce3e2985afd4",
+  #   "jobId": "ec180c96-5488-4b29-8d25-ce3e2985afd4",
+  #   "request": "{\n    \"domains\" : [ {\n        \"name\" : \"example.com\",   \n        \"comment\" : \"Optional domain comment...\",   \n        \"subdomains\" : {\n            \"domains\" : [ {\n                \"name\" : \"sub1.example.com\",\n                \"comment\" : \"1st sample subdomain\",\n                \"emailAddress\" : \"sample@rackspace.com\"\n            }, {\n                \"name\" : \"sub2.example.com\",\n                \"comment\" : \"1st sample subdomain\",\n                \"emailAddress\" : \"sample@rackspace.com\"\n\n            } ]\n        },\n        \"ttl\" : 3600,\n        \"emailAddress\" : \"sample@rackspace.com\"\n} ]\n}",
+  #   "requestUrl": "http://dns.api.rackspacecloud.com/v1.0/1234/domains",
+  #   "status": "RUNNING",
+  #   "verb": "POST"
+  # }
+  - name: Create domain if not exist
+    ansible.builtin.uri:
+      url: '{{ RACKSPACE_DNS_API }}'
+      body:
+        domains:
+        - '{{ item.attributes | combine({"name": item.name}) }}'
+      method: POST
+      status_code: 202
+    when: domain_info.json.totalEntries == 0
+    register: domain_async_call
+
+  - name: Wait for asynchronous operation to complete
+    ansible.builtin.uri:
+      url: '{{ domain_async_call.json.callbackUrl }}'
+      method: GET
+      status_code: [200,202]
+    register: domain_async_call
+    until: domain_async_call.json.status in ["COMPLETED","ERROR"]
+    retries: 5
+    delay: 10
+    failed_when: domain_async_call.json.status == "ERROR"
+
+- name: Create or update domain records
+  include_tasks: domain_record.yml
+  loop: '{{ item.records }}'

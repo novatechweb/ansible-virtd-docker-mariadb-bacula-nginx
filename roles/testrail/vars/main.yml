@@ -1,0 +1,17 @@
+---
+# vars file for testrail
+
+testrail_auth_plugin_path: /var/www/testrail/custom/auth/auth.php
+
+testrail_install_path: /var/www/testrail
+testrail_etc_path: /var/www/testrail/config/
+testrail_storage_path: /opt/testrail
+
+testrail_uid: '33'
+testrail_gid: '33'
+
+testrail_db_etc_path: /etc/mysql/conf.d
+testrail_db_storage_path: /var/lib/mysql
+
+testrail_db_uid: '0'
+testrail_db_gid: '0'

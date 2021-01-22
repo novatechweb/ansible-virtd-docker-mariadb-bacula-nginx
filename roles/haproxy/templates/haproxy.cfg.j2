@@ -55,6 +55,9 @@ frontend container_https_in
     acl is_prometheus   hdr_dom(host) -i {{ prometheus_hostname }}
     use_backend backend-prometheus if is_prometheus
 
+    acl is_testrail     hdr_dom(host) -i {{ testrail_hostname }}
+    use_backend backend-testrail if is_testrail
+
 # frontend container_ldap_in
 #     mode tcp
 #     bind *:389
@@ -112,3 +115,7 @@ backend backend-nexus
 backend backend-prometheus
     option httpchk /
     server prometheus1 {{ prometheus_container }}.{{docker_network_frontend }}:9090 check inter 30s
+
+backend backend-testrail
+    option httpchk /
+    server testrail1 {{ testrail_container }}.{{docker_network_frontend }}:80 check inter 30s

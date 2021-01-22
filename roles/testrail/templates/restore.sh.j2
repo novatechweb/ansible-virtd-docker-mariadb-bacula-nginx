@@ -1,0 +1,18 @@
+#!/bin/sh
+set -exo pipefail
+
+# *****************************************************************************
+# Backup TestRail container
+docker exec {{ testrail_container }} rm -rf '{{ testrail_storage_path }}/*'
+gzip --decompress --stdout '{{ testrail_restore_dir }}/{{ testrail_backup_storage_file }}' \
+    | docker cp --archive - {{ testrail_container }}:{{ testrail_storage_path }}/
+
+# *****************************************************************************
+# Restore TestRail database container
+gzip --decompress --stdout '{{ testrail_restore_dir }}/{{ testrail_backup_db_file }}' \
+    | docker exec -i {{ testrail_db_container }} \
+        mysql \
+            --user="root" \
+            --password="{{ testrail_db_root_password }}" \
+            -u root -p"{{ testrail_db_root_password }}" \
+            {{ testrail_db_database }} \

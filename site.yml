@@ -113,6 +113,10 @@
     role: easyrsa
     tags:
     - easyrsa_container
+  - name: Build and start the Testrail Docker container
+    role: testrail
+    tags:
+      - testrail_container
 
 - name: Setup LDAP users
   import_playbook: ldap_entries.yml

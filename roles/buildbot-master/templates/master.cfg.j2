@@ -211,11 +211,22 @@ c['builders'].append(
     util.BuilderConfig(
         name='master-reconfigure',
         workernames=['master-worker'],
-        factory=util.BuildFactory([steps.ShellCommand(name="Reconfigure",command=["buildbot reconfigure"],)])
+        factory=util.BuildFactory([steps.MasterShellCommand(
+            name="Reconfigure",
+            command=["/usr/bin/buildbot","reconfig","--quiet"],
+            workdir="{{ buildbot_data_path }}",
+        )])
     ))
 
 c['schedulers'].append(
     schedulers.ForceScheduler(
         name='master-reconfigure',
-        builderNames=['master-reconfigure']
+        builderNames=['master-reconfigure'],
     ))
+
+c['schedulers'].append(
+    schedulers.Triggerable(
+        name='trigger-reconfigure',
+        builderNames=['master-reconfigure'],
+    )
+)

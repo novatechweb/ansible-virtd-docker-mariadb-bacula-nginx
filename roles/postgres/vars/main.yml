@@ -1,0 +1,26 @@
+---
+# vars file for postgres
+
+# mount path of the data volume
+postgres_data_path: '/var/lib/postgresql'
+
+# mount path for configuration files
+postgres_etc_path: '/etc/postgresql'
+
+# mount path for init scripts
+postgres_init_path: '/docker-entrypoint-initdb.d/'
+
+# mount path for secrets
+postgres_secrets_path: '/secrets'
+
+# numeric ID of postgres user
+postgres_uid: '999'
+
+# numeric ID of postgres group
+postgres_gid: '999'
+
+postgres_secret_superuser_file: 'superuser'
+postgres_secret_superuser_password_file: 'superuser-pw'
+postgres_secret_user_file: 'user'
+postgres_secret_user_password_file: 'user-pw'
+postgres_secret_database_file: 'database'

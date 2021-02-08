@@ -1,0 +1,51 @@
+---
+# *****************************************************************************
+# Setup the directory where the backup and restore is to take place
+
+- name: backup dir
+  file:
+    state: directory
+    path: '{{ testrail_backup_dir }}'
+    owner: root
+    group: tape
+    mode: 'u=rwx,g=rwx,o=rx'
+    recurse: no
+    setype: svirt_sandbox_file_t
+
+- name: restore dir
+  file:
+    state: directory
+    path: '{{ testrail_restore_dir }}'
+    owner: root
+    group: tape
+    mode: 'u=rwx,g=rwx,o=rx'
+    recurse: no
+    setype: svirt_sandbox_file_t
+
+# *****************************************************************************
+# Get data from tape
+
+# - name: data from tape
+#   bacula:
+#     command: restore
+#     storage: '{{ bacula_storage }}'
+#     fileset: '{{ bacula_fileset }}'
+#     dest: '{{ bacula_dest }}'
+#     path_to_restore: '{{ testrail_backup_dir }}'
+
+# *****************************************************************************
+# restore the mantisbt
+
+- name: restore script
+  command: '{{ testrail_restore_script }}'
+
+# *****************************************************************************
+# cleanup
+
+# - name: Remove - Static and SQL
+#   file:
+#     path: '{{ testrail_restore_dir }}'
+#     state: absent
+
+- name: State file
+  shell: 'date --rfc-3339=seconds > {{ testrail_restore_state }}'

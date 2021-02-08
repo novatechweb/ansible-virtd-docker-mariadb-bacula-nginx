@@ -1,0 +1,26 @@
+#!/bin/sh
+set -exo pipefail
+
+# *****************************************************************************
+# Backup TestRail container
+mkdir -p -m u=rwx,g=rwx,o= {{ testrail_backup_dir }}
+docker cp --archive {{ testrail_container }}:{{ testrail_storage_path }}/. - \
+    | gzip -9 \
+    > '{{ testrail_backup_dir }}/{{ testrail_backup_storage_file }}'
+
+# *****************************************************************************
+# Backup TestRail database container
+docker exec {{ testrail_db_container }} \
+    mysqldump \
+        --host=localhost \
+        --user="root" \
+        --password="{{ testrail_db_root_password }}" \
+        --add-drop-table \
+        --flush-privileges \
+        --hex-blob \
+        --skip-extended-insert \
+        --tz-utc \
+        --default-character-set=utf8 \
+        {{ testrail_db_database }} \
+    | gzip -9 \
+    > '{{ testrail_backup_dir }}/{{ testrail_backup_db_file }}'

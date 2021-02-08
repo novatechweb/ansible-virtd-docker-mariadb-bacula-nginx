@@ -1,0 +1,45 @@
+---
+# tasks file for testrail
+
+- name: Ensure testrail configuration directories exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ testrail_uid }}"
+    group: "{{ testrail_gid }}"
+  with_items:
+    - "{{ testrail_etc_volume }}"
+
+- name: Populate testrail configuration templates
+  template:
+    dest: "{{ testrail_etc_volume }}/{{ item }}"
+    src: "{{ item }}.j2"
+    owner: "{{ testrail_uid }}"
+    group: "{{ testrail_gid }}"
+  with_items:
+    - config.php
+
+- name: Populate auth plugin
+  template:
+    dest: '{{ testrail_auth.path }}'
+    src: '{{ testrail_auth.plugin }}-auth.php.j2'
+    owner: "{{ testrail_uid }}"
+    group: "{{ testrail_gid }}"
+  when: testrail_path.plugin is not none()
+
+- name: Start testrail container
+  docker_container:
+    comparisons: {'*': strict}
+    detach: true
+    env: '{{ testrail_env }}'
+    hostname: '{{ testrail_hostname }}'
+    image: '{{ testrail_image }}'
+    name: '{{ testrail_container }}'
+    networks: '{{ testrail_networks }}'
+    networks_cli_compatible: yes
+    ports: '{{ testrail_port_args }}'
+    pull: yes
+    purge_networks: yes
+    restart_policy: '{{ testrail_restart_policy }}'
+    state: started
+    volumes: '{{ testrail_volumes }}'

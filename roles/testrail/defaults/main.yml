@@ -1,0 +1,109 @@
+---
+# defaults file for testrail
+
+testrail_version: latest
+
+# Authentication plugin configuration
+testrail_auth:
+  plugin: None # None, ldap, active-directory
+  path: '{{ testrail_etc_volume }}/auth.php'
+  # ldap plugin settings
+  ldap:
+    host:  'ldap://ldap.example.com'
+    port: 389
+    bind_dn: ''
+    bind_password: ''
+    dn: 'OU=people,DC=example,DC=com'
+    filter: '(uid=%name%)'
+    fallback: true
+    create_account: false
+    name_attribute: 'displayname'
+    mail_attribute:  'mail'
+  # active-directory plugin settings
+  active-directory:
+    host: 'ad1.directory.example.com'
+    port: 389
+    dn: 'CN=Users,DC=directory,DC=example,DC=com'
+    domain: 'directory'
+    create_account: false
+    fallback: true
+    membership: ''
+
+# directory of backup data
+testrail_backup_bindir: /usr/local/bin
+testrail_backup_script: '{{ testrail_backup_bindir }}/testrail-backup.sh'
+testrail_backup_dir: /tmp/testrail
+testrail_backup_storage_file: testrail.tar.gz
+testrail_backup_db_file: testrail.sql.gz
+
+# directory of restore data
+testrail_restore_dir: /tmp/testrail
+testrail_restore_state: '{{ testrail_etc_volume }}/restore.date.txt'
+testrail_restore_script: '{{ testrail_backup_bindir }}/testrail-restore.sh'
+
+# name of the container
+testrail_container: 'testrail'
+
+# environment passed to the container
+testrail_env: {}
+
+# hostname a container uses for itself
+testrail_hostname: "testrail.local"
+
+testrail_image: "testrail/apache:{{ testrail_version }}"
+
+testrail_networks:
+- name: bridge
+- name: testrail
+
+testrail_port_args: []
+
+testrail_restart_policy: "unless-stopped"
+
+testrail_etc_volume: /etc/testrail
+testrail_storage_volume: testrail-data
+
+testrail_volumes:
+  - '{{ testrail_etc_volume }}:{{ testrail_etc_path }}'
+  - '{{ testrail_storage_volume }}:{{ testrail_storage_path }}'
+  - '{{ testrail_auth.path }}:{{ testrail_auth_plugin_path }}'
+
+testrail_volumes_extra: []
+
+# defaults for testrail database
+testrail_db_version: 5.7
+
+# name of the container
+testrail_db_container: 'testrail_db'
+
+# environment passed to the container
+testrail_db_env:
+  MYSQL_USER: "{{ testrail_db_user }}"
+  MYSQL_PASSWORD: "{{ testrail_db_user_password }}"
+  MYSQL_DATABASE: "{{ testrail_db_database }}"
+  MYSQL_ROOT_PASSWORD: "{{ testrail_db_root_password }}"
+  MYSQL_ALLOW_EMPTY_PASSWORD: 'false'
+
+testrail_db_user: 'testrail'
+testrail_db_user_password: None
+testrail_db_database: 'testrail'
+testrail_db_root_password: None
+
+# hostname a container uses for itself
+testrail_db_hostname: "testrail_db.local"
+
+testrail_db_image: "mysql:{{ testrail_db_version }}"
+
+testrail_db_networks:
+- name: testrail
+
+testrail_db_port_args: []
+
+testrail_db_restart_policy: "unless-stopped"
+
+testrail_db_etc_volume: /etc/testrail_db
+testrail_db_storage_volume: testrail_db
+
+testrail_db_volumes:
+  - '{{ testrail_db_etc_volume }}:{{ testrail_db_etc_path }}'
+  - '{{ testrail_db_storage_volume }}:{{ testrail_db_storage_path }}'

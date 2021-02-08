@@ -1,0 +1,38 @@
+---
+# tasks file for testrail database
+
+- name: Ensure testrail configuration directories exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ testrail_db_uid }}"
+    group: "{{ testrail_db_gid }}"
+  with_items:
+    - "{{ testrail_db_etc_volume }}"
+
+- name: Ensure testrail database storage volume exists
+  docker_volume:
+    name: '{{ testrail_db_storage_volume }}'
+
+- name: Ensure testrail database networks exist
+  docker_network:
+    name: '{{ item.name }}'
+    state: present
+  loop: '{{ testrail_db_networks }}'
+
+- name: Start testrail database container
+  docker_container:
+    comparisons: {'*': strict}
+    detach: true
+    env: '{{ testrail_db_env }}'
+    hostname: '{{ testrail_db_hostname }}'
+    image: '{{ testrail_db_image }}'
+    name: '{{ testrail_db_container }}'
+    networks: '{{ testrail_db_networks }}'
+    networks_cli_compatible: yes
+    ports: '{{ testrail_db_port_args }}'
+    pull: yes
+    purge_networks: yes
+    restart_policy: '{{ testrail_db_restart_policy }}'
+    state: started
+    volumes: '{{ testrail_db_volumes }}'

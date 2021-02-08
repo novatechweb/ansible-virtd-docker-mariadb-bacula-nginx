@@ -1,0 +1,67 @@
+---
+# defaults file for testrail
+
+testrail_version: 6.7.1
+
+# Authentication plugin configuration
+testrail_auth:
+  plugin: ldap # None, ldap, active-directory
+  path: '{{ testrail_etc_volume }}/auth.php'
+  # ldap plugin settings
+  ldap:
+    host:  'ldap://{{ openldap_hostname }}'
+    port: 389
+    bind_dn: 'cn=proxyagent,dc=novatech'
+    bind_password: '{{ openldap_proxyagent_password }}'
+    dn: 'OU=user,dc=novatech'
+    filter: '(&(uid=%name%)(objectClass=posixAccount))'
+    fallback: true
+    create_account: false
+    name_attribute: 'displayname'
+    mail_attribute:  'mail'
+
+# directory of backup data
+testrail_backup_bindir: /usr/libexec/bacula/backup-scripts
+testrail_backup_script: '{{ testrail_backup_bindir }}/55.before_backup.testrail'
+testrail_backup_dir: '{{ docker_backup_dir }}/testrail'
+testrail_restore_dir: '{{ bacula_dest }}{{ testrail_backup_dir }}'
+testrail_restore_script: '{{ testrail_backup_bindir }}/55.before_restore.testrail'
+
+# name of the container
+testrail_container: '{{ docker_name_prefix }}testrail'
+
+# hostname a container uses for itself
+testrail_hostname: "{{ docker_name_prefix }}testrail.novatech-llc.com"
+
+testrail_networks:
+  - name: '{{ docker_network_frontend }}'
+    aliases:
+    - '{{ testrail_hostname }}'
+  - name: '{{ docker_name_prefix }}testrail'
+
+testrail_restart_policy: "{{ docker_restart_policy }}"
+
+testrail_etc_volume: "{{ docker_restore_config_base_dir }}/testrail"
+testrail_storage_volume: "{{ docker_name_prefix }}testrail-data"
+
+testrail_volumes_extra:
+
+
+# defaults for testrail database
+
+# name of the container
+testrail_db_container: '{{ docker_name_prefix }}testrail_db'
+
+testrail_db_user_password: '{{ lookup("password", playbook_dir + "/credentials/testrail_db/user_password length=20") }}'
+testrail_db_root_password: '{{ lookup("password", playbook_dir + "/credentials/testrail_db/root_password length=20") }}'
+
+# hostname a container uses for itself
+testrail_db_hostname: "{{ docker_name_prefix }}testrail_db.local"
+
+testrail_db_networks:
+- name: '{{ docker_name_prefix }}testrail'
+
+testrail_db_restart_policy: "{{ docker_restart_policy }}"
+
+testrail_db_etc_volume: "{{ docker_restore_config_base_dir }}/testrail_db"
+testrail_db_storage_volume: "{{ docker_name_prefix }}testrail_db-data"

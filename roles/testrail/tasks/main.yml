@@ -1,0 +1,47 @@
+---
+# tasks file for testrail
+
+- name: Database
+  import_tasks: database.yml
+
+- name: Server
+  include_tasks: server.yml
+
+- name: Create backup bindir
+  file:
+    path: '{{ testrail_backup_bindir }}'
+    owner: root
+    group: root
+    state: directory
+
+- name: Create backup and restore scripts
+  template:
+    dest: '{{ item.dest }}'
+    src: '{{ item.src }}'
+    owner: root
+    group: root
+    mode: 'u=rwx,g=rwx,o='
+  loop:
+    - src: backup.sh.j2
+      dest: '{{ testrail_backup_script }}'
+    - src: restore.sh.j2
+      dest: '{{ testrail_restore_script }}'
+
+# *****************************************************************************
+# restore?
+
+- name: exists - state file
+  stat:
+    path: '{{ testrail_restore_state }}'
+    get_checksum: False
+    get_md5: False
+  register: st_testrail_restore_state
+
+- include_tasks: restore.yml
+  when: st_testrail_restore_state.stat.exists == False
+
+# *****************************************************************************
+# Upgrade TestRail database
+- name: Upgrade testrail database
+  command: |
+    docker exec {{ testrail_container }} php {{ testrail_install_path }}/run.php update

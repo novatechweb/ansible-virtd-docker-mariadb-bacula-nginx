@@ -1,0 +1,58 @@
+---
+# *****************************************************************************
+# Setup the directory where the backup and restore is to take place
+
+- name: backup dir
+  file:
+    state: directory
+    path: '{{ postgres_backup_dir }}'
+    owner: root
+    group: tape
+    mode: 'u=rwx,g=rwx,o=rx'
+    recurse: no
+    setype: svirt_sandbox_file_t
+
+- name: restore dir
+  file:
+    state: directory
+    path: '{{ postgres_restore_dir }}'
+    owner: root
+    group: tape
+    mode: 'u=rwx,g=rwx,o=rx'
+    recurse: no
+    setype: svirt_sandbox_file_t
+
+# *****************************************************************************
+# Get data from tape
+- name: exists - exim4 archive
+  stat:
+    path: '{{ postgres_restore_dir }}/{{ postgres_backup_db_file }}'
+    get_checksum: False
+    get_md5: False
+  register: st_postgres_backup_db_file
+
+- name: data from tape
+  bacula:
+    command: restore
+    storage: '{{ bacula_storage }}'
+    fileset: '{{ bacula_fileset }}'
+    dest: '{{ bacula_dest }}'
+    path_to_restore: '{{ postgres_backup_dir }}'
+  when: st_postgres_backup_db_file.stat.exists == False
+
+# *****************************************************************************
+# restore the database
+
+- name: restore script
+  command: '{{ postgres_restore_script }}'
+
+# *****************************************************************************
+# cleanup
+
+# - name: Remove - Static and SQL
+#   file:
+#     path: '{{ postgres_restore_dir }}'
+#     state: absent
+
+- name: State file
+  shell: 'date --rfc-3339=seconds > {{ postgres_restore_state }}'

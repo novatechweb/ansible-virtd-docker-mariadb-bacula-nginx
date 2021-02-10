@@ -1,6 +1,6 @@
 ---
 
-buildbot_version: 2.4.0
+buildbot_version: '2.10.1'
 
 asset_host: 'https://nexus.novatech-llc.com/repository/download/'
 asset_pypi: 'https://nexus.novatech-llc.com/repository/pypi/'

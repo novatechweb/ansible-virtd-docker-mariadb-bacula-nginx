@@ -1,0 +1,66 @@
+---
+# tasks file for postgres
+
+- name: Create postgres data volume
+  docker_volume:
+    name: '{{ postgres_data_volume }}'
+
+- name: Create postgres config directories
+  file:
+    path: '{{ item }}'
+    state: directory
+  loop:
+    - '{{ postgres_etc_volume }}'
+    - '{{ postgres_init_volume }}'
+    - '{{ postgres_secrets_volume }}'
+
+- name: Populate init templates
+  become: yes  # to set uid/gid on files
+  template:
+    src: '{{ item }}.j2'
+    dest: '{{ postgres_init_volume }}/{{ item }}'
+    group: '{{ postgres_gid }}'
+    owner: '{{ postgres_uid }}'
+    mode: 'u=rwx,g=rwx,o=rx'
+    unsafe_writes: yes
+  register: templates
+  loop:
+    - init_users.sh
+
+- name: Populate secrets files
+  become: yes  # to set uid/gid on files
+  template:
+    src: 'secret.j2'
+    dest: '{{ postgres_secrets_volume }}/{{ item.filename }}'
+    group: '{{ postgres_uid }}'
+    owner: '{{ postgres_uid }}'
+    mode: 'u=rw,g=,o='
+    unsafe_writes: yes
+  no_log: yes
+  register: secrets
+  vars:
+    secret: '{{ item.content }}'
+  loop: '{{ postgres_secrets_list }}'
+
+- name: Create postgres networks
+  docker_network:
+    name: '{{ item.name }}'
+    state: present
+  loop: '{{ postgres_networks }}'
+
+- name: Create postgres container
+  docker_container:
+    comparisons: {'*': strict}
+    env: '{{ postgres_env }}'
+    exposed_ports: '{{ postgres_exposed_ports }}'
+    hostname: '{{ postgres_hostname }}'
+    image: '{{ postgres_image_name }}'
+    name: '{{ postgres_name }}'
+    networks: '{{ postgres_networks }}'
+    networks_cli_compatible: yes
+    ports: '{{ postgres_published_ports }}'
+    restart: '{{ secrets.changed or templates.changed }}'
+    restart_policy: '{{ postgres_restart_policy }}'
+    state: started
+    volumes: '{{ postgres_volumes }}'
+    working_dir: '{{ postgres_data_path }}'

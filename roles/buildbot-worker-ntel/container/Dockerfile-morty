@@ -35,10 +35,12 @@ RUN apt-get update \
         git \
         language-pack-en \
         libffi-dev \
+        libpython2.7-testsuite \
         libssl-dev \
         locales \
         net-tools \
         python-dev \
+        python-virtualenv \
         python3-dev \
         subversion \
         texinfo \

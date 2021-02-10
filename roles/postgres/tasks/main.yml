@@ -1,0 +1,38 @@
+---
+# tasks file for testrail
+
+- name: Server
+  include_tasks: server.yml
+
+- name: Create backup bindir
+  file:
+    path: '{{ postgres_backup_bindir }}'
+    owner: root
+    group: root
+    state: directory
+
+- name: Create backup and restore scripts
+  template:
+    dest: '{{ item.dest }}'
+    src: '{{ item.src }}'
+    owner: root
+    group: root
+    mode: 'u=rwx,g=rwx,o='
+  loop:
+    - src: backup.sh.j2
+      dest: '{{ postgres_backup_script }}'
+    - src: restore.sh.j2
+      dest: '{{ postgres_restore_script }}'
+
+# *****************************************************************************
+# restore?
+
+- name: exists - state file
+  stat:
+    path: '{{ postgres_restore_state }}'
+    get_checksum: False
+    get_md5: False
+  register: st_postgres_restore_state
+
+- include_tasks: restore.yml
+  when: st_postgres_restore_state.stat.exists == False

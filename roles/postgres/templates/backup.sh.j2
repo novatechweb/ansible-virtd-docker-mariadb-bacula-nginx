@@ -1,0 +1,47 @@
+#!/bin/sh
+set -exo pipefail
+
+# *****************************************************************************
+# Backup PostgreSQL container
+mkdir -p -m u=rwx,g=rwx,o= {{ postgres_backup_dir }}
+docker exec {{ postgres_name }} \
+    pg_dump \
+        --username="{{ postgres_secret_superuser }}" \
+        --dbname="{{ postgres_secret_database }}" \
+        --clean --if-exists\
+        --create \
+        --encoding=utf-8 \
+        --format=plain \
+        --verbose \
+        --compress=9 \
+        --quote-all-identifiers \
+    > '{{ postgres_backup_dir }}/{{ postgres_backup_db_file }}'
+
+{#
+docker exec {{ postgres_name }} \
+    pg_dump \
+        --username="{{ postgres_secret_superuser }}" \
+        --dbname="{{ postgres_secret_database }}" \
+        --clean --if-exists\
+        --create \
+        --encoding=utf-8 \
+        --format=custom \
+        --verbose \
+        --compress=9 \
+        --quote-all-identifiers \
+    > '{{ postgres_backup_dir }}/custom-{{ postgres_backup_db_file }}'
+#}
+
+{#
+docker exec {{ postgres_name }} \
+    pg_dump \
+        --username="{{ postgres_secret_superuser }}" \
+        --dbname="{{ postgres_secret_database }}" \
+        --clean --if-exists\
+        --create \
+        --encoding=utf-8 \
+        --format=tar \
+        --verbose \
+        --quote-all-identifiers \
+    > '{{ postgres_backup_dir }}/tar-{{ postgres_backup_db_file }}'
+#}

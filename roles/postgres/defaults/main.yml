@@ -1,0 +1,88 @@
+---
+# defaults file for postgres
+
+# numeric version of postgres service
+postgres_version: '13'
+
+# directory of backup data
+postgres_backup_bindir: /usr/local/bin
+postgres_backup_script: '{{ postgres_backup_bindir }}/postgres-backup.sh'
+postgres_backup_dir: /tmp/postgres
+postgres_backup_db_file: postgres.sql.gz
+
+# directory of restore data
+postgres_restore_dir: /tmp/postgres
+postgres_restore_state: '{{ postgres_etc_volume }}/restore.date.txt'
+postgres_restore_script: '{{ postgres_backup_bindir }}/postgres-restore.sh'
+
+# environment passed to the container
+postgres_env:
+  POSTGRES_USER_FILE: '{{ postgres_secrets_path }}/superuser'
+  POSTGRES_PASSWORD_FILE: '{{ postgres_secrets_path }}/superuser-pw'
+  PG_USER_FILE: '{{ postgres_secrets_path }}/user'
+  PG_USER_PASSWORD_FILE: '{{ postgres_secrets_path }}/user-pw'
+  PG_USER_DB_FILE: '{{ postgres_secrets_path }}/database'
+  PGDATA: '{{ postgres_data_path }}/data'
+
+# name of the data volume
+postgres_data_volume: '{{ postgres_name }}_DV'
+
+# host path containing configuration files
+postgres_etc_volume: '/etc/postgres'
+
+# exposed ports for postgres database
+postgres_exposed_ports:
+  - '{{ postgres_port_sql | int }}'
+
+# directory for init scripts
+postgres_init_volume: '/etc/postgres/init.d'
+
+# directory for secrets
+postgres_secrets_volume: '/etc/postgres/secrets'
+
+# hostname
+postgres_hostname: postgres.example.com
+
+# name of the image being built
+postgres_image_name: 'postgres:{{ postgres_version }}'
+
+# the name of the container being started
+postgres_name: 'postgres'
+
+# networks of the container
+postgres_networks:
+  - name: 'bridge'
+
+# exposed ports of the container
+postgres_published_ports:
+  - '{{ postgres_port_sql | int }}'
+postgres_port_sql: '5432'
+
+# how the container should restart upon errors
+postgres_restart_policy: 'no'
+
+# postgres secrets
+postgres_secrets_list:
+  - filename: '{{ postgres_secret_superuser_file }}'
+    content: '{{ postgres_secret_superuser }}'
+  - filename: '{{ postgres_secret_superuser_password_file }}'
+    content: '{{ postgres_secret_superuser_password }}'
+  - filename: '{{ postgres_secret_user_file }}'
+    content: '{{ postgres_secret_user }}'
+  - filename: '{{ postgres_secret_user_password_file }}'
+    content: '{{ postgres_secret_user_password }}'
+  - filename: '{{ postgres_secret_database_file }}'
+    content: '{{ postgres_secret_database }}'
+
+postgres_secret_superuser: 'postgres'
+postgres_secret_superuser_password: '{{ lookup("password", "/dev/null length=20 chars=ascii_letters,digits") }}'
+postgres_secret_user: 'nobody'
+postgres_secret_user_password: '{{ lookup("password", "/dev/null length=20 chars=ascii_letters,digits") }}'
+postgres_secret_database: 'nothing'
+
+# volumes mounted within the container
+postgres_volumes:
+  - '{{ postgres_data_volume }}:{{ postgres_data_path }}:z'
+  - '{{ postgres_etc_volume }}:{{ postgres_etc_path }}'
+  - '{{ postgres_init_volume }}:{{ postgres_init_path }}'
+  - '{{ postgres_secrets_volume }}:{{ postgres_secrets_path }}'

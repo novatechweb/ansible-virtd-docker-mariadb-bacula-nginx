@@ -12,7 +12,7 @@ buildbot_hostname: 'buildbot'
 buildbot_worker_port: '9989'
 
 # numeric version of buildbot service
-buildbot_worker_version: '2.4.0'
+buildbot_worker_version: '2.10.1'
 
 # port number for workers to communicate with master
 buildbot_worker_connection_string: "\

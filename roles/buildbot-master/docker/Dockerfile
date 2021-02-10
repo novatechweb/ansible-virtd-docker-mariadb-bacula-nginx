@@ -1,4 +1,4 @@
-ARG BUILDBOT_VERSION=v2.4.0
+ARG BUILDBOT_VERSION=v2.10.1
 FROM  buildbot/buildbot-master:${BUILDBOT_VERSION}
 LABEL maintainer="Andrew Cooper <andrew.cooper@novatechweb.com>"
 

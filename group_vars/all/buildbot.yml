@@ -1,6 +1,6 @@
 ---
 
-buildbot_version: '2.4.0'
+buildbot_version: '2.10.1'
 
 buildbot_hostname: '{{ docker_name_prefix }}buildbot.novatech-llc.com'
 
@@ -305,9 +305,24 @@ buildbot_tlspem: '{{ buildbot_creds }}/server.pem'
 
 buildbot_email_password: '{{ lookup("password", buildbot_creds + "/buildbot@novatech-llc.com length=20 chars=ascii_letters,digits") }}'
 
+buildbot_database_name: '{{ docker_name_prefix }}buildbot_db'
+buildbot_database_creds: '{{ playbook_dir + "/credentials/buildbot_db" }}'
+buildbot_database_dbname: 'buildbot'
+buildbot_database_hostdir_config: '{{ docker_restore_config_base_dir }}/buildbot_db'
+buildbot_database_hostname: 'buildbot_db'
+buildbot_database_networks:
+  - name: '{{ buildbot_network_backend }}'
+    aliases:
+    - '{{ buildbot_database_hostname }}'
+buildbot_database_published_ports: []
+buildbot_database_superuser: 'postgres'
+buildbot_database_superuser_password: '{{ lookup("password", buildbot_database_creds + "/superuser-pw length=20 chars=ascii_letters,digits") }}'
+buildbot_database_user: 'buildbot'
+buildbot_database_user_password: '{{ lookup("password", buildbot_database_creds + "/user-pw length=20 chars=ascii_letters,digits") }}'
+
 # environment passed to the container
 buildbot_env:
-  BUILDBOT_DATABASE: 'sqlite:///{{ buildbot_data_path }}/state.sqlite'
+  BUILDBOT_DATABASE: 'postgresql://{{ buildbot_database_user }}:{{ buildbot_database_user_password }}@{{ buildbot_database_hostname }}/{{ buildbot_database_dbname }}'
   BUILDBOT_SMTP_HOST: '{{ exim4_hostname }}'
   BUILDBOT_SMTP_PORT: '587'
   BUILDBOT_SMTP_USER: 'buildbot'
@@ -360,7 +375,10 @@ buildbot_networks:
   - name: '{{ docker_network_frontend }}'
     aliases:
     - '{{ buildbot_hostname }}'
-
+  - name: '{{ buildbot_network_backend }}'
+    aliases:
+    - '{{ buildbot_hostname }}'
+buildbot_network_backend: '{{ docker_name_prefix }}buildbot-backend'
 buildbot_hostdir_config: '{{ docker_restore_config_base_dir }}/buildbot'
 buildbot_hostdir_config_ssl: '{{ buildbot_hostdir_config }}/ssl'
 
@@ -378,9 +396,8 @@ buildbot_worker_configs:
     giturl: 'git@{{ gitlab_hostname }}:Orion-ptxdist/workspace-ptxdist2'
     branch: 'master'
 
-buildbot_worker_network: '{{ docker_name_prefix }}workers'
 buildbot_worker_networks:
-  - name: '{{ buildbot_worker_network }}'
+  - name: '{{ buildbot_network_backend }}'
     aliases:
       - '{{ buildbot_worker_hostname }}'
 

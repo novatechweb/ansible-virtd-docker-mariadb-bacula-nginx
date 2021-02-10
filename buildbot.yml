@@ -84,6 +84,30 @@
         - buildbot-gitlab
         - buildbot-gitlab-hook
 
+    - name: Build and start the Buildbot master database container
+      include_role:
+        name: postgres
+      vars:
+        postgres_name: '{{ buildbot_database_name }}'
+        postgres_backup_bindir: /usr/libexec/bacula/backup-scripts
+        postgres_backup_script: '{{ postgres_backup_bindir }}/55.before_backup.{{ buildbot_database_name }}'
+        postgres_restore_script: '{{ postgres_backup_bindir }}/55.before_restore.{{ buildbot_database_name }}'
+        postgres_backup_dir: '{{ docker_backup_dir }}/{{ buildbot_database_name }}'
+        postgres_restore_dir: '{{ bacula_dest }}/{{ postgres_backup_dir }}'
+        postgres_etc_volume: '{{ buildbot_database_hostdir_config }}'
+        postgres_init_volume: '{{ buildbot_database_hostdir_config }}/init.d'
+        postgres_secrets_volume: '{{ buildbot_database_hostdir_config }}/secrets'
+        postgres_hostname: '{{ buildbot_database_hostname }}'
+        postgres_networks: '{{ buildbot_database_networks }}'
+        postgres_published_ports: '{{ buildbot_database_published_ports }}'
+        postgres_secret_database: '{{ buildbot_database_dbname }}'
+        postgres_secret_superuser: '{{ buildbot_database_superuser }}'
+        postgres_secret_superuser_password: '{{ buildbot_database_superuser_password }}'
+        postgres_secret_user: '{{ buildbot_database_user }}'
+        postgres_secret_user_password: '{{ buildbot_database_user_password }}'
+      tags:
+        - buildbot-database
+
     - name: Build and start the Buildbot master container
       import_role:
         name: buildbot-master

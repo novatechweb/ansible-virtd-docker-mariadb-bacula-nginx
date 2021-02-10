@@ -153,6 +153,8 @@ FileSet {
 #    disk storage during initial testing.
 #
     File = /tmp/docker
+    File = /var/lib/docker/volumes/nexus-data/_data/blobs
+    File = /var/lib/docker/volumes/nexus-backup/_data/db
   }
 
 #
@@ -160,7 +162,8 @@ FileSet {
 #   files can be useful
 #
   Exclude {
-    File = /tmp/docker/NEXUS3/blobs/archive
+    File = /var/lib/docker/volumes/nexus-data/_data/blobs/archive
+    File = /var/lib/docker/volumes/nexus-data/_data/blobs/default
     File = /var/spool/bacula
     File = /tmp
     File = /proc

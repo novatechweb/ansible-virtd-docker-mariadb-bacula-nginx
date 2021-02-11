@@ -17,6 +17,7 @@ ARG BUILDBOT_UID=1000
 ARG BUILDBOT_VERSION
 ARG PTK_HSM_HOST="127.0.0.1"
 ARG PTK_URI="http://127.0.0.1/610-009981-023_SW_PTK_5.9_Client_RevA.tar"
+ARG PIP_VERSION="pip~=20.0"
 
 # Install security updates and required packages
 RUN apt-get update \
@@ -45,6 +46,7 @@ RUN apt-get update \
         python-virtualenv \
         python3-dev \
         python3-pexpect \
+        python3-setuptools \
         socat \
         subversion \
         texinfo \
@@ -71,8 +73,7 @@ RUN curl https://github.com/Yelp/dumb-init/releases/download/v1.2.1/dumb-init_1.
 &&  dpkg -i /tmp/init.deb \
 
 # ubuntu pip version has issues so we should use the official version
-&&  curl https://bootstrap.pypa.io/get-pip.py -Lo /tmp/get-pip.py \
-&&  python3 /tmp/get-pip.py --no-cache-dir \
+&&  easy_install3 ${PIP_VERSION} \
 
 # Install required python packages, and twisted
 &&  python3 -m pip --no-cache-dir install \

@@ -87,3 +87,9 @@ gitlab_users:
   confirm: no
   group: ntel/setup-scripts
   access_level: developer
+
+- username: tester
+  name: Test Runner
+  email: tester@novatech-llc.com
+  password: "{{ gitlab_user_tester_password }}"
+  confirm: no

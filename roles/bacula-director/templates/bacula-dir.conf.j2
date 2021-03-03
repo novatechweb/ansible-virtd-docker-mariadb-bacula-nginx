@@ -43,7 +43,6 @@ Job {
   Type = Admin
   Priority = 5
   RunBeforeJob = "/usr/libexec/bacula/before_backup"
-  RunAfterJob  = "/usr/libexec/bacula/after_backup"
 }
 
 #
@@ -53,16 +52,7 @@ Job {
   Name = "BackupClient1"
   JobDefs = "DefaultJob"
   Priority = 10
-}
-
-Job {
-  Name = "BackupClient1ToFile"
-  JobDefs = "DefaultJob"
-  Schedule = "WeeklyCycleToFile"
-  Client = bacula-fd2-encrypted
-  Pool = FilePool
-  Storage = FileStorage
-  FileSet = "Full Set without Nexus"
+  RunAfterJob  = "/usr/libexec/bacula/after_backup"
 }
 
 # Backup the catalog database (after the nightly save)
@@ -78,25 +68,51 @@ Job {
   RunBeforeJob = "/usr/libexec/bacula/make_catalog_backup.pl MyCatalog"
   # This deletes the copy of the catalog
   RunAfterJob  = "/usr/libexec/bacula/delete_catalog_backup"
-  Write Bootstrap = "/var/spool/bacula/%n.bsr"
   Priority = 11                   # run after main backup
+}
+
+JobDefs {
+  Name = "DefaultFileJob"
+  Type = Backup
+  Level = Full
+  Client = bacula-fd2-encrypted
+  FileSet = "Full Set without Nexus"
+  Schedule = "WeeklyCycleToFile"
+  Storage = FileStorage
+  Messages = Standard
+  Pool = FilePool
+  Priority = 10
+  Write Bootstrap = "/var/spool/bacula/%c.bsr"
+  Enabled = no
+}
+
+Job {
+  Name = "BackupClient1ToFile"
+  JobDefs = "DefaultJob"
+  Priority = 10
+  RunAfterJob  = "/usr/libexec/bacula/after_backup_sync"
 }
 
 Job {
   Name = "BackupCatalogToFile"
-  JobDefs = "DefaultJob"
-  Client = bacula-fd2-encrypted
+  JobDefs = "DefaultFileJob"
+  Client = bacula-fd
   FileSet="Catalog"
-  Schedule = "WeeklyCycleToFile"
-  # This creates an ASCII copy of the catalog
-  # Arguments to make_catalog_backup.pl are:
-  #  make_catalog_backup.pl <catalog-name>
   RunBeforeJob = "/usr/libexec/bacula/make_catalog_backup.pl MyCatalog"
-  # This deletes the copy of the catalog
-  RunAfterJob  = "/usr/libexec/bacula/delete_catalog_backup"
-  Priority = 11                   # run after main backup
-  Pool = FilePool
+  RunAfterJob  = "/usr/libexec/bacula/after_backup_sync"
+  Priority = 15                   # run after main backup
+}
+
+Job {
+  Name = "AdminInfo"
+  Client = bacula-fd
+  FileSet="Catalog"
+  RunBeforeJob = "ls -al --color=always /etc/bacula"
+  Messages = "Standard"
   Storage = FileStorage
+  Pool = FilePool
+  Type = Admin
+  Level = Full
 }
 
 #
@@ -174,16 +190,20 @@ FileSet {
 #  and incremental backups other days
 Schedule {
   Name = "WeeklyCycle"
-  Run = Level=Full Pool=Monthly 1st fri at 23:05
-  Run = Level=Full Pool=Weekly 2nd-5th fri at 23:05
+  #Run = Level=Full Pool=Monthly 1st fri at 23:05
+  Run = Level=Full Pool=Default 1st fri at 23:05
+  #Run = Level=Full Pool=Weekly 2nd-5th fri at 23:05
+  Run = Level=Full Pool=Default 2nd-5th fri at 23:05
   Run = Level=Full Pool=Default mon-thu at 23:05
 }
 
 # This schedule does the catalog. It starts after the WeeklyCycle
 Schedule {
   Name = "WeeklyCycleAfterBackup"
-  Run = Level=Full Pool=Monthly 1st fri at 23:10
-  Run = Level=Full Pool=Weekly 2nd-5th fri at 23:10
+  #Run = Level=Full Pool=Monthly 1st fri at 23:10
+  Run = Level=Full Pool=Default 1st fri at 23:10
+  #Run = Level=Full Pool=Weekly 2nd-5th fri at 23:10
+  Run = Level=Full Pool=Default 2nd-5th fri at 23:10
   Run = Level=Full Pool=Default mon-thu at 23:10
 }
 
@@ -216,9 +236,7 @@ Client {
 }
 
 
-# Second Client (File Services) to backup
-#  You should change Name, Address, and Password before using
-
+# Client (File Services) to backup
 Client {
   Name = bacula-fd2-encrypted
   Address = {{ bacula_encrypted_address }}
@@ -311,6 +329,7 @@ Pool {
   Volume Retention = 30 days          # 30 calendar days of Mon-Thu backups
   #Use Volume Once = yes
   Maximum Volume Jobs = 2
+  Recycle Current Volume = yes
 }
 
 # Default pool definition
@@ -322,6 +341,7 @@ Pool {
   Volume Retention = 6w               # 6 calendar weeks of Fri backups
   #Use Volume Once = yes
   Maximum Volume Jobs = 2
+  Recycle Current Volume = yes
 }
 
 # Default pool definition
@@ -333,6 +353,7 @@ Pool {
   Volume Retention = 6m               # 6 calendar months of 1st Fri backups
   #Use Volume Once = yes
   Maximum Volume Jobs = 2
+  Recycle Current Volume = yes
 }
 
 # Scratch pool definition
@@ -344,13 +365,14 @@ Pool {
 Pool {
   Name = FilePool
   Pool Type = Backup
-  Maximum Volume Jobs = 1
-  LabelFormat="${JobName}"
+  Maximum Volume Jobs = 2
+  Maximum Volumes = 31
+  LabelFormat = "FilePool-${Day:p/2/0/r}"
   Volume Retention = 30d
-  Recycle = no
+  Recycle = yes
+  Recycle Oldest Volume = yes
   Action On Purge = Truncate
 }
-
 #
 # Restricted console used by tray-monitor to get the status of the director
 #

@@ -17,7 +17,7 @@
   set_fact:
     nexus_version_running: >-
       {{
-        nexus_container['container']['Config']['Labels']['release']
+        nexus_container['container']['Config']['Labels']['release'] | default('0')
       }}
   when:
     - nexus_container.exists | default(false)
